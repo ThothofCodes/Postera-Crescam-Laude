@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
-const COND_COLORS = { NEW:'#00ff88', GOOD:'#00d4ff', FAIR:'#ffd700', DAMAGED:'#ff8800', SCRAPPED:'#ff3366' };
+const COND_COLORS = { NEW:'#00ff88', GOOD:'#EE6100', FAIR:'#ffd700', DAMAGED:'#ff8800', SCRAPPED:'#ff3366' };
 const MOVE_TYPES = ['RESTOCK','SALE','JOB_USAGE','DAMAGE_LOSS','RETURN','TRANSFER','ADJUSTMENT'];
 
 const Tag = ({ label, color }) => (
@@ -12,14 +12,14 @@ const Tag = ({ label, color }) => (
 );
 
 const Input = ({ label, ...props }) => (
-  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#7a9ab0' }}>
+  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#A9C4BE' }}>
     {label}
-    <input {...props} style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050',
-      borderRadius:5, color:'#e0f0ff', fontSize:13, outline:'none' }} />
+    <input {...props} style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+      borderRadius:5, color:'#F4F1EA', fontSize:13, outline:'none' }} />
   </label>
 );
 
-export default function InventoryPage({ color = '#00d4ff' }) {
+export default function InventoryPage({ color = '#EE6100' }) {
   const [items, setItems]       = useState([]);
   const [total, setItemsTotal]  = useState(0);
   const [loading, setLoading]   = useState(true);
@@ -211,8 +211,8 @@ export default function InventoryPage({ color = '#00d4ff' }) {
           </button>
         ))}
         <input placeholder="Search…" value={search} onChange={e => setSearch(e.target.value)}
-          style={{ marginLeft:'auto', padding:'0.35rem 0.75rem', background:'#0a1628', border:'1px solid #1a3050',
-            borderRadius:5, color:'#e0f0ff', fontSize:12, outline:'none', width:180 }} />
+          style={{ marginLeft:'auto', padding:'0.35rem 0.75rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+            borderRadius:5, color:'#F4F1EA', fontSize:12, outline:'none', width:180 }} />
       </div>
 
       {loading ? <p style={{ color:'#4a6a8a' }}>Loading…</p> : (
@@ -228,24 +228,24 @@ export default function InventoryPage({ color = '#00d4ff' }) {
           <tbody>
             {items.map((item, i) => (
               <tr key={item._id} style={{ borderBottom:'1px solid #040c1a', background: i%2===0?'transparent':'#050d1a' }}>
-                <td style={{ padding:'0.6rem 0.75rem', fontWeight:600, color:'#e0f0ff' }}>
+                <td style={{ padding:'0.6rem 0.75rem', fontWeight:600, color:'#F4F1EA' }}>
                   {item.name}
                   {item.quantity <= item.reorderLevel && (
                     <span style={{ marginLeft:6, fontSize:9, color:'#ff8800', fontWeight:700 }}>⚠ LOW</span>
                   )}
                 </td>
-                <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>{item.category}</td>
+                <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>{item.category}</td>
                 <td style={{ padding:'0.6rem 0.75rem', fontWeight:700,
                   color: item.quantity === 0 ? '#ff3366' : item.quantity <= item.reorderLevel ? '#ff8800' : '#00ff88' }}>
                   {item.quantity}
                 </td>
-                <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>{item.reorderLevel}</td>
-                <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>KES {item.unitCost?.toLocaleString()}</td>
-                <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>KES {item.sellingPrice?.toLocaleString()}</td>
+                <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>{item.reorderLevel}</td>
+                <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>KES {item.unitCost?.toLocaleString()}</td>
+                <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>KES {item.sellingPrice?.toLocaleString()}</td>
                 <td style={{ padding:'0.6rem 0.75rem' }}><Tag label={item.condition} color={COND_COLORS[item.condition]} /></td>
-                <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>
+                <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>
                   {item.attachments && item.attachments.length > 0 ? (
-                    <span style={{ color: '#00d4ff' }}>📸 {item.attachments.length}</span>
+                    <span style={{ color: '#EE6100' }}>📸 {item.attachments.length}</span>
                   ) : (
                     <span>—</span>
                   )}
@@ -255,12 +255,12 @@ export default function InventoryPage({ color = '#00d4ff' }) {
                     <button onClick={() => editItem(item)}
                       style={{ padding:'3px 8px', background:`${color}22`, color, border:`1px solid ${color}44`, borderRadius:4, fontSize:10, cursor:'pointer', fontWeight:700 }}>EDIT</button>
                     <button onClick={() => setMoveTarget(item)}
-                      style={{ padding:'3px 8px', background:'#1a304022', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:4, fontSize:10, cursor:'pointer' }}>MOVE</button>
+                      style={{ padding:'3px 8px', background:'#1a304022', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:4, fontSize:10, cursor:'pointer' }}>MOVE</button>
                     {item.qrCodeUrl && (
                       <a 
                         href={item.qrCodeUrl} 
                         download={`qr-${item.sku || item.name}.png`}
-                        style={{ padding:'3px 8px', background:'#00d4ff22', color:'#00d4ff', border:'1px solid #00d4ff44', borderRadius:4, fontSize:10, cursor:'pointer', textDecoration: 'none' }}
+                        style={{ padding:'3px 8px', background:'#EE610022', color:'#EE6100', border:'1px solid #EE610044', borderRadius:4, fontSize:10, cursor:'pointer', textDecoration: 'none' }}
                       >
                         QR
                       </a>
@@ -281,7 +281,7 @@ export default function InventoryPage({ color = '#00d4ff' }) {
       {/* Add/Edit Item Modal */}
       {showForm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:500, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:500, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16 }}>{selected ? 'Edit Item' : 'Add Item'}</h3>
             <form onSubmit={submitItem} style={{ display:'flex', flexDirection:'column', gap:10 }}>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
@@ -295,24 +295,24 @@ export default function InventoryPage({ color = '#00d4ff' }) {
                 <Input label="Supplier" value={form.supplier} onChange={e => setForm(p=>({...p,supplier:e.target.value}))} />
                 <Input label="Supplier Contact" value={form.supplierContact} onChange={e => setForm(p=>({...p,supplierContact:e.target.value}))} />
                 <Input label="Location" value={form.location} onChange={e => setForm(p=>({...p,location:e.target.value}))} />
-                <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                   Condition
                   <select value={form.condition} onChange={e => setForm(p=>({...p,condition:e.target.value}))}
-                    style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                    style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                     {['NEW','GOOD','FAIR','DAMAGED','SCRAPPED'].map(c => <option key={c}>{c}</option>)}
                   </select>
                 </label>
                 
                 {/* Image Upload for Hardware Repair Photos */}
                 <div style={{ gridColumn: 'span 2' }}>
-                  <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                  <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                     Attachments (Photos for repair documentation)
                     <input 
                       type="file" 
                       accept="image/*" 
                       multiple
                       onChange={handleImageChange}
-                      style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}
+                      style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}
                     />
                   </label>
                   
@@ -324,7 +324,7 @@ export default function InventoryPage({ color = '#00d4ff' }) {
                           <img 
                             src={preview} 
                             alt={`Attachment ${index + 1}`} 
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px', border: '1px solid #1a3050' }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px', border: '1px solid rgba(36,74,68,0.4)' }}
                           />
                           <button
                             type="button"
@@ -354,7 +354,7 @@ export default function InventoryPage({ color = '#00d4ff' }) {
                   )}
                   
                   {attachments.length > 0 && (
-                    <div style={{ marginTop: '10px', fontSize: '11px', color: '#7a9ab0' }}>
+                    <div style={{ marginTop: '10px', fontSize: '11px', color: '#A9C4BE' }}>
                       {attachments.length} file(s) selected for upload
                     </div>
                   )}
@@ -365,7 +365,7 @@ export default function InventoryPage({ color = '#00d4ff' }) {
                 <button 
                   type="button" 
                   onClick={() => generateQRCode(form.sku || form.name)}
-                  style={{ flex:1, padding:'0.6rem', background:'#00d4ff', color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}
+                  style={{ flex:1, padding:'0.6rem', background:'#EE6100', color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}
                 >
                   Generate QR Code
                 </button>
@@ -373,7 +373,7 @@ export default function InventoryPage({ color = '#00d4ff' }) {
                   {selected ? 'Update' : 'Add Item'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setSelected(null); setAttachments([]); setImagePreviews([]); setQrCode(null); }}
-                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>
+                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>
                   Cancel
                 </button>
               </div>
@@ -385,29 +385,29 @@ export default function InventoryPage({ color = '#00d4ff' }) {
       {/* Record Movement Modal */}
       {moveTarget && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:'1px solid #1a3050', borderRadius:12, padding:'1.5rem', width:380 }}>
-            <h3 style={{ margin:'0 0 0.75rem', color:'#e0f0ff', fontSize:15 }}>Stock Movement — {moveTarget.name}</h3>
-            <p style={{ fontSize:12, color:'#4a6a8a', margin:'0 0 1rem' }}>Current stock: <strong style={{ color:'#e0f0ff' }}>{moveTarget.quantity}</strong></p>
+          <div style={{ background:'#0B1F1B', border:'1px solid rgba(36,74,68,0.4)', borderRadius:12, padding:'1.5rem', width:380 }}>
+            <h3 style={{ margin:'0 0 0.75rem', color:'#F4F1EA', fontSize:15 }}>Stock Movement — {moveTarget.name}</h3>
+            <p style={{ fontSize:12, color:'#4a6a8a', margin:'0 0 1rem' }}>Current stock: <strong style={{ color:'#F4F1EA' }}>{moveTarget.quantity}</strong></p>
             <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Movement Type
                 <select value={move.type} onChange={e => setMove(p=>({...p,type:e.target.value}))}
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                   {MOVE_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
               </label>
               <Input label="Quantity" type="number" value={move.quantity} onChange={e => setMove(p=>({...p,quantity:e.target.value}))} min={1} />
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Notes
                 <textarea value={move.notes} onChange={e => setMove(p=>({...p,notes:e.target.value}))} rows={2}
-                  style={{ padding:'0.45rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13, resize:'none', outline:'none' }} />
+                  style={{ padding:'0.45rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13, resize:'none', outline:'none' }} />
               </label>
             </div>
             <div style={{ display:'flex', gap:10, marginTop:14 }}>
               <button onClick={recordMove}
                 style={{ flex:1, padding:'0.6rem', background:color, color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}>Record</button>
               <button onClick={() => setMoveTarget(null)}
-                style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>Cancel</button>
+                style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>Cancel</button>
             </div>
           </div>
         </div>

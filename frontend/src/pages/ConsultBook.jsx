@@ -16,7 +16,7 @@ const FEES = {
   'data-recovery': { 30: 800, 60: 1500 }, 'general-it': { 30: 500, 60: 1000 },
 };
 
-const card = { background: 'linear-gradient(160deg,#1f1438,#1a1030)', border: '1px solid rgba(240,238,255,0.08)', borderRadius: 12, padding: '1.25rem' };
+const card = { background: 'linear-gradient(160deg,#0F2620,#0F2620)', border: '1px solid rgba(244,241,234,0.08)', borderRadius: 12, padding: '1.25rem' };
 
 export default function ConsultBook() {
   const [params] = useSearchParams();
@@ -53,7 +53,7 @@ export default function ConsultBook() {
       // If WhatsApp medium selected, open WhatsApp with session details
       if (form.medium === 'whatsapp') {
         const msg = encodeURIComponent(
-          `Hi Ruai Tech Solutions! I've just booked a consultation.\n\n` +
+          `Hi Postera Crescam Laude! I've just booked a consultation.\n\n` +
           `Type: ${form.consultationType.replace(/-/g,' ')}\n` +
           `Duration: ${form.duration} minutes\n` +
           `Date: ${new Date(form.preferredDate).toLocaleString('en-KE')}\n` +
@@ -69,15 +69,15 @@ export default function ConsultBook() {
     setSubmitting(false);
   };
 
-  const selBtn = (active, color = '#e74c3c') => ({ flex: 1, padding: '0.55rem', borderRadius: 8, border: `2px solid ${active ? color : 'rgba(240,238,255,0.1)'}`, background: active ? `${color}18` : 'transparent', color: active ? '#f0eeff' : '#6a5a8a', cursor: 'pointer', fontWeight: 600, fontFamily: "'Inter',sans-serif", transition: 'all 0.15s' });
+  const selBtn = (active, color = '#FF8A3D') => ({ flex: 1, padding: '0.55rem', borderRadius: 8, border: `2px solid ${active ? color : 'rgba(244,241,234,0.1)'}`, background: active ? `${color}18` : 'transparent', color: active ? '#F4F1EA' : '#6A8A82', cursor: 'pointer', fontWeight: 600, fontFamily: "'Inter',sans-serif", transition: 'all 0.15s' });
 
   return (
     <div style={{ maxWidth: 620, margin: '2rem auto', padding: '0 1.5rem' }}>
-      <h1 style={{ margin: '0 0 1.5rem', fontFamily: "'Poppins',sans-serif", color: '#f0eeff' }}>Book a Consultation</h1>
+      <h1 style={{ margin: '0 0 1.5rem', fontFamily: "'Poppins',sans-serif", color: '#F4F1EA' }}>Book a Consultation</h1>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
         <div style={card}>
-          <h3 style={{ margin: '0 0 1rem', color: '#f0eeff', fontFamily: "'Poppins',sans-serif" }}>Session Details</h3>
+          <h3 style={{ margin: '0 0 1rem', color: '#F4F1EA', fontFamily: "'Poppins',sans-serif" }}>Session Details</h3>
           <div style={{ marginBottom: 12 }}>
             <label style={T.label}>Consultation Type</label>
             <select value={form.consultationType} onChange={(e) => setForm({ ...form, consultationType: e.target.value })} style={T.input}>
@@ -105,7 +105,7 @@ export default function ConsultBook() {
         </div>
 
         <div style={card}>
-          <h3 style={{ margin: '0 0 1rem', color: '#f0eeff', fontFamily: "'Poppins',sans-serif" }}>Your Brief</h3>
+          <h3 style={{ margin: '0 0 1rem', color: '#F4F1EA', fontFamily: "'Poppins',sans-serif" }}>Your Brief</h3>
           <div style={{ marginBottom: 12 }}>
             <label style={T.label}>Topic (short title)</label>
             <input value={form.topic} onChange={(e) => setForm({ ...form, topic: e.target.value })} required maxLength={200} style={T.input} placeholder="e.g. Need help choosing a business website platform" />
@@ -117,7 +117,7 @@ export default function ConsultBook() {
         </div>
 
         <div style={card}>
-          <h3 style={{ margin: '0 0 1rem', color: '#f0eeff', fontFamily: "'Poppins',sans-serif" }}>Your Details</h3>
+          <h3 style={{ margin: '0 0 1rem', color: '#F4F1EA', fontFamily: "'Poppins',sans-serif" }}>Your Details</h3>
           {[['name','Full Name','text',true],['phone','Phone Number','tel',true],['email','Email (optional)','email',false]].map(([k,l,t,req]) => (
             <div key={k} style={{ marginBottom: 12 }}>
               <label style={T.label}>{l}</label>
@@ -127,14 +127,14 @@ export default function ConsultBook() {
         </div>
 
         <div style={card}>
-          <h3 style={{ margin: '0 0 0.75rem', color: '#f0eeff', fontFamily: "'Poppins',sans-serif" }}>Payment — {formatKES(fee)}</h3>
+          <h3 style={{ margin: '0 0 0.75rem', color: '#F4F1EA', fontFamily: "'Poppins',sans-serif" }}>Payment — {formatKES(fee)}</h3>
           <div style={{ display: 'flex', gap: 8 }}>
             <button type="button" onClick={() => setForm({ ...form, payNow: true })} style={selBtn(form.payNow, '#2ecc71')}>📱 Pay Now (M-Pesa)</button>
             <button type="button" onClick={() => setForm({ ...form, payNow: false })} style={selBtn(!form.payNow)}>💵 Pay on Day</button>
           </div>
         </div>
 
-        <button type="submit" disabled={submitting} style={{ padding: '0.9rem', background: 'linear-gradient(135deg,#c0392b,#e74c3c)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700, fontSize: 16, fontFamily: "'Poppins',sans-serif", boxShadow: '0 4px 20px rgba(192,57,43,0.35)' }}>
+        <button type="submit" disabled={submitting} style={{ padding: '0.9rem', background: 'linear-gradient(135deg,#EE6100,#FF8A3D)', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700, fontSize: 16, fontFamily: "'Poppins',sans-serif", boxShadow: '0 4px 20px rgba(238,97,0,0.35)' }}>
           {submitting ? 'Booking...' : `Confirm Booking — ${formatKES(fee)}`}
         </button>
       </form>

@@ -10,6 +10,7 @@ const { upload } = require('../middleware/upload'); // Destructure the upload ob
 router.get('/', productController.getProducts); // Changed from getAll to getProducts
 router.get('/featured', productController.getFeatured);
 router.get('/search', productController.search);
+router.get('/slug/:slug', productController.getProductBySlug);
 router.get('/:id', productController.getById);
 
 // Protected routes

@@ -14,7 +14,7 @@ const ICONS = {
 };
 
 const COLORS = {
-  'web-development':      '#00d4ff',
+  'web-development':      '#EE6100',
   'cybersecurity':        '#ff3366',
   'networking':           '#00ff88',
   'hardware-advisory':    '#ffd700',
@@ -24,14 +24,16 @@ const COLORS = {
   'general-it':           '#22d3ee',
 };
 
-export default function ConsultationCard({ type, fees }) {
+import { memo } from 'react';
+
+function ConsultationCard({ type, fees }) {
   const label = type.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const minFee = Math.min(...Object.values(fees));
-  const color = COLORS[type] || '#00d4ff';
+  const color = COLORS[type] || '#EE6100';
 
   return (
     <div style={{
-      background: 'linear-gradient(160deg, #0d1f35 0%, #0a1628 100%)',
+      background: 'linear-gradient(160deg, #0F2620 0%, #0F2620 100%)',
       border: `1px solid rgba(${hexToRgb(color)},0.15)`,
       borderRadius: 8,
       padding: '1.25rem',
@@ -65,7 +67,7 @@ export default function ConsultationCard({ type, fees }) {
         boxShadow: `0 0 12px rgba(${hexToRgb(color)},0.15)`,
       }}>{ICONS[type] || '◈'}</div>
 
-      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#e2eeff', letterSpacing: '0.02em' }}>{label}</h3>
+      <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#F4F1EA', letterSpacing: '0.02em' }}>{label}</h3>
 
       {/* Duration/fee chips */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -81,7 +83,7 @@ export default function ConsultationCard({ type, fees }) {
         ))}
       </div>
 
-      <p style={{ margin: 0, fontSize: 12, color: '#4a6580' }}>
+      <p style={{ margin: 0, fontSize: 12, color: '#6A8A82' }}>
         From <span style={{ color, fontWeight: 700 }}>{formatKES(minFee)}</span>
       </p>
 
@@ -101,6 +103,8 @@ export default function ConsultationCard({ type, fees }) {
     </div>
   );
 }
+
+export default memo(ConsultationCard);
 
 // Helper: hex to r,g,b string for rgba()
 function hexToRgb(hex) {

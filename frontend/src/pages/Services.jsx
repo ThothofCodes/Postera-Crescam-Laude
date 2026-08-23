@@ -66,15 +66,15 @@ export default function Services() {
             <div key={s._id} style={{ ...T.card, opacity: s.isActive ? 1 : 0.5 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                 <div>
-                  <p style={{ margin: '0 0 6px', fontWeight: 700, color: '#f0eeff', fontSize: 15, fontFamily: "'Poppins',sans-serif" }}>{s.name}</p>
+                  <p style={{ margin: '0 0 6px', fontWeight: 700, color: '#F4F1EA', fontSize: 15, fontFamily: "'Poppins',sans-serif" }}>{s.name}</p>
                   <span style={badge}>{s.category}</span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <span style={{ fontWeight: 800, fontSize: 17, background: 'linear-gradient(90deg,#e74c3c,#d8d0f0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontFamily: "'Poppins',sans-serif" }}>{formatKES(s.basePrice)}</span>
-                  <div style={{ fontSize: 11, color: '#6a5a8a', fontFamily: "'Inter',sans-serif" }}>{s.priceUnit}</div>
+                  <span style={{ fontWeight: 800, fontSize: 17, background: 'linear-gradient(90deg,#FF8A3D,#A9C4BE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontFamily: "'Poppins',sans-serif" }}>{formatKES(s.basePrice)}</span>
+                  <div style={{ fontSize: 11, color: '#6A8A82', fontFamily: "'Inter',sans-serif" }}>{s.priceUnit}</div>
                 </div>
               </div>
-              {s.description && <p style={{ fontSize: 13, color: '#b8a8d8', margin: '0 0 10px', lineHeight: 1.5, fontFamily: "'Inter',sans-serif" }}>{s.description}</p>}
+              {s.description && <p style={{ fontSize: 13, color: '#A9C4BE', margin: '0 0 10px', lineHeight: 1.5, fontFamily: "'Inter',sans-serif" }}>{s.description}</p>}
               <div style={{ display: 'flex', gap: 6 }}>
                 <button onClick={() => { setForm({ name: s.name, category: s.category, description: s.description || '', basePrice: s.basePrice, priceUnit: s.priceUnit, isActive: s.isActive }); setModal(s); }} style={btnSm('blue')}>Edit</button>
                 <button onClick={() => del(s._id)} style={btnSm('danger')}>Delete</button>
@@ -87,7 +87,7 @@ export default function Services() {
       {modal && (
         <div style={T.overlay}>
           <div style={T.modal}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#c0392b,#8e44ad,#2980b9)', borderRadius: '14px 14px 0 0' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EE6100,#244A44,#2BB6A3)', borderRadius: '14px 14px 0 0' }} />
             <h3 style={T.modalH3}>{modal === 'create' ? 'New Service' : 'Edit Service'}</h3>
             <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div><label style={T.label}>Name</label><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required style={T.input} /></div>
@@ -100,7 +100,7 @@ export default function Services() {
               <div><label style={T.label}>Base Price (KES)</label><input type="number" value={form.basePrice} onChange={(e) => setForm({ ...form, basePrice: e.target.value })} required min={0} style={T.input} /></div>
               <div><label style={T.label}>Price Unit</label><input value={form.priceUnit} onChange={(e) => setForm({ ...form, priceUnit: e.target.value })} style={T.input} /></div>
               <div><label style={T.label}>Description</label><textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} style={{ ...T.input, resize: 'vertical' }} /></div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', color: '#b8a8d8', fontSize: 13, fontFamily: "'Inter',sans-serif" }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', color: '#A9C4BE', fontSize: 13, fontFamily: "'Inter',sans-serif" }}>
                 <input type="checkbox" checked={form.isActive} onChange={(e) => setForm({ ...form, isActive: e.target.checked })} /> Active
               </label>
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>

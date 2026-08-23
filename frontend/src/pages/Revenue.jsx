@@ -14,8 +14,8 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 const ChartTip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: '#1f1438', border: '1px solid rgba(192,57,43,0.3)', borderRadius: 8, padding: '0.75rem 1rem', fontSize: 13 }}>
-      <p style={{ color: '#f0eeff', fontWeight: 700, marginBottom: 6 }}>{label}</p>
+    <div style={{ background: '#0F2620', border: '1px solid rgba(238,97,0,0.3)', borderRadius: 8, padding: '0.75rem 1rem', fontSize: 13 }}>
+      <p style={{ color: '#F4F1EA', fontWeight: 700, marginBottom: 6 }}>{label}</p>
       {payload.map((p) => <p key={p.name} style={{ color: p.color, margin: '2px 0' }}>{p.name}: {formatKES(p.value)}</p>)}
     </div>
   );
@@ -75,27 +75,27 @@ export default function Revenue() {
 
       {/* KPI cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1rem' }}>
-        {[['Total Income', totalIncome, '#2ecc71'], ['Total Expenses', totalExpense, '#e74c3c'], ['Net Profit', totalIncome - totalExpense, '#3498db']].map(([l, v, c]) => (
+        {[['Total Income', totalIncome, '#2ecc71'], ['Total Expenses', totalExpense, '#FF8A3D'], ['Net Profit', totalIncome - totalExpense, '#2BB6A3']].map(([l, v, c]) => (
           <div key={l} style={{ ...T.card, borderBottom: `3px solid ${c}` }}>
-            <div style={{ fontSize: 11, color: '#6a5a8a', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{l} (YTD)</div>
-            <div style={{ fontWeight: 800, fontSize: 22, background: `linear-gradient(90deg,${c},#d8d0f0)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{formatKES(v)}</div>
+            <div style={{ fontSize: 11, color: '#6A8A82', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{l} (YTD)</div>
+            <div style={{ fontWeight: 800, fontSize: 22, background: `linear-gradient(90deg,${c},#A9C4BE)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{formatKES(v)}</div>
           </div>
         ))}
       </div>
 
       {/* Chart */}
       <div style={{ ...T.card, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#c0392b,#8e44ad,#2980b9)', opacity: 0.7 }} />
-        <h3 style={{ margin: '0 0 1rem', fontSize: 14, fontWeight: 700, color: '#f0eeff' }}>Monthly Revenue vs Expenses</h3>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EE6100,#244A44,#2BB6A3)', opacity: 0.7 }} />
+        <h3 style={{ margin: '0 0 1rem', fontSize: 14, fontWeight: 700, color: '#F4F1EA' }}>Monthly Revenue vs Expenses</h3>
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={chartData} barCategoryGap="30%">
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(240,238,255,0.05)" />
-            <XAxis dataKey="name" tick={{ fill: '#6a5a8a', fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} tick={{ fill: '#6a5a8a', fontSize: 11 }} axisLine={false} tickLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(244,241,234,0.05)" />
+            <XAxis dataKey="name" tick={{ fill: '#6A8A82', fontSize: 11 }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} tick={{ fill: '#6A8A82', fontSize: 11 }} axisLine={false} tickLine={false} />
             <Tooltip content={<ChartTip />} />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#b8a8d8' }} />
+            <Legend wrapperStyle={{ fontSize: 12, color: '#A9C4BE' }} />
             <Bar dataKey="income"  fill="#2ecc71" name="Income"  radius={[4,4,0,0]} opacity={0.9} />
-            <Bar dataKey="expense" fill="#e74c3c" name="Expense" radius={[4,4,0,0]} opacity={0.9} />
+            <Bar dataKey="expense" fill="#FF8A3D" name="Expense" radius={[4,4,0,0]} opacity={0.9} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -115,10 +115,10 @@ export default function Revenue() {
               {entries.map((e) => (
                 <tr key={e._id} style={T.trHover}>
                   <td style={T.td}>{formatDate(e.date)}</td>
-                  <td style={T.td}><span style={{ color: e.type === 'income' ? '#2ecc71' : '#e74c3c', fontWeight: 600, textTransform: 'capitalize' }}>{e.type}</span></td>
+                  <td style={T.td}><span style={{ color: e.type === 'income' ? '#2ecc71' : '#FF8A3D', fontWeight: 600, textTransform: 'capitalize' }}>{e.type}</span></td>
                   <td style={T.td}>{e.category}</td>
                   <td style={T.td}>{e.description}</td>
-                  <td style={{ ...T.td, fontWeight: 700, color: '#f0eeff' }}>{formatKES(e.amount)}</td>
+                  <td style={{ ...T.td, fontWeight: 700, color: '#F4F1EA' }}>{formatKES(e.amount)}</td>
                   <td style={T.td}>{e.paymentMethod || '—'}</td>
                   <td style={T.td}>{e.reference || '—'}</td>
                   <td style={T.td}><button onClick={() => del(e._id)} style={btnSm('danger')}>Del</button></td>
@@ -137,7 +137,7 @@ export default function Revenue() {
       {modal && (
         <div style={T.overlay}>
           <div style={T.modal}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#c0392b,#8e44ad,#2980b9)', borderRadius: '14px 14px 0 0' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EE6100,#244A44,#2BB6A3)', borderRadius: '14px 14px 0 0' }} />
             <h3 style={T.modalH3}>Add Revenue Entry</h3>
             <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

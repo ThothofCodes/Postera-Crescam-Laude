@@ -81,8 +81,8 @@ export const useSocket = (eventHandlers = {}) => {
     }
   }, [token]);
 
-  // Return socket instance
-  return socket;
+  // Return socket instance (or a safe stub if not yet initialised)
+  return socket || { emit: () => {}, on: () => {}, off: () => {}, connected: false };
 };
 
 // Export as default for backward compatibility

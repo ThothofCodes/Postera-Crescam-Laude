@@ -82,14 +82,14 @@ export default function Products() {
             <tbody>
               {products.map((p) => (
                 <tr key={p._id} style={T.trHover}>
-                  <td style={T.td}><img src={p.images?.[0] || noImagePlaceholder(50, 50)} alt="" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8, border: '1px solid rgba(240,238,255,0.1)' }} /></td>
+                  <td style={T.td}><img src={p.images?.[0] || noImagePlaceholder(50, 50)} alt="" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8, border: '1px solid rgba(244,241,234,0.1)' }} /></td>
                   <td style={T.tdBold}>{p.name}</td>
                   <td style={T.td}><span style={badge}>{p.category}</span></td>
                   <td style={T.td}>
-                    <span style={{ fontWeight: 700, color: '#f0eeff' }}>{formatKES(p.price)}</span>
-                    {p.comparePrice ? <span style={{ textDecoration: 'line-through', color: '#6a5a8a', fontSize: 11, marginLeft: 6 }}>{formatKES(p.comparePrice)}</span> : null}
+                    <span style={{ fontWeight: 700, color: '#F4F1EA' }}>{formatKES(p.price)}</span>
+                    {p.comparePrice ? <span style={{ textDecoration: 'line-through', color: '#6A8A82', fontSize: 11, marginLeft: 6 }}>{formatKES(p.comparePrice)}</span> : null}
                   </td>
-                  <td style={T.td}>{p.isDigital ? <span style={{ color: '#3498db' }}>∞ digital</span> : p.stock}</td>
+                  <td style={T.td}>{p.isDigital ? <span style={{ color: '#2BB6A3' }}>∞ digital</span> : p.stock}</td>
                   <td style={T.td}>{p.featured ? '⭐' : '—'}</td>
                   <td style={T.td}><StatusBadge status={p.isActive ? 'active' : 'inactive'} /></td>
                   <td style={T.td}>
@@ -111,7 +111,7 @@ export default function Products() {
       {modal && (
         <div style={T.overlay}>
           <div style={T.modalWide}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#c0392b,#8e44ad,#2980b9)', borderRadius: '14px 14px 0 0' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EE6100,#244A44,#2BB6A3)', borderRadius: '14px 14px 0 0' }} />
             <h3 style={T.modalH3}>{modal === 'create' ? 'New Product' : 'Edit Product'}</h3>
             <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div><label style={T.label}>Name</label><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required style={T.input} /></div>
@@ -133,10 +133,10 @@ export default function Products() {
                 <div><label style={T.label}>Warranty</label><input value={form.warranty} onChange={(e) => setForm({ ...form, warranty: e.target.value })} style={T.input} /></div>
               </div>
               <div><label style={T.label}>Tags (comma separated)</label><input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} style={T.input} /></div>
-              <div><label style={T.label}>Images</label><input type="file" multiple accept="image/*" onChange={(e) => setFiles(Array.from(e.target.files))} style={{ color: '#b8a8d8', fontSize: 13 }} /></div>
+              <div><label style={T.label}>Images</label><input type="file" multiple accept="image/*" onChange={(e) => setFiles(Array.from(e.target.files))} style={{ color: '#A9C4BE', fontSize: 13 }} /></div>
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 {[['isDigital', 'Digital Product'], ['isActive', 'Active'], ['featured', 'Featured']].map(([k, l]) => (
-                  <label key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: '#b8a8d8', fontSize: 13, fontFamily: "'Inter',sans-serif" }}>
+                  <label key={k} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', color: '#A9C4BE', fontSize: 13, fontFamily: "'Inter',sans-serif" }}>
                     <input type="checkbox" checked={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.checked })} /> {l}
                   </label>
                 ))}

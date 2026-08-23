@@ -88,15 +88,15 @@ export default function Bookings() {
               {bookings.map((b) => (
                 <tr key={b._id} style={T.trHover}>
                   <td style={T.td}>
-                    <div style={{ fontWeight: 600, color: '#f0eeff' }}>{b.client?.name}</div>
-                    <div style={{ fontSize: 11, color: '#6a5a8a' }}>{b.client?.phone}</div>
+                    <div style={{ fontWeight: 600, color: '#F4F1EA' }}>{b.client?.name}</div>
+                    <div style={{ fontSize: 11, color: '#6A8A82' }}>{b.client?.phone}</div>
                   </td>
                   <td style={T.td}>{b.service?.name}</td>
                   <td style={T.td}>{formatDate(b.scheduledAt)}</td>
-                  <td style={{ ...T.td, fontWeight: 600, color: '#f0eeff' }}>{formatKES(b.amountCharged)}</td>
+                  <td style={{ ...T.td, fontWeight: 600, color: '#F4F1EA' }}>{formatKES(b.amountCharged)}</td>
                   <td style={T.td}>
                     <select value={b.status} onChange={(e) => updateStatus(b._id, e.target.value)}
-                      style={{ background: 'rgba(14,10,20,0.7)', border: '1px solid rgba(240,238,255,0.1)', color: '#f0eeff', borderRadius: 6, padding: '3px 8px', cursor: 'pointer', fontSize: 12 }}>
+                      style={{ background: 'rgba(14,10,20,0.7)', border: '1px solid rgba(244,241,234,0.1)', color: '#F4F1EA', borderRadius: 6, padding: '3px 8px', cursor: 'pointer', fontSize: 12 }}>
                       {STATUSES.map((s) => <option key={s}>{s}</option>)}
                     </select>
                   </td>
@@ -121,7 +121,7 @@ export default function Bookings() {
       {modal && (
         <div style={T.overlay}>
           <div style={T.modal}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#c0392b,#8e44ad,#2980b9)', borderRadius: '14px 14px 0 0' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EE6100,#244A44,#2BB6A3)', borderRadius: '14px 14px 0 0' }} />
             <h3 style={T.modalH3}>{modal === 'create' ? 'New Booking' : 'Edit Booking'}</h3>
             <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>

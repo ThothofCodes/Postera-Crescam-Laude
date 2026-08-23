@@ -51,7 +51,16 @@ function initSocket(httpServer) {
 
   _io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:3000',
+      origin: (origin, cb) => {
+        if (!origin) return cb(null, true);
+        const isDev = process.env.NODE_ENV !== 'production';
+        if (isDev && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+        if (isDev && /^https?:\/\/\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)) return cb(null, true);
+        const allowed = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map(o => o.trim());
+        if (allowed.includes(origin)) return cb(null, true);
+        console.warn(`[SOCKET] CORS blocked: ${origin}`);
+        cb(new Error('CORS'), false);
+      },
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -119,6 +128,7 @@ function initSocket(httpServer) {
       // their highest-clearance status already covers every department via
       // presenceManager.isAnyAdminOnlineForDept().
       socket.join('admin-room');
+      socket.join('public-chat'); // Also join public-chat so admin:status events reach the admin's own client
       if (departmentSlug) socket.join(`admin-room:${departmentSlug}`);
 
       // Broadcast to ALL visitors that admin status may have changed
@@ -188,6 +198,9 @@ function initSocket(httpServer) {
 
         console.log(`[CHAT] Admin disconnected: ${socket.id} reason=${reason}`);
       });
+
+      // Send the admin their own online status directly so the UI reflects it immediately
+      socket.emit('admin:status', { online: presenceManager.isAnyAdminOnline() });
 
       console.log(`[CHAT] Admin connected: ${socket.id} (user: ${userId}, role: ${userRole})`);
 
@@ -444,6 +457,13 @@ function initSocket(httpServer) {
     });
     socket.on('ticket:leave', (ticketId) => {
       socket.leave(`ticket:${ticketId}`);
+    });
+
+    // ── Broadcast ticket status updates to all admins ──────────
+    socket.on('ticket:status-update', (data) => {
+      if (data?._id && data?.status) {
+        _io.to('admin-room').emit('ticket:status-update', data);
+      }
     });
 
     // ── Payment status polling room ────────────────────────

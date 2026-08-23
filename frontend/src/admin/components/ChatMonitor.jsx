@@ -86,14 +86,14 @@ const ChatMonitor = ({ authToken, onClose }) => {
       {/* Header */}
       <div style={{
         padding: '1rem',
-        background: 'linear-gradient(90deg, rgba(0,212,255,0.1), rgba(255,51,102,0.1))',
+        background: 'linear-gradient(90deg, rgba(238,97,0,0.1), rgba(255,51,102,0.1))',
         borderBottom: '1px solid rgba(240, 238, 255, 0.1)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <h3 style={{ margin: 0, color: '#f0eeff' }}>Live Chat Monitor</h3>
+          <h3 style={{ margin: 0, color: '#F4F1EA' }}>Live Chat Monitor</h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div style={{
               width: '10px',
@@ -118,7 +118,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.8rem', color: '#b8a8d8' }}>Availability:</span>
+          <span style={{ fontSize: '0.8rem', color: '#A9C4BE' }}>Availability:</span>
           <button
             type="button"
             onClick={() => {}}
@@ -126,7 +126,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
               padding: '0.25rem 0.75rem',
               background: adminOnline ? 'rgba(0,255,136,0.2)' : 'rgba(255,170,0,0.2)',
               color: adminOnline ? '#00ff88' : '#ffaa00',
-              border: '1px solid rgba(240,238,255,0.2)',
+              border: '1px solid rgba(244,241,234,0.2)',
               borderRadius: '4px',
               cursor: 'default',
               fontSize: '0.8rem'
@@ -138,9 +138,9 @@ const ChatMonitor = ({ authToken, onClose }) => {
             onClick={() => setMonitoringEnabled(!monitoringEnabled)}
             style={{
               padding: '0.25rem 0.75rem',
-              background: monitoringEnabled ? 'rgba(0,212,255,0.2)' : 'rgba(255,170,0,0.2)',
-              color: monitoringEnabled ? '#00d4ff' : '#ffaa00',
-              border: '1px solid rgba(240,238,255,0.2)',
+              background: monitoringEnabled ? 'rgba(238,97,0,0.2)' : 'rgba(255,170,0,0.2)',
+              color: monitoringEnabled ? '#EE6100' : '#ffaa00',
+              border: '1px solid rgba(244,241,234,0.2)',
               borderRadius: '4px',
               cursor: 'pointer',
               fontSize: '0.8rem'
@@ -153,7 +153,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
             style={{
               background: 'none',
               border: 'none',
-              color: '#f0eeff',
+              color: '#F4F1EA',
               fontSize: '1.2rem',
               cursor: 'pointer',
               padding: '5px',
@@ -194,7 +194,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
                 width: '100%',
                 padding: '0.5rem',
                 background: 'rgba(14,10,20,0.8)',
-                border: '1px solid rgba(240,238,255,0.12)',
+                border: '1px solid rgba(244,241,234,0.12)',
                 borderRadius: '4px',
                 color: 'var(--text-primary)',
                 fontSize: '0.875rem'
@@ -218,7 +218,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
                       : 'rgba(14,10,20,0.5)',
                     border: selectedConversation === conv._id 
                       ? '1px solid rgba(0, 212, 255, 0.3)' 
-                      : '1px solid rgba(240,238,255,0.05)',
+                      : '1px solid rgba(244,241,234,0.05)',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease'
                   }}
@@ -240,7 +240,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
                     marginBottom: '0.25rem' 
                   }}>
                     <strong style={{ 
-                      color: '#f0eeff', 
+                      color: '#F4F1EA', 
                       fontSize: '0.9rem',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -261,7 +261,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
                     )}
                   </div>
                   <div style={{ 
-                    color: '#b8a8d8', 
+                    color: '#A9C4BE', 
                     fontSize: '0.8rem',
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
@@ -270,7 +270,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
                     {conv.lastMessage.substring(0, 40)}...
                   </div>
                   <div style={{ 
-                    color: '#6a5a8a', 
+                    color: '#6A8A82', 
                     fontSize: '0.7rem',
                     marginTop: '0.25rem' 
                   }}>
@@ -281,7 +281,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
             ) : (
               <div style={{ 
                 textAlign: 'center', 
-                color: '#6a5a8a',
+                color: '#6A8A82',
                 padding: '2rem 0' 
               }}>
                 {searchFilter ? 'No matching conversations' : 'No active conversations'}
@@ -303,10 +303,10 @@ const ChatMonitor = ({ authToken, onClose }) => {
                 alignItems: 'center'
               }}>
                 <div>
-                  <h3 style={{ color: '#f0eeff', fontWeight: 600, margin: 0 }}>
+                  <h3 style={{ color: '#F4F1EA', fontWeight: 600, margin: 0 }}>
                     Chat with Guest: {currentConversation.replace('guest-', '').substring(0, 8)}
                   </h3>
-                  <p style={{ color: '#b8a8d8', fontSize: '0.875rem', margin: 0 }}>
+                  <p style={{ color: '#A9C4BE', fontSize: '0.875rem', margin: 0 }}>
                     {currentMessages.length} messages • {connected ? 'Connected' : 'Disconnected'}
                   </p>
                 </div>
@@ -347,9 +347,9 @@ const ChatMonitor = ({ authToken, onClose }) => {
                           ? '12px 4px 12px 12px' 
                           : '4px 12px 12px 12px',
                         background: msg.senderType === 'admin' 
-                          ? 'linear-gradient(135deg, #00d4ff, #00b4ff)' 
+                          ? 'linear-gradient(135deg, #EE6100, #00b4ff)' 
                           : 'rgba(240, 238, 255, 0.1)',
-                        color: msg.senderType === 'admin' ? 'white' : '#f0eeff',
+                        color: msg.senderType === 'admin' ? 'white' : '#F4F1EA',
                         fontSize: '0.9rem',
                         wordWrap: 'break-word'
                       }}>
@@ -366,7 +366,7 @@ const ChatMonitor = ({ authToken, onClose }) => {
                     justifyContent: 'center', 
                     alignItems: 'center',
                     height: '100%',
-                    color: '#6a5a8a',
+                    color: '#6A8A82',
                     textAlign: 'center'
                   }}>
                     <div>
@@ -412,9 +412,9 @@ const ChatMonitor = ({ authToken, onClose }) => {
                       flex: 1,
                       padding: '0.75rem 1rem',
                       background: adminOnline ? 'rgba(14,10,20,0.8)' : 'rgba(14,10,20,0.4)',
-                      border: adminOnline ? '1px solid rgba(240,238,255,0.12)' : '1px solid rgba(240,238,255,0.05)',
+                      border: adminOnline ? '1px solid rgba(244,241,234,0.12)' : '1px solid rgba(244,241,234,0.05)',
                       borderRadius: '6px',
-                      color: adminOnline ? 'var(--text-primary)' : 'rgba(240,238,255,0.4)',
+                      color: adminOnline ? 'var(--text-primary)' : 'rgba(244,241,234,0.4)',
                       fontSize: '0.875rem'
                     }}
                   />
@@ -424,8 +424,8 @@ const ChatMonitor = ({ authToken, onClose }) => {
                     style={{
                       padding: '0.75rem 1.5rem',
                       background: adminOnline 
-                        ? 'linear-gradient(135deg, #00d4ff, #00b4ff)' 
-                        : 'linear-gradient(135deg, #6a5a8a, #4a4a6a)',
+                        ? 'linear-gradient(135deg, #EE6100, #00b4ff)' 
+                        : 'linear-gradient(135deg, #6A8A82, #244A44)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '6px',
@@ -452,10 +452,10 @@ const ChatMonitor = ({ authToken, onClose }) => {
               padding: '2rem'
             }}>
               <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>💬</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem', color: '#f0eeff' }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem', color: '#F4F1EA' }}>
                 Select a conversation
               </div>
-              <div style={{ fontSize: '1rem', color: '#b8a8d8', maxWidth: '400px' }}>
+              <div style={{ fontSize: '1rem', color: '#A9C4BE', maxWidth: '400px' }}>
                 Choose a conversation from the left panel to start chatting with customers
               </div>
               {!adminOnline && (

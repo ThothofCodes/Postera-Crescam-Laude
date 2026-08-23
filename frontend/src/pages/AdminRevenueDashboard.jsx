@@ -1,21 +1,21 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAdminAuth } from '../admin/context/AdminAuthContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { Spinner } from '../components/UI';
 import { api } from '../utils/api';
 
-const COLORS = ['#00d4ff', '#ff3366', '#7a5aff', '#00ff88', '#ffaa00'];
+const COLORS = ['#EE6100', '#ff3366', '#7a5aff', '#00ff88', '#ffaa00'];
 const STATUS_COLORS = { 
   pending: '#ffaa00', 
-  processing: '#00d4ff', 
+  processing: '#EE6100', 
   shipped: '#00ff88', 
   delivered: '#7a5aff', 
   cancelled: '#ff3366' 
 };
 
 export default function AdminRevenueDashboard() {
-  const { user } = useAuth();
+  const { user } = useAdminAuth();
   const [stats, setStats] = useState({});
   const [revenueData, setRevenueData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,13 +63,13 @@ export default function AdminRevenueDashboard() {
           <h1 style={{ 
             fontSize: '1.8rem', 
             margin: 0, 
-            color: '#f0eeff',
+            color: '#F4F1EA',
             fontWeight: 700
           }}>
             Revenue Analytics Dashboard
           </h1>
           <p style={{ 
-            color: '#b8a8d8', 
+            color: '#A9C4BE', 
             margin: '0.5rem 0 0',
             fontSize: '1rem'
           }}>
@@ -86,7 +86,7 @@ export default function AdminRevenueDashboard() {
               background: 'var(--bg-card)',
               border: '1px solid rgba(240, 238, 255, 0.2)',
               borderRadius: '8px',
-              color: '#f0eeff',
+              color: '#F4F1EA',
               fontSize: '0.9rem'
             }}
           >
@@ -112,11 +112,11 @@ export default function AdminRevenueDashboard() {
           border: '1px solid rgba(240, 238, 255, 0.1)',
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}>
-          <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginBottom: '0.5rem' }}>Total Revenue</div>
+          <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginBottom: '0.5rem' }}>Total Revenue</div>
           <div style={{ 
             fontSize: '1.8rem', 
             fontWeight: 700, 
-            color: '#00d4ff' 
+            color: '#EE6100' 
           }}>
             KSh {stats.totalRevenue?.toLocaleString() || 0}
           </div>
@@ -132,7 +132,7 @@ export default function AdminRevenueDashboard() {
           border: '1px solid rgba(240, 238, 255, 0.1)',
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}>
-          <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginBottom: '0.5rem' }}>Total Orders</div>
+          <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginBottom: '0.5rem' }}>Total Orders</div>
           <div style={{ 
             fontSize: '1.8rem', 
             fontWeight: 700, 
@@ -152,7 +152,7 @@ export default function AdminRevenueDashboard() {
           border: '1px solid rgba(240, 238, 255, 0.1)',
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}>
-          <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginBottom: '0.5rem' }}>Pending Orders</div>
+          <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginBottom: '0.5rem' }}>Pending Orders</div>
           <div style={{ 
             fontSize: '1.8rem', 
             fontWeight: 700, 
@@ -172,7 +172,7 @@ export default function AdminRevenueDashboard() {
           border: '1px solid rgba(240, 238, 255, 0.1)',
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}>
-          <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginBottom: '0.5rem' }}>Active Clients</div>
+          <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginBottom: '0.5rem' }}>Active Clients</div>
           <div style={{ 
             fontSize: '1.8rem', 
             fontWeight: 700, 
@@ -180,7 +180,7 @@ export default function AdminRevenueDashboard() {
           }}>
             {stats.activeClients || 0}
           </div>
-          <div style={{ fontSize: '0.8rem', color: '#00d4ff', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '0.8rem', color: '#EE6100', marginTop: '0.25rem' }}>
             +5.1% from last period
           </div>
         </div>
@@ -197,7 +197,7 @@ export default function AdminRevenueDashboard() {
       }}>
         <h3 style={{ 
           margin: '0 0 1.5rem 0', 
-          color: '#f0eeff', 
+          color: '#F4F1EA', 
           fontSize: '1.3rem',
           fontWeight: 600 
         }}>
@@ -206,14 +206,14 @@ export default function AdminRevenueDashboard() {
         <div style={{ height: '400px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(240,238,255,0.1)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(244,241,234,0.1)" />
               <XAxis 
                 dataKey="date" 
-                stroke="#b8a8d8" 
+                stroke="#A9C4BE" 
                 tick={{ fontSize: '12px' }}
               />
               <YAxis 
-                stroke="#b8a8d8" 
+                stroke="#A9C4BE" 
                 tickFormatter={(value) => `KSh ${(value / 1000).toFixed(0)}k`} 
                 tick={{ fontSize: '12px' }}
               />
@@ -222,17 +222,17 @@ export default function AdminRevenueDashboard() {
                 labelFormatter={(label) => `Date: ${label}`}
                 contentStyle={{ 
                   background: 'var(--bg-surface)', 
-                  border: '1px solid rgba(240,238,255,0.1)',
+                  border: '1px solid rgba(244,241,234,0.1)',
                   borderRadius: '8px'
                 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="revenue" 
-                stroke="#00d4ff" 
+                stroke="#EE6100" 
                 strokeWidth={3} 
-                dot={{ r: 5, fill: '#00d4ff' }} 
-                activeDot={{ r: 8, stroke: '#00d4ff', strokeWidth: 2 }} 
+                dot={{ r: 5, fill: '#EE6100' }} 
+                activeDot={{ r: 8, stroke: '#EE6100', strokeWidth: 2 }} 
               />
             </LineChart>
           </ResponsiveContainer>
@@ -251,7 +251,7 @@ export default function AdminRevenueDashboard() {
         }}>
           <h3 style={{ 
             margin: '0 0 1.5rem 0', 
-            color: '#f0eeff', 
+            color: '#F4F1EA', 
             fontSize: '1.3rem',
             fontWeight: 600 
           }}>
@@ -260,26 +260,26 @@ export default function AdminRevenueDashboard() {
           <div style={{ height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ordersByStatus}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(240,238,255,0.1)" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(244,241,234,0.1)" />
                 <XAxis 
                   dataKey="name" 
-                  stroke="#b8a8d8" 
+                  stroke="#A9C4BE" 
                   tick={{ fontSize: '12px' }}
                 />
                 <YAxis 
-                  stroke="#b8a8d8" 
+                  stroke="#A9C4BE" 
                   tick={{ fontSize: '12px' }}
                 />
                 <Tooltip 
                   contentStyle={{ 
                     background: 'var(--bg-surface)', 
-                    border: '1px solid rgba(240,238,255,0.1)',
+                    border: '1px solid rgba(244,241,234,0.1)',
                     borderRadius: '8px'
                   }}
                 />
                 <Bar 
                   dataKey="value" 
-                  fill="#00d4ff"
+                  fill="#EE6100"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>
@@ -297,7 +297,7 @@ export default function AdminRevenueDashboard() {
         }}>
           <h3 style={{ 
             margin: '0 0 1.5rem 0', 
-            color: '#f0eeff', 
+            color: '#F4F1EA', 
             fontSize: '1.3rem',
             fontWeight: 600 
           }}>
@@ -324,7 +324,7 @@ export default function AdminRevenueDashboard() {
                   formatter={(value) => [value, 'Count']}
                   contentStyle={{ 
                     background: 'var(--bg-surface)', 
-                    border: '1px solid rgba(240,238,255,0.1)',
+                    border: '1px solid rgba(244,241,234,0.1)',
                     borderRadius: '8px'
                   }}
                 />
@@ -344,7 +344,7 @@ export default function AdminRevenueDashboard() {
       }}>
         <h3 style={{ 
           margin: '0 0 1.5rem 0', 
-          color: '#f0eeff', 
+          color: '#F4F1EA', 
           fontSize: '1.3rem',
           fontWeight: 600 
         }}>
@@ -357,10 +357,10 @@ export default function AdminRevenueDashboard() {
             background: 'rgba(0, 212, 255, 0.1)',
             borderRadius: '8px'
           }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#00d4ff' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#EE6100' }}>
               {(stats.avgOrderValue || 0).toLocaleString()}
             </div>
-            <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginTop: '0.5rem' }}>
               Avg. Order Value
             </div>
           </div>
@@ -374,7 +374,7 @@ export default function AdminRevenueDashboard() {
             <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#00ff88' }}>
               {stats.conversionRate || 0}%
             </div>
-            <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginTop: '0.5rem' }}>
               Conversion Rate
             </div>
           </div>
@@ -388,7 +388,7 @@ export default function AdminRevenueDashboard() {
             <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ff3366' }}>
               {stats.returningCustomers || 0}
             </div>
-            <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginTop: '0.5rem' }}>
               Returning Customers
             </div>
           </div>
@@ -402,7 +402,7 @@ export default function AdminRevenueDashboard() {
             <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#7a5aff' }}>
               {stats.customerSatisfaction || 0}%
             </div>
-            <div style={{ fontSize: '0.9rem', color: '#b8a8d8', marginTop: '0.5rem' }}>
+            <div style={{ fontSize: '0.9rem', color: '#A9C4BE', marginTop: '0.5rem' }}>
               Satisfaction Score
             </div>
           </div>

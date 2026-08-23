@@ -105,7 +105,7 @@ export default function SetPassword() {
         background: 'var(--bg-void)',
         fontFamily: "'Inter', sans-serif"
       }}>
-        <div style={{ fontSize: '1.5rem', color: '#f0eeff' }}>Verifying invitation...</div>
+        <div style={{ fontSize: '1.5rem', color: '#F4F1EA' }}>Verifying invitation...</div>
       </div>
     );
   }
@@ -119,12 +119,12 @@ export default function SetPassword() {
         alignItems: 'center',
         background: 'var(--bg-void)',
         fontFamily: "'Inter', sans-serif",
-        color: '#f0eeff'
+        color: '#F4F1EA'
       }}>
         <div style={{ textAlign: 'center', padding: '2rem' }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
           <h2>Invalid Invitation</h2>
-          <p style={{ color: '#b8a8d8', marginBottom: '1rem' }}>
+          <p style={{ color: '#A9C4BE', marginBottom: '1rem' }}>
             The invitation link is invalid or has expired.
           </p>
           <button 
@@ -158,11 +158,11 @@ export default function SetPassword() {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔐</div>
-          <h2 style={{ color: '#f0eeff', margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
+          <h2 style={{ color: '#F4F1EA', margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
             Set Your Password
           </h2>
-          <p style={{ color: '#b8a8d8', fontSize: '0.875rem' }}>
-            Welcome to Ruai Tech Solutions! Please set your password to activate your account.
+          <p style={{ color: '#A9C4BE', fontSize: '0.875rem' }}>
+            Welcome to Postera Crescam Laude! Please set your password to activate your account.
           </p>
         </div>
 
@@ -170,7 +170,7 @@ export default function SetPassword() {
           <div>
             <label htmlFor="password" style={{ 
               display: 'block', 
-              color: '#f0eeff', 
+              color: '#F4F1EA', 
               marginBottom: '0.5rem',
               fontSize: '0.875rem',
               fontWeight: '500'
@@ -190,7 +190,7 @@ export default function SetPassword() {
                 width: '100%',
                 padding: '0.75rem 1rem',
                 background: 'rgba(14,10,20,0.6)',
-                border: '1px solid rgba(240,238,255,0.12)',
+                border: '1px solid rgba(244,241,234,0.12)',
                 borderRadius: '6px',
                 color: 'var(--text-primary)',
                 fontSize: '0.875rem'
@@ -201,7 +201,7 @@ export default function SetPassword() {
           <div>
             <label htmlFor="confirmPassword" style={{ 
               display: 'block', 
-              color: '#f0eeff', 
+              color: '#F4F1EA', 
               marginBottom: '0.5rem',
               fontSize: '0.875rem',
               fontWeight: '500'
@@ -221,7 +221,7 @@ export default function SetPassword() {
                 width: '100%',
                 padding: '0.75rem 1rem',
                 background: 'rgba(14,10,20,0.6)',
-                border: '1px solid rgba(240,238,255,0.12)',
+                border: '1px solid rgba(244,241,234,0.12)',
                 borderRadius: '6px',
                 color: 'var(--text-primary)',
                 fontSize: '0.875rem'
@@ -234,7 +234,7 @@ export default function SetPassword() {
             disabled={submitting}
             style={{
               padding: '0.75rem',
-              background: 'linear-gradient(135deg, #00d4ff, #00b4ff)',
+              background: 'linear-gradient(135deg, #EE6100, #00b4ff)',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -254,7 +254,7 @@ export default function SetPassword() {
           borderTop: '1px solid rgba(240, 238, 255, 0.1)',
           textAlign: 'center'
         }}>
-          <p style={{ color: '#b8a8d8', fontSize: '0.75rem' }}>
+          <p style={{ color: '#A9C4BE', fontSize: '0.75rem' }}>
             After setting your password, you'll be able to access your staff portal
           </p>
         </div>

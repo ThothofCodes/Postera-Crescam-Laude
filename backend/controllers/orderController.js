@@ -93,12 +93,20 @@ exports.createOrder = async (req, res, next) => {
       paymentMethod: paymentMethod || 'cash',
     });
 
+    let stkPushResult = null;
     if (paymentMethod === 'mpesa') {
       try {
-        const r = await stkPush(phone, total, order.orderNumber, 'Ruai Tech Order');
-        order.checkoutRequestId = r.CheckoutRequestID;
+        stkPushResult = await stkPush(phone, total, order.orderNumber, 'Ruai Tech Order');
+        order.checkoutRequestId = stkPushResult.CheckoutRequestID;
         await order.save();
-      } catch (e) { console.error('STK Push failed:', e.message); }
+      } catch (e) {
+        console.error('STK Push failed:', e.message);
+        // Return order but warn the customer — payment prompt may not arrive
+        return res.status(201).json({
+          ...order.toObject(),
+          _stkError: e.message || 'M-Pesa prompt could not be sent. Please try again or pay cash.',
+        });
+      }
     }
 
     sendSMS(phone, `Order ${order.orderNumber} placed! Total: KES ${total}. We'll confirm shortly.`);

@@ -36,8 +36,8 @@ export default function CollapsibleSidebar() {
     <aside style={{
       width: isCollapsed ? '70px' : '235px',
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #130d1e 0%, #1a1030 50%, #130d1e 100%)',
-      borderRight: '1px solid rgba(192,57,43,0.15)',
+      background: 'linear-gradient(180deg, #0F2620 0%, #0F2620 50%, #0F2620 100%)',
+      borderRight: '1px solid rgba(238,97,0,0.15)',
       boxShadow: '4px 0 24px rgba(0,0,0,0.5)',
       display: 'flex',
       flexDirection: 'column',
@@ -45,13 +45,13 @@ export default function CollapsibleSidebar() {
       overflow: 'hidden',
       transition: 'width 0.3s ease',
     }}>
-      <div style={{ position: 'absolute', top: 0, right: 0, width: 1, height: '100%', background: 'linear-gradient(180deg, transparent, rgba(192,57,43,0.4), transparent)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', top: 0, right: 0, width: 1, height: '100%', background: 'linear-gradient(180deg, transparent, rgba(238,97,0,0.4), transparent)', pointerEvents: 'none' }} />
 
       {/* Collapsible Logo */}
       <div style={{ 
         padding: '1.1rem 1rem', 
-        borderBottom: '1px solid rgba(192,57,43,0.1)', 
-        background: 'rgba(192,57,43,0.03)', 
+        borderBottom: '1px solid rgba(238,97,0,0.1)', 
+        background: 'rgba(238,97,0,0.03)', 
         display: 'flex',
         justifyContent: isCollapsed ? 'center' : 'space-between',
         alignItems: 'center',
@@ -64,8 +64,8 @@ export default function CollapsibleSidebar() {
           textDecoration: 'none',
           width: isCollapsed ? 'auto' : 'calc(100% - 30px)'
         }}
-          onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(192,57,43,0.07)'; }}
-          onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(192,57,43,0.03)'; }}>
+          onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(238,97,0,0.07)'; }}
+          onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(238,97,0,0.03)'; }}>
           <RuaiTechLogo size={isCollapsed ? 30 : 32} showText={!isCollapsed} textSize={isCollapsed ? "0px" : "12px"} />
         </Link>
         
@@ -74,7 +74,7 @@ export default function CollapsibleSidebar() {
           onClick={() => setIsCollapsed(!isCollapsed)}
           style={{
             background: 'none',
-            border: '1px solid rgba(192,57,43,0.3)',
+            border: '1px solid rgba(238,97,0,0.3)',
             color: 'var(--text-secondary)',
             borderRadius: '4px',
             width: '24px',
@@ -94,15 +94,15 @@ export default function CollapsibleSidebar() {
 
       {/* User badge - only show when expanded */}
       {!isCollapsed && user && (
-        <div style={{ margin: '0.75rem 0.75rem 0', padding: '0.6rem 0.75rem', background: 'rgba(192,57,43,0.05)', border: '1px solid rgba(192,57,43,0.1)', borderRadius: 8 }}>
+        <div style={{ margin: '0.75rem 0.75rem 0', padding: '0.6rem 0.75rem', background: 'rgba(238,97,0,0.05)', border: '1px solid rgba(238,97,0,0.1)', borderRadius: 8 }}>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', fontFamily: "'Inter',sans-serif" }}>Logged in as</div>
           <div style={{ fontSize: 13, color: 'var(--white-soft)', fontWeight: 600, marginTop: 3, fontFamily: "'Inter',sans-serif" }}>{user.name}</div>
           <div style={{ display: 'flex', gap: 4, marginTop: 4, flexWrap: 'wrap' }}>
-            <div style={{ padding: '2px 10px', background: 'rgba(192,57,43,0.12)', border: '1px solid rgba(192,57,43,0.25)', borderRadius: 20, fontSize: 10, color: '#e74c3c', fontWeight: 600, fontFamily: "'Inter',sans-serif" }}>
+            <div style={{ padding: '2px 10px', background: 'rgba(238,97,0,0.12)', border: '1px solid rgba(238,97,0,0.25)', borderRadius: 20, fontSize: 10, color: '#FF8A3D', fontWeight: 600, fontFamily: "'Inter',sans-serif" }}>
               {user.role}
             </div>
             {user.departmentSlug && (
-              <div style={{ padding: '2px 10px', background: 'rgba(41,128,185,0.1)', border: '1px solid rgba(41,128,185,0.25)', borderRadius: 20, fontSize: 10, color: '#3498db', fontWeight: 600, fontFamily: "'Inter',sans-serif" }}>
+              <div style={{ padding: '2px 10px', background: 'rgba(43,182,163,0.1)', border: '1px solid rgba(43,182,163,0.25)', borderRadius: 20, fontSize: 10, color: '#2BB6A3', fontWeight: 600, fontFamily: "'Inter',sans-serif" }}>
                 {user.departmentSlug}
               </div>
             )}
@@ -135,8 +135,8 @@ export default function CollapsibleSidebar() {
               fontSize: 13,
               fontWeight: isActive ? 600 : 400,
               fontFamily: "'Inter',sans-serif",
-              background: isActive ? 'linear-gradient(90deg, rgba(192,57,43,0.2), rgba(41,128,185,0.1))' : 'transparent',
-              borderLeft: isCollapsed ? 'none' : (isActive ? '3px solid #e74c3c' : '3px solid transparent'),
+              background: isActive ? 'linear-gradient(90deg, rgba(238,97,0,0.2), rgba(43,182,163,0.1))' : 'transparent',
+              borderLeft: isCollapsed ? 'none' : (isActive ? '3px solid #FF8A3D' : '3px solid transparent'),
               transition: 'all 0.15s ease',
               justifyContent: isCollapsed ? 'center' : 'flex-start',
             })}>
@@ -149,7 +149,7 @@ export default function CollapsibleSidebar() {
       {/* Logout - only show when expanded */}
       {!isCollapsed && (
         <div style={{ padding: '0.75rem' }}>
-          <button onClick={logout} style={{ width: '100%', padding: '0.6rem', background: 'rgba(231,76,60,0.08)', color: '#e74c3c', border: '1px solid rgba(231,76,60,0.2)', borderRadius: 8, fontSize: 13, fontWeight: 600, fontFamily: "'Inter',sans-serif", cursor: 'pointer', transition: 'all 0.2s ease' }}
+          <button onClick={logout} style={{ width: '100%', padding: '0.6rem', background: 'rgba(231,76,60,0.08)', color: '#FF8A3D', border: '1px solid rgba(231,76,60,0.2)', borderRadius: 8, fontSize: 13, fontWeight: 600, fontFamily: "'Inter',sans-serif", cursor: 'pointer', transition: 'all 0.2s ease' }}
             onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(231,76,60,0.18)'; }}
             onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(231,76,60,0.08)'; }}>
             ⏻ Logout

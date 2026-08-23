@@ -10,6 +10,11 @@ const mongoose = require('mongoose');
 const http = require('http');
 const connectDB = require('./config/db');
 const setupIndexes = require('./utils/setupIndexes');
+const requestId = require('./middleware/requestId');
+const logger = require('./utils/logger');
+const { metrics, metricsMiddleware } = require('./utils/metrics');
+const swaggerUi = require('swagger-ui-express');
+const { swaggerSpec } = require('./swagger');
 
 mongoose.set('bufferCommands', false);
 
@@ -54,15 +59,21 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false, // allow Cloudinary images
 }));
 
-// ── 2. CORS — strict origin whitelist ──────────────────────────────────────
+// ── 2. CORS — origin whitelist with mobile/LAN support ─────────────────────
+const isDev = process.env.NODE_ENV !== 'production';
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
   .split(',')
   .map((o) => o.trim());
 
 app.use(cors({
   origin: (origin, cb) => {
-    // Allow requests with no origin (mobile apps, curl, Postman in dev)
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
+    if (!origin) return cb(null, true);
+    // In development, allow any localhost/LAN origin
+    if (isDev && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+    if (isDev && /^https?:\/\/\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    console.warn(`CORS blocked: origin ${origin} not in whitelist`);
     cb(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
@@ -135,22 +146,85 @@ const chatLimiter = rateLimit({
 });
 app.use('/api/chat/callback', chatLimiter);
 
-// ── M-Pesa callback — no rate limit (Safaricom calls this) ──────────────
-// Exempt from global limiter by placing before it — already done above
-
-// ── 9. Health check ─────────────────────────────────────────────────────────
+// ── Health check — exempt from rate limiter (placed before it) ──────────
+const startTime = Date.now();
 app.get('/api/health', (req, res) => {
   const dbState = mongoose.connection.readyState;
   const states = {
     0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting',
   };
   const ok = dbState === 1;
+  const mem = process.memoryUsage();
   res.status(ok ? 200 : 503).json({
     status: ok ? 'ok' : 'degraded',
     db: states[dbState] || 'unknown',
+    uptime: Math.floor((Date.now() - startTime) / 1000),
+    version: process.env.npm_package_version || '1.0.0',
+    memory: {
+      rss: Math.round(mem.rss / 1024 / 1024) + 'MB',
+      heapUsed: Math.round(mem.heapUsed / 1024 / 1024) + 'MB',
+      heapTotal: Math.round(mem.heapTotal / 1024 / 1024) + 'MB',
+    },
     ...(dbState !== 1 && { hint: 'Set MONGO_URI in backend/.env and restart the server' }),
   });
 });
+app.get('/api/ready', (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  if (dbState === 1) {
+    res.status(200).json({ status: 'ready', db: 'connected' });
+  } else {
+    const dbStates = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    res.status(503).json({ status: 'not ready', db: dbStates[dbState] || 'unknown' });
+  }
+});
+
+// ── Health detail — comprehensive metrics for the admin dashboard ─────
+// Exempt from rate limiter (placed before it). Auth required.
+app.get('/api/health/detail', async (req, res) => {
+  try {
+    const dbState = mongoose.connection.readyState;
+    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+
+    // Get metrics snapshot
+    const metricsData = metrics.snapshot();
+
+    // Get collection counts if DB is connected
+    let collections = {};
+    if (dbState === 1) {
+      try {
+        const db = mongoose.connection.db;
+        const collectionNames = ['users', 'products', 'orders', 'tickets', 'revenue', 'consultations', 'invoices', 'chatmessages', 'departments', 'services'];
+        const counts = await Promise.all(
+          collectionNames.map(name => db.collection(name).countDocuments().catch(() => 0))
+        );
+        collectionNames.forEach((name, i) => { collections[name] = counts[i]; });
+      } catch { /* collection counts unavailable */ }
+    }
+
+    res.json({
+      status: dbState === 1 ? 'ok' : 'degraded',
+      db: {
+        state: states[dbState] || 'unknown',
+        connected: dbState === 1,
+        host: mongoose.connection.host || 'unknown',
+        name: mongoose.connection.name || 'unknown',
+        collections,
+      },
+      ...metricsData,
+    });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
+
+// ── M-Pesa callback — no rate limit (Safaricom calls this) ──────────────
+// Exempt from global limiter by placing before it — already done above
+
+// ── 7b. Request metrics collector ─────────────────────────────────────────
+app.use(metricsMiddleware);
+
+// ── 8. Request ID — unique X-Request-Id on every request ─────────────────────
+app.use(requestId);
 
 // ── 10. API routes ───────────────────────────────────────────────────────────
 app.use('/api/auth', require('./routes/auth'));
@@ -169,8 +243,8 @@ app.use('/api/users', require('./routes/users'));
 app.use('/api/dept', require('./routes/deptModules'));
 app.use('/api/track', require('./routes/track')); // Phase 9 market research — public repair status tracker, no auth
 app.use('/api/admin', require('./routes/admin'));
-app.use('/api/tickets', require('./routes/tickets'));
-app.use('/api/tickets', require('./routes/publicTicketsTrack'));
+app.use('/api/tickets', require('./routes/publicTicketsTrack')); // Public: track + create (no auth)
+app.use('/api/tickets', require('./routes/tickets')); // Protected: admin CRUD (requires auth)
 
 app.use('/api/staff-portal', require('./routes/staffPortal'));
 app.use('/api/staff-invitation', require('./routes/staffInvitation')); // Staff invitation system
@@ -183,7 +257,18 @@ app.use('/api/help', require('./routes/help')); // Help Desk routes
 
 app.use('/api/email', require('./routes/email'));
 app.use('/api/ussd', require('./routes/ussd'));
+app.use('/api/devices', require('./routes/devices'));
 app.use('/api/analytics', require('./routes/analytics'));
+
+// ── 10a. Swagger API docs ──────────────────────────────────────────────────
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'PCL API Documentation',
+}));
+app.get('/api/docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // ── 11. 404 handler ──────────────────────────────────────────────────────────
 app.use((req, res) => {

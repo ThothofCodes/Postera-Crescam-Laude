@@ -1,26 +1,22 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
+// PCL — Circuit Canopy DBStatusBanner
 import { useEffect, useState } from 'react';
 import { api } from '../utils/api';
 import useSocket from '../hooks/useSocket';
 
 export default function DBStatusBanner() {
-  const [status, setStatus] = useState(null); // null=checking, 'ok', 'degraded'
+  const [status, setStatus] = useState(null);
 
-  // Initial check
   useEffect(() => {
     api.get('/health')
       .then(({ data }) => setStatus(data.status))
       .catch(() => setStatus('degraded'));
   }, []);
 
-  // Real-time system status from Super Admin dashboard socket events
   useSocket({
-    'system:status': ({ status: s }) => {
-      setStatus(s === 'ok' ? 'ok' : 'degraded');
-    },
-    connect:         () => setStatus('ok'),
-    disconnect:      () => {
-      // only flag degraded after a short delay (transient disconnects are normal)
+    'system:status': ({ status: s }) => { setStatus(s === 'ok' ? 'ok' : 'degraded'); },
+    connect: () => setStatus('ok'),
+    disconnect: () => {
       setTimeout(() => {
         api.get('/health')
           .then(({ data }) => setStatus(data.status))
@@ -34,26 +30,21 @@ export default function DBStatusBanner() {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
-      background: 'linear-gradient(90deg,rgba(255,51,102,0.95),rgba(180,0,60,0.95))',
-      borderBottom: '1px solid rgba(255,51,102,0.6)',
-      boxShadow: '0 2px 20px rgba(255,51,102,0.4)',
+      background: '#FF3B3B',
+      borderBottom: '1px solid rgba(255,59,59,0.6)',
       padding: '0.6rem 1.5rem', display: 'flex', alignItems: 'center',
-      justifyContent: 'space-between', gap: 12, backdropFilter: 'blur(8px)',
+      justifyContent: 'space-between', gap: 12,
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 16 }}>⚠</span>
         <div>
-          <span style={{ fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', color: '#fff' }}>
+          <span style={{ fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', color: '#fff', fontFamily: "'Share Tech Mono',monospace" }}>
             DATABASE NOT CONNECTED
           </span>
           <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', marginLeft: 12 }}>
-            Open <code style={{ background: 'rgba(0,0,0,0.3)', padding: '1px 6px', borderRadius: 3 }}>
-              backend/.env
-            </code>
-            {' '}→ set <code style={{ background: 'rgba(0,0,0,0.3)', padding: '1px 6px', borderRadius: 3 }}>
-              MONGO_URI
-            </code>
-            {' '}→ restart the server
+            Open <code style={{ background: 'rgba(0,0,0,0.3)', padding: '1px 6px', borderRadius: 3 }}>backend/.env</code>
+            {' '}→ set <code style={{ background: 'rgba(0,0,0,0.3)', padding: '1px 6px', borderRadius: 3 }}>MONGO_URI</code>
+            {' '}→ restart
           </span>
         </div>
       </div>
@@ -61,7 +52,7 @@ export default function DBStatusBanner() {
         style={{ padding: '3px 12px', background: 'rgba(255,255,255,0.15)',
           border: '1px solid rgba(255,255,255,0.4)', borderRadius: 3, color: '#fff',
           fontSize: 11, fontWeight: 700, letterSpacing: '0.06em',
-          textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          textDecoration: 'none', whiteSpace: 'nowrap', fontFamily: "'Share Tech Mono',monospace" }}>
         Get Atlas URI →
       </a>
     </div>

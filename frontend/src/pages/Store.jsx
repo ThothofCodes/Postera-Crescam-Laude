@@ -1,4 +1,5 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
+// PCL — Circuit Canopy Store
 import { useEffect, useState } from 'react';
 import { publicApi } from '../utils/api';
 import ProductCard from '../components/ProductCard';
@@ -30,11 +31,12 @@ export default function Store() {
   return (
     <div>
       {/* Hero */}
-      <div className="hero-section" style={{ padding: '3rem 1rem 2rem' }}>
-        <div className="section-label">Ruai Tech Solutions</div>
-        <h1 className="hero-title" style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)' }}>Tech Store</h1>
-        <p style={{ color: 'var(--white-dim)', fontSize: 14, margin: 0, fontFamily: "'Inter', sans-serif" }}>
-          {total} products · Laptops, accessories, software &amp; service packages
+      <div className="hero-section" style={{ padding: '5rem 1rem 4rem' }}>
+        <div className="scanline-overlay" style={{ opacity: 0.3 }} />
+        <div className="section-label">POSTERA CRESCAM LAUDE</div>
+        <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>Tech Store</h1>
+        <p style={{ color: '#A9C4BE', fontSize: 14, margin: 0, fontFamily: "'Poppins', sans-serif" }}>
+          <span style={{ fontFamily: "'Share Tech Mono',monospace", color: '#2BB6A3' }}>{total}</span> products · Laptops, accessories, software &amp; service packages
         </p>
       </div>
 
@@ -49,7 +51,7 @@ export default function Store() {
               className="input-field"
               style={{ paddingLeft: '2.4rem', fontSize: 14 }}
             />
-            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 14 }}>🔍</span>
+            <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#6A8A82', fontSize: 14 }}>🔍</span>
           </div>
           <select value={sort} onChange={(e) => setSort(e.target.value)} className="input-field" style={{ width: 'auto', fontSize: 13, cursor: 'pointer' }}>
             <option value="-createdAt">Newest</option>

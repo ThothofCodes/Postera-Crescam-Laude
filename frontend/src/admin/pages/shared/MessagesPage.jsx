@@ -1,48 +1,31 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../../context/AuthContext';
 import { useChat } from '../../../hooks/useChat';
-import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
 const MessagesPage = () => {
-  const { user, logout } = useAuth();
-  const authToken = localStorage.getItem('token');
+  const authToken = localStorage.getItem('adminToken') || localStorage.getItem('token');
   
-  // Verify that the token is still valid before initializing chat
-  const [tokenValid, setTokenValid] = useState(true);
+  const [tokenValid, setTokenValid] = useState(!!authToken);
   
   useEffect(() => {
-    // Simple validation of token format
     if (!authToken || typeof authToken !== 'string' || !authToken.includes('.')) {
       setTokenValid(false);
       return;
     }
-    
-    // Check if token is expired by decoding payload (without verification)
     try {
       const parts = authToken.split('.');
-      if (parts.length !== 3) {
-        setTokenValid(false);
-        return;
-      }
-      
+      if (parts.length !== 3) { setTokenValid(false); return; }
       const payload = JSON.parse(atob(parts[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-      
-      if (payload.exp && payload.exp < currentTime) {
+      if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
         setTokenValid(false);
-        logout(); // Token expired, log out user
         return;
       }
-      
       setTokenValid(true);
-    } catch (e) {
-      console.error('Error validating token:', e);
+    } catch {
       setTokenValid(false);
-      return;
     }
-  }, [authToken, logout]);
+  }, [authToken]);
 
   const { 
     connected, 
@@ -210,7 +193,7 @@ const MessagesPage = () => {
       }}>
         <div style={{ 
           textAlign: 'center', 
-          color: '#f0eeff',
+          color: '#F4F1EA',
           background: 'var(--bg-card)',
           padding: '2rem',
           borderRadius: '12px',
@@ -249,7 +232,7 @@ const MessagesPage = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h1 style={{ 
-                color: '#f0eeff', 
+                color: '#F4F1EA', 
                 fontSize: '2rem', 
                 fontWeight: 700, 
                 marginBottom: '0.5rem',
@@ -257,13 +240,13 @@ const MessagesPage = () => {
               }}>
                 Customer Support Chat
               </h1>
-              <p style={{ color: '#b8a8d8', fontSize: '1rem' }}>
+              <p style={{ color: '#A9C4BE', fontSize: '1rem' }}>
                 Manage customer conversations and provide support
               </p>
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <label htmlFor="notification-channel" style={{ color: '#b8a8d8', fontSize: '0.875rem' }}>Channel:</label>
+                <label htmlFor="notification-channel" style={{ color: '#A9C4BE', fontSize: '0.875rem' }}>Channel:</label>
                 <select
                   id="notification-channel"
                   value={notificationChannel}
@@ -271,9 +254,9 @@ const MessagesPage = () => {
                   style={{
                     padding: '0.25rem 0.5rem',
                     background: 'rgba(14,10,20,0.6)',
-                    border: '1px solid rgba(240,238,255,0.12)',
+                    border: '1px solid rgba(244,241,234,0.12)',
                     borderRadius: '4px',
-                    color: '#f0eeff',
+                    color: '#F4F1EA',
                     fontSize: '0.875rem'
                   }}
                 >
@@ -287,7 +270,7 @@ const MessagesPage = () => {
                 borderRadius: '20px', 
                 fontSize: '0.875rem',
                 background: connected ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 51, 102, 0.2)',
-                color: connected ? '#00d4ff' : '#ff3366'
+                color: connected ? '#EE6100' : '#ff3366'
               }}>
                 {connected ? '🟢 Connected' : '🔴 Disconnected'}
               </span>
@@ -296,7 +279,7 @@ const MessagesPage = () => {
                 borderRadius: '20px', 
                 fontSize: '0.875rem',
                 background: adminOnline ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 51, 102, 0.2)',
-                color: adminOnline ? '#00d4ff' : '#ff3366'
+                color: adminOnline ? '#EE6100' : '#ff3366'
               }}>
                 {adminOnline ? '👨‍💼 Admin Available' : '😴 No Admin Available'}
               </span>
@@ -322,13 +305,13 @@ const MessagesPage = () => {
           }}>
             <div style={{ padding: '1rem', borderBottom: '1px solid rgba(240, 238, 255, 0.1)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                <h3 style={{ color: '#f0eeff', fontWeight: 600, margin: 0 }}>Conversations</h3>
+                <h3 style={{ color: '#F4F1EA', fontWeight: 600, margin: 0 }}>Conversations</h3>
                 <span style={{ 
                   padding: '0.25rem 0.5rem', 
                   borderRadius: '12px', 
                   fontSize: '0.75rem',
                   background: connected ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 51, 102, 0.2)',
-                  color: connected ? '#00d4ff' : '#ff3366'
+                  color: connected ? '#EE6100' : '#ff3366'
                 }}>
                   {connected ? 'Live' : 'Offline'}
                 </span>
@@ -344,7 +327,7 @@ const MessagesPage = () => {
                     width: '100%',
                     padding: '0.5rem 0.75rem',
                     background: 'rgba(14,10,20,0.6)',
-                    border: '1px solid rgba(240,238,255,0.12)',
+                    border: '1px solid rgba(244,241,234,0.12)',
                     borderRadius: '6px',
                     color: 'var(--text-primary)',
                     fontSize: '0.875rem'
@@ -375,7 +358,7 @@ const MessagesPage = () => {
                       onClick={() => handleSelectConversation(normalizedConvId)}
                       className={`p-3 cursor-pointer transition-colors ${
                         currentConversation === normalizedConvId 
-                          ? 'background: rgba(0, 212, 255, 0.1); border-left: 3px solid #00d4ff;' 
+                          ? 'background: rgba(0, 212, 255, 0.1); border-left: 3px solid #EE6100;' 
                           : 'hover:bg-gray-800'
                       }`}
                       style={{
@@ -383,7 +366,7 @@ const MessagesPage = () => {
                           ? 'rgba(0, 212, 255, 0.1)' 
                           : 'transparent',
                         borderLeft: currentConversation === normalizedConvId 
-                          ? '3px solid #00d4ff' 
+                          ? '3px solid #EE6100' 
                           : 'none',
                         cursor: 'pointer',
                         padding: '1rem',
@@ -391,16 +374,16 @@ const MessagesPage = () => {
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                        <div style={{ fontWeight: '600', color: '#f0eeff' }}>
+                        <div style={{ fontWeight: '600', color: '#F4F1EA' }}>
                           Guest: {conv.guestId?.substring(0, 8) || normalizedConvId.replace('conversation-guest-', '').substring(0, 8)}
                         </div>
-                        <span style={{ fontSize: '0.75rem', color: '#b8a8d8' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#A9C4BE' }}>
                           {conv.timestamp ? new Date(conv.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                         </span>
                       </div>
                       <div style={{ 
                         fontSize: '0.875rem', 
-                        color: '#b8a8d8', 
+                        color: '#A9C4BE', 
                         whiteSpace: 'nowrap', 
                         overflow: 'hidden', 
                         textOverflow: 'ellipsis',
@@ -416,7 +399,7 @@ const MessagesPage = () => {
                           background: 'rgba(0, 212, 255, 0.8)',
                           marginRight: '0.5rem'
                         }}></span>
-                        <span style={{ fontSize: '0.75rem', color: '#00d4ff' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#EE6100' }}>
                           Active now
                         </span>
                       </div>
@@ -425,13 +408,13 @@ const MessagesPage = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          sendNotification(normalizedConvId, `Hello, this is a ${notificationChannel} notification from Ruai Tech Solutions.`);
+                          sendNotification(normalizedConvId, `Hello, this is a ${notificationChannel} notification from Postera Crescam Laude.`);
                         }}
                         style={{
                           marginTop: '0.5rem',
                           padding: '0.25rem 0.5rem',
                           background: 'rgba(0, 212, 255, 0.2)',
-                          color: '#00d4ff',
+                          color: '#EE6100',
                           border: '1px solid rgba(0, 212, 255, 0.3)',
                           borderRadius: '4px',
                           fontSize: '0.75rem',
@@ -470,21 +453,21 @@ const MessagesPage = () => {
                   alignItems: 'center'
                 }}>
                   <div>
-                    <h3 style={{ color: '#f0eeff', fontWeight: 600, margin: 0 }}>
+                    <h3 style={{ color: '#F4F1EA', fontWeight: 600, margin: 0 }}>
                       Chat with Guest: {currentConversation.replace('conversation-guest-', '').substring(0, 8)}
                     </h3>
-                    <p style={{ color: '#b8a8d8', fontSize: '0.875rem', margin: 0 }}>
+                    <p style={{ color: '#A9C4BE', fontSize: '0.875rem', margin: 0 }}>
                       {currentMessages.length} messages • {connected ? 'Connected' : 'Disconnected'}
                     </p>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     {/* Notification button for current conversation */}
                     <button
-                      onClick={() => sendNotification(currentConversation, `Hello, this is a ${notificationChannel} notification from Ruai Tech Solutions.`)}
+                      onClick={() => sendNotification(currentConversation, `Hello, this is a ${notificationChannel} notification from Postera Crescam Laude.`)}
                       style={{
                         padding: '0.5rem 1rem',
                         background: 'rgba(0, 212, 255, 0.2)',
-                        color: '#00d4ff',
+                        color: '#EE6100',
                         border: '1px solid rgba(0, 212, 255, 0.3)',
                         borderRadius: '6px',
                         fontSize: '0.875rem',
@@ -498,7 +481,7 @@ const MessagesPage = () => {
                       borderRadius: '12px', 
                       fontSize: '0.75rem',
                       background: 'rgba(0, 212, 255, 0.2)',
-                      color: '#00d4ff'
+                      color: '#EE6100'
                     }}>
                       Active
                     </span>
@@ -529,10 +512,10 @@ const MessagesPage = () => {
                             borderRadius: '12px',
                             background: msg.senderType === 'admin' 
                               ? 'linear-gradient(135deg, rgba(255,51,102,0.15), rgba(255,0,102,0.1))' 
-                              : 'linear-gradient(135deg, rgba(0,212,255,0.15), rgba(0,180,255,0.1))',
+                              : 'linear-gradient(135deg, rgba(238,97,0,0.15), rgba(0,180,255,0.1))',
                             border: msg.senderType === 'admin' 
                               ? '1px solid rgba(255,51,102,0.2)' 
-                              : '1px solid rgba(0,212,255,0.2)',
+                              : '1px solid rgba(238,97,0,0.2)',
                             color: 'var(--text-primary)',
                             fontSize: '0.875rem',
                           }}
@@ -562,10 +545,10 @@ const MessagesPage = () => {
                       textAlign: 'center'
                     }}>
                       <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>💬</div>
-                      <div style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem', color: '#f0eeff' }}>
+                      <div style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '0.5rem', color: '#F4F1EA' }}>
                         Ready to assist
                       </div>
-                      <div style={{ fontSize: '0.875rem', color: '#b8a8d8' }}>
+                      <div style={{ fontSize: '0.875rem', color: '#A9C4BE' }}>
                         Waiting for customer message...
                       </div>
                     </div>
@@ -589,7 +572,7 @@ const MessagesPage = () => {
                         flex: 1,
                         padding: '0.75rem 1rem',
                         background: 'rgba(14,10,20,0.8)',
-                        border: '1px solid rgba(240,238,255,0.12)',
+                        border: '1px solid rgba(244,241,234,0.12)',
                         borderRadius: '6px',
                         color: 'var(--text-primary)',
                         fontSize: '0.875rem'
@@ -600,7 +583,7 @@ const MessagesPage = () => {
                       disabled={!newMessage.trim() || !currentConversation}
                       style={{
                         padding: '0.75rem 1.5rem',
-                        background: 'linear-gradient(135deg, #00d4ff, #00b4ff)',
+                        background: 'linear-gradient(135deg, #EE6100, #00b4ff)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '6px',
@@ -627,10 +610,10 @@ const MessagesPage = () => {
                 padding: '2rem'
               }}>
                 <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>💬</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem', color: '#f0eeff' }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.5rem', color: '#F4F1EA' }}>
                   Select a conversation
                 </div>
-                <div style={{ fontSize: '1rem', color: '#b8a8d8', maxWidth: '400px' }}>
+                <div style={{ fontSize: '1rem', color: '#A9C4BE', maxWidth: '400px' }}>
                   Choose a conversation from the left panel to start chatting with customers
                 </div>
               </div>

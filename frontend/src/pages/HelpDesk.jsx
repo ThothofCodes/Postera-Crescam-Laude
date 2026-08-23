@@ -12,12 +12,13 @@ const HelpDesk = () => {
   const [newTicket, setNewTicket] = useState({
     subject: '',
     category: 'general',
-    priority: 'medium',
+    priority: 'MEDIUM',
     description: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showTicketForm, setShowTicketForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submittedTicket, setSubmittedTicket] = useState(null);
   const [faqs, setFaqs] = useState([]);
   const [troubleshootingGuides, setTroubleshootingGuides] = useState([]);
   const [knowledgeBase, setKnowledgeBase] = useState([]);
@@ -110,18 +111,29 @@ const HelpDesk = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await api.post('/help/tickets', newTicket);
+      const response = await publicApi.post('/tickets', {
+        title: newTicket.subject,
+        description: newTicket.description,
+        category: newTicket.category,
+        priority: newTicket.priority?.toUpperCase() || 'MEDIUM',
+        departmentSlug: 'general',
+      });
       if (response.data.success) {
-        // Add the new ticket to the list
-        setTickets([...tickets, response.data.data]);
-        setNewTicket({
-          subject: '',
-          category: 'general',
-          priority: 'medium',
-          description: ''
-        });
+        // Add the new ticket to the local list so it appears immediately
+        const newEntry = {
+          id: response.data.ticketId || Date.now(),
+          subject: newTicket.subject,
+          category: newTicket.category,
+          priority: newTicket.priority,
+          description: newTicket.description,
+          status: 'open',
+          createdAt: new Date().toISOString(),
+          ticketId: response.data.ticketId,
+        };
+        setTickets((prev) => [newEntry, ...prev]);
+        setSubmittedTicket(response.data);
+        setNewTicket({ subject: '', category: 'general', priority: 'MEDIUM', description: '' });
         setShowTicketForm(false);
-        alert('Ticket submitted successfully! Our support team will get back to you soon.');
       } else {
         alert(response.data.message || 'Failed to submit ticket. Please try again.');
       }
@@ -277,10 +289,10 @@ const HelpDesk = () => {
                   value={newTicket.priority}
                   onChange={(e) => setNewTicket({...newTicket, priority: e.target.value})}
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
+                  <option value="LOW">Low</option>
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High</option>
+                  <option value="CRITICAL">Urgent</option>
                 </select>
               </div>
             </div>
@@ -391,8 +403,8 @@ const HelpDesk = () => {
         <div className="contact-option">
           <h3>Email Support</h3>
           <p>Send us an email and we'll respond within 24 hours</p>
-          <a href="mailto:support@ruaitech.com" className="btn-secondary">
-            support@ruaitech.com
+          <a href="mailto:support@posteracrescamlaude.co.ke" className="btn-secondary">
+            support@posteracrescamlaude.co.ke
           </a>
         </div>
         
@@ -452,6 +464,87 @@ const HelpDesk = () => {
     </div>
   );
 
+  // ── Success overlay ──────────────────────────────────────────────
+  const SuccessOverlay = () => {
+    if (!submittedTicket) return null;
+    const ticketId = submittedTicket.ticketId || submittedTicket._id || '—';
+    return (
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(8,25,22,0.92)', backdropFilter: 'blur(8px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        animation: 'pcl-fade-in 0.3s ease',
+      }}>
+        <div style={{
+          background: 'linear-gradient(160deg, #0F2620, #0B1F1B)',
+          border: '1px solid rgba(43,182,163,0.3)',
+          borderRadius: 16, padding: '3rem 2.5rem', maxWidth: 440, width: '90%',
+          textAlign: 'center', position: 'relative', overflow: 'hidden',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.6), 0 0 60px rgba(43,182,163,0.08)',
+          animation: 'pcl-slide-up 0.4s cubic-bezier(0.4,0,0.2,1)',
+        }}>
+          {/* Top glow line */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+            background: 'linear-gradient(90deg, transparent, #39FF88, #2BB6A3, #39FF88, transparent)', opacity: 0.8 }} />
+          {/* Animated checkmark circle */}
+          <div style={{
+            width: 88, height: 88, borderRadius: '50%', margin: '0 auto 1.5rem',
+            background: 'rgba(57,255,136,0.08)', border: '3px solid #39FF88',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            animation: 'pcl-pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.1s both',
+          }}>
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <path d="M10 20L17 27L30 13" stroke="#39FF88" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"
+                style={{ strokeDasharray: 50, strokeDashoffset: 50, animation: 'pcl-draw 0.6s ease 0.4s forwards' }} />
+            </svg>
+          </div>
+          <h2 style={{ margin: '0 0 0.5rem', fontSize: 22, fontWeight: 700, color: '#39FF88',
+            fontFamily: "'Rajdhani',sans-serif", letterSpacing: '0.06em' }}>
+            Ticket Submitted!
+          </h2>
+          <p style={{ margin: '0 0 1.25rem', fontSize: 14, color: '#A9C4BE', lineHeight: 1.6 }}>
+            Our support team will review your request and get back to you soon.
+          </p>
+          {/* Ticket ID card */}
+          <div style={{
+            background: 'rgba(43,182,163,0.06)', border: '1px solid rgba(43,182,163,0.2)',
+            borderRadius: 10, padding: '1rem', marginBottom: '1.5rem',
+          }}>
+            <div style={{ fontSize: 9, color: '#6A8A82', letterSpacing: '0.15em',
+              textTransform: 'uppercase', fontFamily: "'Share Tech Mono',monospace", marginBottom: 4 }}>
+              Your Reference Number
+            </div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#EE6100',
+              fontFamily: "'Share Tech Mono',monospace", letterSpacing: '0.08em' }}>
+              {ticketId}
+            </div>
+          </div>
+          <p style={{ margin: '0 0 1.5rem', fontSize: 12, color: '#6A8A82',
+            fontFamily: "'Share Tech Mono',monospace" }}>
+            Save this number to track your ticket status
+          </p>
+          {/* Action buttons */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+            <button onClick={() => { setSubmittedTicket(null); setActiveTab('tickets'); }}
+              style={{ padding: '0.65rem 1.5rem', background: 'transparent', color: '#2BB6A3',
+                border: '1px solid rgba(43,182,163,0.3)', borderRadius: 6, cursor: 'pointer',
+                fontWeight: 600, fontSize: 13, transition: 'all 0.2s', fontFamily: "'Poppins',sans-serif" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(43,182,163,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >View My Tickets</button>
+            <button onClick={() => setSubmittedTicket(null)}
+              style={{ padding: '0.65rem 1.5rem', background: '#EE6100', color: '#fff',
+                border: 'none', borderRadius: 6, cursor: 'pointer',
+                fontWeight: 700, fontSize: 13, transition: 'all 0.2s', fontFamily: "'Poppins',sans-serif" }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 0 20px rgba(238,97,0,0.3)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+            >Done</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{
       padding: '2rem',
@@ -466,7 +559,7 @@ const HelpDesk = () => {
         background: 'var(--bg-panel)',
         borderRadius: '12px',
         padding: '2rem',
-        border: '1px solid #f0eeff1a',
+        border: '1px solid rgba(244,241,234,0.1)',
         boxShadow: '0 8px 32px #000000b3'
       }}>
         <h1 style={{
@@ -545,7 +638,13 @@ const HelpDesk = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <SuccessOverlay />
+
+      <style>{`
+        @keyframes pcl-fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pcl-slide-up { from { opacity: 0; transform: translateY(24px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes pcl-pop { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+        @keyframes pcl-draw { to { stroke-dashoffset: 0; } }
         .help-content {
           display: flex;
           flex-direction: column;
@@ -564,7 +663,7 @@ const HelpDesk = () => {
         .search-input {
           width: 100%;
           padding: 0.75rem;
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           font-size: 1rem;
           background: var(--bg-card);
@@ -583,7 +682,7 @@ const HelpDesk = () => {
 
         .category-btn {
           padding: 0.5rem 1rem;
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           background: var(--bg-card);
           color: var(--text-secondary);
           border-radius: 6px;
@@ -595,7 +694,7 @@ const HelpDesk = () => {
         .category-btn.active {
           background: var(--grad-btn-red);
           color: white;
-          border-color: #c0392b4d;
+          border-color: #EE61004d;
         }
 
         .faq-list {
@@ -605,7 +704,7 @@ const HelpDesk = () => {
         }
 
         .faq-item {
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           padding: 1rem;
           background: var(--bg-card);
@@ -628,7 +727,7 @@ const HelpDesk = () => {
         }
 
         .guide-item {
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           padding: 1rem;
           background: var(--bg-card);
@@ -656,7 +755,7 @@ const HelpDesk = () => {
         }
 
         .article-item {
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           padding: 1rem;
           background: var(--bg-card);
@@ -679,12 +778,12 @@ const HelpDesk = () => {
         }
 
         .tag {
-          background: #c0392b26;
+          background: #EE610026;
           color: var(--text-secondary);
           padding: 0.25rem 0.5rem;
           border-radius: 4px;
           font-size: 0.8rem;
-          border: 1px solid #c0392b4d;
+          border: 1px solid #EE61004d;
         }
 
         .tickets-content {
@@ -714,7 +813,7 @@ const HelpDesk = () => {
         .btn-primary:hover {
           filter: brightness(1.1);
           transform: translateY(-1px);
-          box-shadow: 0 6px 24px #c0392b66;
+          box-shadow: 0 6px 24px #EE610066;
         }
 
         .btn-primary:disabled {
@@ -724,7 +823,7 @@ const HelpDesk = () => {
 
         .ticket-form {
           background: var(--bg-card);
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           padding: 1.5rem;
           margin-bottom: 1.5rem;
@@ -754,9 +853,9 @@ const HelpDesk = () => {
         .form-group textarea {
           width: 100%;
           padding: 0.65rem 0.9rem;
-          border: 1px solid #f0eeff1f;
+          border: 1px solid rgba(244,241,234,0.12);
           border-radius: 8px;
-          background: #0e0a1499;
+          background: #08191699;
           color: var(--text-primary);
           font-size: 14px;
           font-family: "'Inter', sans-serif";
@@ -765,9 +864,9 @@ const HelpDesk = () => {
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
-          background: #1a1030cc;
-          border-color: #c0392b80;
-          box-shadow: 0 0 0 3px #c0392b1a;
+          background: #0F2620cc;
+          border-color: #EE610080;
+          box-shadow: 0 0 0 3px #EE61001a;
           outline: none;
         }
 
@@ -796,7 +895,7 @@ const HelpDesk = () => {
         }
 
         .ticket-item {
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           padding: 1rem;
           background: var(--bg-card);
@@ -826,9 +925,9 @@ const HelpDesk = () => {
         }
 
         .status-badge.open {
-          border-color: #3498db;
+          border-color: #2BB6A3;
           color: var(--text-blue);
-          background: #2980b91a;
+          background: #2BB6A31a;
         }
 
         .status-badge.closed {
@@ -851,7 +950,7 @@ const HelpDesk = () => {
         }
 
         .contact-option {
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           padding: 1.5rem;
           text-align: center;
@@ -875,7 +974,7 @@ const HelpDesk = () => {
           color: var(--white-soft);
           transition: var(--transition);
           background: transparent;
-          border: 1px solid #f0eeff40;
+          border: 1px solid rgba(244,241,234,0.25);
           border-radius: 8px;
           text-decoration: none;
           cursor: pointer;
@@ -885,12 +984,12 @@ const HelpDesk = () => {
 
         .btn-secondary:hover {
           color: #fff;
-          background: #f0eeff14;
-          border-color: #f0eeff80;
+          background: rgba(244,241,234,0.08);
+          border-color: rgba(244,241,234,0.5);
         }
 
         .support-hours {
-          border: 1px solid #f0eeff1a;
+          border: 1px solid rgba(244,241,234,0.1);
           border-radius: 8px;
           padding: 1.5rem;
           background: var(--bg-card);

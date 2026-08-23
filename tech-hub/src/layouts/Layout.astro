@@ -1,0 +1,183 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Empowering Kenya\'s Digital Future — Tech articles, tips, and news' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="nav">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">
+          <span class="brand-icon">◈</span>
+          <span class="brand-text">PCL Tech Hub</span>
+        </a>
+        <div class="nav-links">
+          <a href="/">Home</a>
+          <a href="/articles">Articles</a>
+          <a href="/tips">Tips</a>
+          <a href="/news">News</a>
+          <a href="https://pcl.co.ke" target="_blank" rel="noopener">Main Site</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <slot />
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <span class="brand-icon">◈</span>
+          <span>PCL Tech Hub</span>
+        </div>
+        <p class="footer-tagline">Empowering Kenya's Digital Future</p>
+        <div class="footer-links">
+          <a href="/">Home</a>
+          <a href="/articles">Articles</a>
+          <a href="/tips">Tips</a>
+          <a href="/news">News</a>
+        </div>
+        <p class="footer-copy">&copy; 2026 Postera Crescam Laude. Licensed under MIT.</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #0B1F1B;
+    color: #F4F1EA;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Navigation */
+  .nav {
+    background: rgba(11, 31, 27, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(43, 182, 163, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #F4F1EA;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .brand-icon {
+    color: #EE6100;
+    font-size: 1.25rem;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .nav-links a {
+    color: #A9C4BE;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: #EE6100; }
+
+  /* Footer */
+  .footer {
+    margin-top: auto;
+    background: #050d0a;
+    border-top: 1px solid rgba(43, 182, 163, 0.2);
+    padding: 2rem 0;
+  }
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-tagline {
+    color: #2BB6A3;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .footer-links a {
+    color: #A9C4BE;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: #EE6100; }
+
+  .footer-copy {
+    color: #4a6a8a;
+    font-size: 0.8rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .nav-links { gap: 1rem; }
+    .nav-links a { font-size: 0.8rem; }
+  }
+</style>

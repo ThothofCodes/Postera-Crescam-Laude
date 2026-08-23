@@ -4,7 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
-const StaffInvitation = ({ color = '#00d4ff' }) => {
+const StaffInvitation = ({ color = '#EE6100' }) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
@@ -124,7 +124,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ marginBottom: '2rem' }}>
           <h1 style={{ 
-            color: '#f0eeff', 
+            color: '#F4F1EA', 
             fontSize: '2rem', 
             fontWeight: 700, 
             marginBottom: '0.5rem',
@@ -132,7 +132,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
           }}>
             Staff Invitation System
           </h1>
-          <p style={{ color: '#b8a8d8', fontSize: '1rem' }}>
+          <p style={{ color: '#A9C4BE', fontSize: '1rem' }}>
             Invite new staff members via company email assignment
           </p>
         </div>
@@ -146,7 +146,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
             border: '1px solid rgba(240, 238, 255, 0.1)'
           }}>
             <h2 style={{ 
-              color: '#f0eeff', 
+              color: '#F4F1EA', 
               fontSize: '1.25rem', 
               fontWeight: 600, 
               marginBottom: '1.5rem',
@@ -160,7 +160,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
               <div>
                 <label htmlFor="name" style={{ 
                   display: 'block', 
-                  color: '#f0eeff', 
+                  color: '#F4F1EA', 
                   marginBottom: '0.5rem',
                   fontSize: '0.875rem',
                   fontWeight: '500'
@@ -179,7 +179,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                     width: '100%',
                     padding: '0.75rem 1rem',
                     background: 'rgba(14,10,20,0.6)',
-                    border: '1px solid rgba(240,238,255,0.12)',
+                    border: '1px solid rgba(244,241,234,0.12)',
                     borderRadius: '6px',
                     color: 'var(--text-primary)',
                     fontSize: '0.875rem'
@@ -190,7 +190,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
               <div>
                 <label htmlFor="email" style={{ 
                   display: 'block', 
-                  color: '#f0eeff', 
+                  color: '#F4F1EA', 
                   marginBottom: '0.5rem',
                   fontSize: '0.875rem',
                   fontWeight: '500'
@@ -209,7 +209,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                     width: '100%',
                     padding: '0.75rem 1rem',
                     background: 'rgba(14,10,20,0.6)',
-                    border: '1px solid rgba(240,238,255,0.12)',
+                    border: '1px solid rgba(244,241,234,0.12)',
                     borderRadius: '6px',
                     color: 'var(--text-primary)',
                     fontSize: '0.875rem'
@@ -220,7 +220,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
               <div>
                 <label htmlFor="departmentSlug" style={{ 
                   display: 'block', 
-                  color: '#f0eeff', 
+                  color: '#F4F1EA', 
                   marginBottom: '0.5rem',
                   fontSize: '0.875rem',
                   fontWeight: '500'
@@ -236,7 +236,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                     width: '100%',
                     padding: '0.75rem 1rem',
                     background: 'rgba(14,10,20,0.6)',
-                    border: '1px solid rgba(240,238,255,0.12)',
+                    border: '1px solid rgba(244,241,234,0.12)',
                     borderRadius: '6px',
                     color: 'var(--text-primary)',
                     fontSize: '0.875rem'
@@ -255,7 +255,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
               <div>
                 <label htmlFor="role" style={{ 
                   display: 'block', 
-                  color: '#f0eeff', 
+                  color: '#F4F1EA', 
                   marginBottom: '0.5rem',
                   fontSize: '0.875rem',
                   fontWeight: '500'
@@ -271,7 +271,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                     width: '100%',
                     padding: '0.75rem 1rem',
                     background: 'rgba(14,10,20,0.6)',
-                    border: '1px solid rgba(240,238,255,0.12)',
+                    border: '1px solid rgba(244,241,234,0.12)',
                     borderRadius: '6px',
                     color: 'var(--text-primary)',
                     fontSize: '0.875rem'
@@ -317,7 +317,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
               paddingBottom: '0.5rem'
             }}>
               <h2 style={{ 
-                color: '#f0eeff', 
+                color: '#F4F1EA', 
                 fontSize: '1.25rem', 
                 fontWeight: 600 
               }}>
@@ -327,9 +327,9 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                 onClick={loadPendingInvitations}
                 style={{
                   padding: '0.25rem 0.5rem',
-                  background: 'rgba(240,238,255,0.1)',
-                  color: '#b8a8d8',
-                  border: '1px solid rgba(240,238,255,0.2)',
+                  background: 'rgba(244,241,234,0.1)',
+                  color: '#A9C4BE',
+                  border: '1px solid rgba(244,241,234,0.2)',
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '0.75rem'
@@ -340,11 +340,11 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
             </div>
 
             {pendingLoading ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#b8a8d8' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#A9C4BE' }}>
                 Loading pending invitations...
               </div>
             ) : invitations.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: '#b8a8d8' }}>
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#A9C4BE' }}>
                 No pending invitations
               </div>
             ) : (
@@ -355,19 +355,19 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                     style={{ 
                       padding: '1rem', 
                       background: 'rgba(14,10,20,0.4)',
-                      border: '1px solid rgba(240,238,255,0.1)',
+                      border: '1px solid rgba(244,241,234,0.1)',
                       borderRadius: '6px'
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div>
-                        <div style={{ fontWeight: '600', color: '#f0eeff', marginBottom: '0.25rem' }}>
+                        <div style={{ fontWeight: '600', color: '#F4F1EA', marginBottom: '0.25rem' }}>
                           {invitation.name}
                         </div>
-                        <div style={{ fontSize: '0.875rem', color: '#b8a8d8' }}>
+                        <div style={{ fontSize: '0.875rem', color: '#A9C4BE' }}>
                           {invitation.email}
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: '#7a9ab0', marginTop: '0.25rem' }}>
+                        <div style={{ fontSize: '0.75rem', color: '#A9C4BE', marginTop: '0.25rem' }}>
                           {invitation.departmentSlug?.toUpperCase()} • {invitation.role}
                         </div>
                       </div>
@@ -377,7 +377,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                           style={{
                             padding: '0.25rem 0.5rem',
                             background: 'rgba(0, 212, 255, 0.2)',
-                            color: '#00d4ff',
+                            color: '#EE6100',
                             border: '1px solid rgba(0, 212, 255, 0.3)',
                             borderRadius: '4px',
                             cursor: 'pointer',
@@ -402,7 +402,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                         </button>
                       </div>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#7a9ab0', marginTop: '0.5rem' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#A9C4BE', marginTop: '0.5rem' }}>
                       Invited: {new Date(invitation.createdAt).toLocaleDateString('en-KE')}
                     </div>
                   </div>
@@ -429,7 +429,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
             paddingBottom: '0.5rem'
           }}>
             <h2 style={{ 
-              color: '#f0eeff', 
+              color: '#F4F1EA', 
               fontSize: '1.25rem', 
               fontWeight: 600 
             }}>
@@ -439,9 +439,9 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
               onClick={loadStaffDirectory}
               style={{
                 padding: '0.25rem 0.5rem',
-                background: 'rgba(240,238,255,0.1)',
-                color: '#b8a8d8',
-                border: '1px solid rgba(240,238,255,0.2)',
+                background: 'rgba(244,241,234,0.1)',
+                color: '#A9C4BE',
+                border: '1px solid rgba(244,241,234,0.2)',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontSize: '0.75rem'
@@ -452,11 +452,11 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
           </div>
 
           {directoryLoading ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: '#b8a8d8' }}>
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#A9C4BE' }}>
               Loading staff directory...
             </div>
           ) : staffDirectory.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: '#b8a8d8' }}>
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#A9C4BE' }}>
               No staff members found
             </div>
           ) : (
@@ -464,23 +464,23 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid rgba(240, 238, 255, 0.2)' }}>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>Name</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>Email</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>Department</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>Role</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>Status</th>
-                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>Joined</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>Name</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>Email</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>Department</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>Role</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>Status</th>
+                    <th style={{ textAlign: 'left', padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>Joined</th>
                   </tr>
                 </thead>
                 <tbody>
                   {staffDirectory.map((staff) => (
                     <tr key={staff._id} style={{ borderBottom: '1px solid rgba(240, 238, 255, 0.1)' }}>
-                      <td style={{ padding: '0.75rem', color: '#f0eeff' }}>{staff.name}</td>
-                      <td style={{ padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>{staff.email}</td>
-                      <td style={{ padding: '0.75rem', color: '#7a9ab0', fontSize: '0.875rem' }}>
+                      <td style={{ padding: '0.75rem', color: '#F4F1EA' }}>{staff.name}</td>
+                      <td style={{ padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>{staff.email}</td>
+                      <td style={{ padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>
                         {staff.departmentSlug?.toUpperCase()}
                       </td>
-                      <td style={{ padding: '0.75rem', color: '#b8a8d8', fontSize: '0.875rem' }}>{staff.role}</td>
+                      <td style={{ padding: '0.75rem', color: '#A9C4BE', fontSize: '0.875rem' }}>{staff.role}</td>
                       <td style={{ padding: '0.75rem' }}>
                         <span style={{
                           padding: '0.25rem 0.5rem',
@@ -492,7 +492,7 @@ const StaffInvitation = ({ color = '#00d4ff' }) => {
                           {staff.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td style={{ padding: '0.75rem', color: '#7a9ab0', fontSize: '0.75rem' }}>
+                      <td style={{ padding: '0.75rem', color: '#A9C4BE', fontSize: '0.75rem' }}>
                         {new Date(staff.createdAt).toLocaleDateString('en-KE')}
                       </td>
                     </tr>

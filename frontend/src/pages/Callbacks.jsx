@@ -82,7 +82,7 @@ const Callbacks = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h1 style={{ 
-                color: '#f0eeff', 
+                color: '#F4F1EA', 
                 fontSize: '2rem', 
                 fontWeight: 700, 
                 marginBottom: '0.5rem',
@@ -90,7 +90,7 @@ const Callbacks = () => {
               }}>
                 Callback Requests
               </h1>
-              <p style={{ color: '#b8a8d8', fontSize: '1rem' }}>
+              <p style={{ color: '#A9C4BE', fontSize: '1rem' }}>
                 Manage customer callback requests
               </p>
             </div>
@@ -101,9 +101,9 @@ const Callbacks = () => {
                 style={{
                   padding: '0.5rem 1rem',
                   background: 'rgba(14,10,20,0.6)',
-                  border: '1px solid rgba(240,238,255,0.12)',
+                  border: '1px solid rgba(244,241,234,0.12)',
                   borderRadius: '6px',
-                  color: '#f0eeff',
+                  color: '#F4F1EA',
                   fontSize: '0.875rem'
                 }}
               >
@@ -153,10 +153,10 @@ const Callbacks = () => {
                     key={request._id} 
                     style={{ borderBottom: '1px solid rgba(240, 238, 255, 0.05)' }}
                   >
-                    <td style={{ padding: '1rem', color: '#f0eeff', fontWeight: 500 }}>
+                    <td style={{ padding: '1rem', color: '#F4F1EA', fontWeight: 500 }}>
                       {request.clientName}
                     </td>
-                    <td style={{ padding: '1rem', color: '#b8a8d8' }}>
+                    <td style={{ padding: '1rem', color: '#A9C4BE' }}>
                       {request.phone || 'N/A'}
                     </td>
                     <td style={{ padding: '1rem', color: '#a0aec0', maxWidth: '200px' }}>
@@ -193,9 +193,9 @@ const Callbacks = () => {
                           style={{
                             padding: '0.25rem 0.5rem',
                             background: 'rgba(14,10,20,0.6)',
-                            border: '1px solid rgba(240,238,255,0.12)',
+                            border: '1px solid rgba(244,241,234,0.12)',
                             borderRadius: '4px',
-                            color: '#f0eeff',
+                            color: '#F4F1EA',
                             fontSize: '0.75rem'
                           }}
                         >
@@ -224,9 +224,9 @@ const Callbacks = () => {
                               style={{
                                 padding: '0.25rem 0.5rem',
                                 background: 'rgba(14,10,20,0.6)',
-                                border: '1px solid rgba(240,238,255,0.12)',
+                                border: '1px solid rgba(244,241,234,0.12)',
                                 borderRadius: '4px',
-                                color: '#f0eeff',
+                                color: '#F4F1EA',
                                 fontSize: '0.75rem',
                                 minWidth: '100px'
                               }}
@@ -239,7 +239,7 @@ const Callbacks = () => {
                             style={{
                               padding: '0.25rem 0.5rem',
                               background: 'rgba(0, 212, 255, 0.2)',
-                              color: '#00d4ff',
+                              color: '#EE6100',
                               border: '1px solid rgba(0, 212, 255, 0.3)',
                               borderRadius: '4px',
                               fontSize: '0.75rem',

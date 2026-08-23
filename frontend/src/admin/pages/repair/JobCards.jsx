@@ -58,22 +58,22 @@ export default function JobCards() {
       {loading ? <Spinner /> : jobs.length === 0 ? <EmptyState icon="◧" message="No job cards found" /> : (
         <div style={{ overflowX: 'auto' }}>
           <table style={tbl}>
-            <thead><tr style={{ background: 'rgba(0,212,255,0.04)', borderBottom: '1px solid rgba(0,212,255,0.15)' }}>
+            <thead><tr style={{ background: 'rgba(238,97,0,0.04)', borderBottom: '1px solid rgba(238,97,0,0.15)' }}>
               {['Job #','Client','Device','Fault','Est. Cost','Status','Payment','Date','Actions'].map((h) => <th key={h} style={th}>{h}</th>)}
             </tr></thead>
             <tbody>
               {jobs.map((j) => (
                 <tr key={j._id} style={{ borderBottom: '1px solid rgba(26,58,92,0.4)' }}>
                   <td style={td}><span style={{ color: '#ff8800', fontWeight: 700 }}>{j.jobNumber}</span></td>
-                  <td style={td}><div style={{ fontWeight: 600, color: '#e2eeff' }}>{j.clientName}</div><div style={{ fontSize: 11, color: '#4a6580' }}>{j.clientPhone}</div></td>
+                  <td style={td}><div style={{ fontWeight: 600, color: '#F4F1EA' }}>{j.clientName}</div><div style={{ fontSize: 11, color: '#6A8A82' }}>{j.clientPhone}</div></td>
                   <td style={td}>{j.deviceType} {j.deviceBrand && `(${j.deviceBrand})`}</td>
-                  <td style={td}><span style={{ fontSize: 12, color: '#8fa8c0' }}>{j.faultDescription?.slice(0, 40)}...</span></td>
+                  <td style={td}><span style={{ fontSize: 12, color: '#A9C4BE' }}>{j.faultDescription?.slice(0, 40)}...</span></td>
                   <td style={td}>{j.estimatedCost ? formatKES(j.estimatedCost) : '—'}</td>
                   <td style={td}><StatusBadge status={j.status} /></td>
                   <td style={td}><StatusBadge status={j.paymentStatus} /></td>
                   <td style={td}>{formatDate(j.createdAt)}</td>
                   <td style={td}>
-                    <button onClick={() => { setForm({ clientName:j.clientName, clientPhone:j.clientPhone, deviceType:j.deviceType, deviceBrand:j.deviceBrand||'', faultDescription:j.faultDescription, estimatedCost:j.estimatedCost||'', assignedTechnician:j.assignedTechnician||'', warrantyDays:j.warrantyDays||0, notes:j.notes||'', status:j.status }); setModal(j); }} style={btnSm('#00d4ff')}>Edit</button>
+                    <button onClick={() => { setForm({ clientName:j.clientName, clientPhone:j.clientPhone, deviceType:j.deviceType, deviceBrand:j.deviceBrand||'', faultDescription:j.faultDescription, estimatedCost:j.estimatedCost||'', assignedTechnician:j.assignedTechnician||'', warrantyDays:j.warrantyDays||0, notes:j.notes||'', status:j.status }); setModal(j); }} style={btnSm('#EE6100')}>Edit</button>
                   </td>
                 </tr>
               ))}
@@ -83,8 +83,8 @@ export default function JobCards() {
       )}
 
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-        {page > 1 && <button onClick={() => setPage(p => p-1)} style={btn('#4a6580')}>← Prev</button>}
-        {jobs.length === 20 && <button onClick={() => setPage(p => p+1)} style={btn('#4a6580')}>Next →</button>}
+        {page > 1 && <button onClick={() => setPage(p => p-1)} style={btn('#6A8A82')}>← Prev</button>}
+        {jobs.length === 20 && <button onClick={() => setPage(p => p+1)} style={btn('#6A8A82')}>Next →</button>}
       </div>
 
       {modal && (
@@ -111,7 +111,7 @@ export default function JobCards() {
               )}
               <div><label style={lbl}>Notes</label><textarea value={form.notes} onChange={(e) => setForm({...form,notes:e.target.value})} rows={2} style={{...inp,resize:'vertical'}} /></div>
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setModal(null)} style={btn('#4a6580')}>Cancel</button>
+                <button type="button" onClick={() => setModal(null)} style={btn('#6A8A82')}>Cancel</button>
                 <button type="submit" disabled={saving} style={btn('#ff8800')}>{saving ? 'Saving...' : 'Save'}</button>
               </div>
             </form>
@@ -124,11 +124,11 @@ export default function JobCards() {
 
 const btn  = (c) => ({ padding:'0.45rem 1rem', background:`${c}18`, color:c, border:`1px solid ${c}44`, borderRadius:4, cursor:'pointer', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase' });
 const btnSm= (c) => ({ ...btn(c), padding:'2px 8px' });
-const tab  = (a) => ({ padding:'3px 12px', borderRadius:3, border:`1px solid ${a?'rgba(0,212,255,0.4)':'rgba(74,101,128,0.3)'}`, background:a?'rgba(0,212,255,0.08)':'transparent', color:a?'#00d4ff':'#4a6580', cursor:'pointer', fontSize:10, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase' });
-const tbl  = { width:'100%', borderCollapse:'collapse', background:'linear-gradient(160deg,#0d1f35,#0a1628)', borderRadius:8, overflow:'hidden' };
-const th   = { padding:'0.6rem 0.8rem', textAlign:'left', fontSize:10, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color:'#00d4ff' };
+const tab  = (a) => ({ padding:'3px 12px', borderRadius:3, border:`1px solid ${a?'rgba(238,97,0,0.4)':'rgba(74,101,128,0.3)'}`, background:a?'rgba(238,97,0,0.08)':'transparent', color:a?'#EE6100':'#6A8A82', cursor:'pointer', fontSize:10, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase' });
+const tbl  = { width:'100%', borderCollapse:'collapse', background:'linear-gradient(160deg,#0F2620,#0F2620)', borderRadius:8, overflow:'hidden' };
+const th   = { padding:'0.6rem 0.8rem', textAlign:'left', fontSize:10, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color:'#EE6100' };
 const td   = { padding:'0.6rem 0.8rem', fontSize:13, color:'#a8c0d8' };
 const overlay = { position:'fixed', inset:0, background:'rgba(2,4,8,0.88)', backdropFilter:'blur(6px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 };
-const box  = { background:'linear-gradient(160deg,#0d1f35,#0a1628)', border:'1px solid rgba(0,212,255,0.25)', borderRadius:8, padding:'1.5rem', width:'100%', maxWidth:560, maxHeight:'90vh', overflowY:'auto' };
-const inp  = { width:'100%', padding:'0.5rem 0.7rem', background:'rgba(6,13,20,0.8)', border:'1px solid rgba(0,212,255,0.15)', borderRadius:4, color:'#e2eeff', fontSize:13, outline:'none', boxSizing:'border-box' };
-const lbl  = { display:'block', marginBottom:4, fontSize:10, color:'#00d4ff', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase' };
+const box  = { background:'linear-gradient(160deg,#0F2620,#0F2620)', border:'1px solid rgba(238,97,0,0.25)', borderRadius:8, padding:'1.5rem', width:'100%', maxWidth:560, maxHeight:'90vh', overflowY:'auto' };
+const inp  = { width:'100%', padding:'0.5rem 0.7rem', background:'rgba(6,13,20,0.8)', border:'1px solid rgba(238,97,0,0.15)', borderRadius:4, color:'#F4F1EA', fontSize:13, outline:'none', boxSizing:'border-box' };
+const lbl  = { display:'block', marginBottom:4, fontSize:10, color:'#EE6100', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase' };

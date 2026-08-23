@@ -6,14 +6,14 @@ import { formatKES } from '../utils/helpers';
 import { Spinner } from '../components/UI';
 
 const CAT_META = {
-  internet:      { icon: '🌐', label: 'Internet',       color: '#3498db' },
-  printing:      { icon: '🖨️',  label: 'Printing',       color: '#e74c3c' },
+  internet:      { icon: '🌐', label: 'Internet',       color: '#2BB6A3' },
+  printing:      { icon: '🖨️',  label: 'Printing',       color: '#FF8A3D' },
   gaming:        { icon: '🎮', label: 'Gaming',          color: '#9b59b6' },
-  'web-dev':     { icon: '💻', label: 'Web Dev',         color: '#2980b9' },
-  cybersecurity: { icon: '🔒', label: 'Cybersecurity',   color: '#c0392b' },
+  'web-dev':     { icon: '💻', label: 'Web Dev',         color: '#2BB6A3' },
+  cybersecurity: { icon: '🔒', label: 'Cybersecurity',   color: '#EE6100' },
   hardware:      { icon: '🔧', label: 'Hardware Repair', color: '#e67e22' },
   'it-support':  { icon: '🛠️',  label: 'IT Support',     color: '#27ae60' },
-  'social-media':{ icon: '📱', label: 'Social Media',    color: '#8e44ad' },
+  'social-media':{ icon: '📱', label: 'Social Media',    color: '#244A44' },
   other:         { icon: '📋', label: 'Other',           color: '#7f8c8d' },
 };
 
@@ -42,7 +42,7 @@ export default function PublicServices() {
     <div>
       {/* Hero */}
       <div className="hero-section">
-        <div className="section-label">Ruai Tech Solutions</div>
+        <div className="section-label">Postera Crescam Laude</div>
         <h1 className="hero-title">Our Services</h1>
         <p className="hero-subtitle">
           Everything you need under one roof — internet, printing, repairs, web development and more at Ruai Town Centre, Nairobi.
@@ -101,7 +101,7 @@ export default function PublicServices() {
                   )}
 
                   {/* Price + CTA */}
-                  <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid rgba(240,238,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid rgba(244,241,234,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <span className="service-price">{formatKES(s.basePrice)}</span>
                       <span className="service-unit"> {s.priceUnit}</span>

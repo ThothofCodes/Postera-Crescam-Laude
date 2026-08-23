@@ -17,7 +17,7 @@ import { useChat } from '../hooks/useChat';
 import { api } from '../utils/api';
 
 const AdminChatControl = () => {
-  const authToken = localStorage.getItem('token');
+  const authToken = localStorage.getItem('adminToken');
   const { connected, adminOnline, requestAdminStatusUpdate } = useChat({ authToken });
   const [availability, setAvailability] = useState(false);
   const [loading, setLoading] = useState(true);

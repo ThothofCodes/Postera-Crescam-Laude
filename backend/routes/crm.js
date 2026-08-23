@@ -13,17 +13,18 @@ router.post('/verify-otp', ctrl.verifyPortalOTP);
 router.use(protect, staffGuard);
 router.get('/', ctrl.getClients);
 router.post('/', ctrl.createClient);
+
+// Super Admin — static paths BEFORE /:id to avoid param capture
+router.get('/directory/all', superAdminGuard, ctrl.getClients);
+
+// Dept head and above — static paths BEFORE /:id
+router.post('/bulk-sms', deptHeadGuard, ctrl.bulkSMS);
+
+// Dynamic param routes LAST
 router.get('/:id', ctrl.getClient);
 router.patch('/:id', ctrl.updateClient);
 router.post('/:id/interactions', ctrl.addInteraction);
-
-// Dept head and above
 router.post('/:id/portal-invite', deptHeadGuard, ctrl.sendPortalInvite);
-router.post('/bulk-sms', deptHeadGuard, ctrl.bulkSMS);
-
-// Super Admin
-router.get('/directory/all', superAdminGuard, ctrl.getClients);
-
 router.post('/:id/redeem-points', protect, staffGuard, require('../controllers/crmController').redeemPoints);
 router.post('/:id/referral-code', protect, staffGuard, require('../controllers/crmController').generateReferralCode);
 

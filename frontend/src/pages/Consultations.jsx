@@ -58,22 +58,22 @@ export default function Consultations() {
             <div key={c._id} style={{ ...T.card, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
               <div style={{ flex: 1, minWidth: 220 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 700, color: '#f0eeff', fontSize: 15, fontFamily: "'Poppins',sans-serif" }}>{c.client?.name}</span>
+                  <span style={{ fontWeight: 700, color: '#F4F1EA', fontSize: 15, fontFamily: "'Poppins',sans-serif" }}>{c.client?.name}</span>
                   <StatusBadge status={c.status} />
                   <StatusBadge status={c.paymentStatus} />
                 </div>
-                <div style={{ fontSize: 12, color: '#6a5a8a', marginBottom: 4, fontFamily: "'Inter',sans-serif" }}>{c.client?.phone} · {c.client?.email}</div>
-                <div style={{ fontSize: 13, color: '#b8a8d8', marginBottom: 2, fontFamily: "'Inter',sans-serif" }}>
-                  <span style={{ color: '#a090c8' }}>Type:</span> {c.consultationType} &nbsp;·&nbsp;
-                  <span style={{ color: '#a090c8' }}>Duration:</span> {c.duration}min &nbsp;·&nbsp;
-                  <span style={{ color: '#a090c8' }}>Medium:</span> {c.medium}
+                <div style={{ fontSize: 12, color: '#6A8A82', marginBottom: 4, fontFamily: "'Inter',sans-serif" }}>{c.client?.phone} · {c.client?.email}</div>
+                <div style={{ fontSize: 13, color: '#A9C4BE', marginBottom: 2, fontFamily: "'Inter',sans-serif" }}>
+                  <span style={{ color: '#6A8A82' }}>Type:</span> {c.consultationType} &nbsp;·&nbsp;
+                  <span style={{ color: '#6A8A82' }}>Duration:</span> {c.duration}min &nbsp;·&nbsp;
+                  <span style={{ color: '#6A8A82' }}>Medium:</span> {c.medium}
                 </div>
-                <div style={{ fontSize: 13, color: '#b8a8d8', marginBottom: 2, fontFamily: "'Inter',sans-serif" }}><span style={{ color: '#a090c8' }}>Topic:</span> {c.topic}</div>
-                <div style={{ fontSize: 13, color: '#b8a8d8', fontFamily: "'Inter',sans-serif" }}>
-                  <span style={{ color: '#a090c8' }}>Date:</span> {formatDate(c.preferredDate)} &nbsp;·&nbsp;
-                  <span style={{ color: '#a090c8' }}>Fee:</span> <span style={{ color: '#f0eeff', fontWeight: 600 }}>{formatKES(c.fee)}</span>
+                <div style={{ fontSize: 13, color: '#A9C4BE', marginBottom: 2, fontFamily: "'Inter',sans-serif" }}><span style={{ color: '#6A8A82' }}>Topic:</span> {c.topic}</div>
+                <div style={{ fontSize: 13, color: '#A9C4BE', fontFamily: "'Inter',sans-serif" }}>
+                  <span style={{ color: '#6A8A82' }}>Date:</span> {formatDate(c.preferredDate)} &nbsp;·&nbsp;
+                  <span style={{ color: '#6A8A82' }}>Fee:</span> <span style={{ color: '#F4F1EA', fontWeight: 600 }}>{formatKES(c.fee)}</span>
                 </div>
-                {c.description && <div style={{ fontSize: 12, color: '#6a5a8a', marginTop: 6, fontFamily: "'Inter',sans-serif" }}>{c.description}</div>}
+                {c.description && <div style={{ fontSize: 12, color: '#6A8A82', marginTop: 6, fontFamily: "'Inter',sans-serif" }}>{c.description}</div>}
               </div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {c.status === 'pending' && <button onClick={() => action(c._id, 'confirm')} style={btn('blue')}>Confirm</button>}
@@ -99,7 +99,7 @@ export default function Consultations() {
             <form onSubmit={saveNotes} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div><label style={T.label}>Consultant Notes (internal)</label><textarea value={notes.consultantNotes} onChange={(e) => setNotes({ ...notes, consultantNotes: e.target.value })} rows={4} style={{ ...T.input, resize: 'vertical' }} /></div>
               <div><label style={T.label}>Client Summary (emailed to client)</label><textarea value={notes.clientSummary} onChange={(e) => setNotes({ ...notes, clientSummary: e.target.value })} rows={4} style={{ ...T.input, resize: 'vertical' }} /></div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', color: '#b8a8d8', fontSize: 13, fontFamily: "'Inter',sans-serif" }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', color: '#A9C4BE', fontSize: 13, fontFamily: "'Inter',sans-serif" }}>
                 <input type="checkbox" checked={notes.followUpRequired} onChange={(e) => setNotes({ ...notes, followUpRequired: e.target.checked })} />
                 Follow-up session required
               </label>

@@ -1,85 +1,96 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import React from 'react';
-import { useEffect } from 'react';
+import React, { Suspense } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
-import { AdminAuthProvider } from './admin/context/AdminAuthContext';
+import { useAuth, useAuthStore } from './store/authStore';
+import { useCartStore } from './store/cartStore';
+import { useAdminStore, useAdminAuth, initializeAdminAuth } from './store/adminStore';
 import useSocket from './hooks/useSocket';
 
-import PrivateRoute from './components/PrivateRoute';
 import AdminPrivateRoute from './admin/components/AdminPrivateRoute';
 import AdminLayout from './admin/components/AdminLayout';
 import DeptLayout from './admin/components/DeptLayout';
 
-// ── Legacy admin pages ─────────────────────────────────────────────────────
+// ── Eager imports (small, needed immediately) ────────────────────────────────
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Clients from './pages/Clients';
-import Services from './pages/Services';
-import Bookings from './pages/Bookings';
-import Products from './pages/Products';
-import Orders from './pages/Orders';
-import Consultations from './pages/Consultations';
-import Revenue from './pages/Revenue';
-import Settings from './pages/Settings';
-import DeptStaff from './pages/DeptStaff';
-import AdminChatControl from './pages/AdminChatControl';
-import AdminRevenueDashboard from './pages/AdminRevenueDashboard';
-
-// ── Public pages ───────────────────────────────────────────────────────────
-import Store from './pages/Store';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
-import OrderStatus from './pages/OrderStatus';
-import Calculator from './pages/Calculator';
-import ConsultLanding from './pages/ConsultLanding';
-import ConsultBook from './pages/ConsultBook';
 import PublicServices from './pages/PublicServices';
 import Contact from './pages/Contact';
 import TrackTicket from './pages/TrackTicket';
-import SessionsPage from './admin/pages/playstation/Sessions';
-import PublicWebPortal from './pages/PublicWebPortal';
-import HelpDesk from './pages/HelpDesk';
-
-// ── Department specific pages ──────────────────────────────────────────────
-import JobCards from './admin/pages/repair/JobCards'; // Import the JobCards page
-
-
-// ── Public layouts ─────────────────────────────────────────────────────────
 import PublicLayout from './layouts/PublicLayout';
-
-
-
-// ── Admin components ───────────────────────────────────────────────────────
-import { SuperAdminLayout } from './admin/pages/super/SuperDashboard';
-import SuperDashboard from './admin/pages/super/SuperDashboard';
-import UserManagement from './admin/pages/super/UserManagement';
-import Soon from './admin/components/Soon';
-import InventoryPage from './admin/pages/shared/InventoryPage';
-import TicketsPage from './admin/pages/shared/TicketsPage';
-import StaffPortalAdmin from './admin/pages/shared/StaffPortalAdmin';
-import MessagesPage from './admin/pages/shared/MessagesPage';
-import StaffInvitation from './admin/pages/shared/StaffInvitation';
-import CRMPage from './admin/pages/shared/CRMPage'; // Import the enhanced CRM page
-import BillingPage from './admin/pages/shared/BillingPage'; // Import the enhanced Billing page
-
-// ── Staff & Client portals ─────────────────────────────────────────────────
-import StaffDashboard from './pages/staff/StaffDashboard';
-import ClientPortal from './pages/client/ClientPortal';
-
-// ── Staff invitation page ──────────────────────────────────────────────────
-import SetPassword from './pages/staff/SetPassword';
-
-// ── Callbacks page ─────────────────────────────────────────────────────────
-import Callbacks from './pages/Callbacks';
-
-// ── Chat widget (public only) ──────────────────────────────────────────────
 import ChatWidget from './components/ChatWidget';
+import { SuperAdminLayout } from './admin/pages/super/SuperDashboard';
+
+// ── Lazy-loaded pages (code-split for smaller initial bundle) ───────────────
+const Store = React.lazy(() => import('./pages/Store'));
+const ProductDetail = React.lazy(() => import('./pages/ProductDetail'));
+const Cart = React.lazy(() => import('./pages/Cart'));
+const Checkout = React.lazy(() => import('./pages/Checkout'));
+const OrderStatus = React.lazy(() => import('./pages/OrderStatus'));
+const Calculator = React.lazy(() => import('./pages/Calculator'));
+const ConsultLanding = React.lazy(() => import('./pages/ConsultLanding'));
+const ConsultBook = React.lazy(() => import('./pages/ConsultBook'));
+const HelpDesk = React.lazy(() => import('./pages/HelpDesk'));
+const TechInsights = React.lazy(() => import('./pages/TechInsights'));
+const TechHubLocal = React.lazy(() => import('./pages/TechHubLocal'));
+const BlogManagement = React.lazy(() => import('./admin/pages/shared/BlogManagement'));
+const PublicWebPortal = React.lazy(() => import('./pages/PublicWebPortal'));
+const Callbacks = React.lazy(() => import('./pages/Callbacks'));
+const AccessDenied = React.lazy(() => import('./pages/AccessDenied'));
+const ReceiptPage = React.lazy(() => import('./pages/ReceiptPage'));
+const SetPassword = React.lazy(() => import('./pages/staff/SetPassword'));
+const StaffDashboard = React.lazy(() => import('./pages/staff/StaffDashboard'));
+const ClientPortal = React.lazy(() => import('./pages/client/ClientPortal'));
+
+// ── Lazy-loaded admin pages ──────────────────────────────────────────────
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Clients = React.lazy(() => import('./pages/Clients'));
+const Services = React.lazy(() => import('./pages/Services'));
+const Bookings = React.lazy(() => import('./pages/Bookings'));
+const Products = React.lazy(() => import('./pages/Products'));
+const Orders = React.lazy(() => import('./pages/Orders'));
+const Consultations = React.lazy(() => import('./pages/Consultations'));
+const Revenue = React.lazy(() => import('./pages/Revenue'));
+const Settings = React.lazy(() => import('./pages/Settings'));
+const DeptStaff = React.lazy(() => import('./pages/DeptStaff'));
+const AdminChatControl = React.lazy(() => import('./pages/AdminChatControl'));
+const AdminRevenueDashboard = React.lazy(() => import('./pages/AdminRevenueDashboard'));
+import SuperDashboard from './admin/pages/super/SuperDashboard'; // already imported above for SuperAdminLayout
+const UserManagement = React.lazy(() => import('./admin/pages/super/UserManagement'));
+const DepartmentsPage = React.lazy(() => import('./admin/pages/super/Departments'));
+const DeviceManagement = React.lazy(() => import("./admin/pages/super/DeviceManagement"));
+const SessionsPage = React.lazy(() => import('./admin/pages/playstation/Sessions'));
+const JobCards = React.lazy(() => import('./admin/pages/repair/JobCards'));
+const EmailAllocationPage = React.lazy(() => import('./admin/pages/shared/EmailAllocationPage'));
+const FinancePage = React.lazy(() => import('./admin/pages/shared/FinancePage'));
+const AuditLogPage = React.lazy(() => import('./admin/pages/shared/AuditLogPage'));
+const BroadcastPage = React.lazy(() => import('./admin/pages/shared/BroadcastPage'));
+const SettingsPage = React.lazy(() => import('./admin/pages/shared/SettingsPage'));
+const HealthDashboard = React.lazy(() => import('./admin/pages/shared/HealthDashboard'));
+const TransactionsPage = React.lazy(() => import('./admin/pages/shared/TransactionsPage'));
+const ExpensesPage = React.lazy(() => import('./admin/pages/shared/ExpensesPage'));
+const InventoryPage = React.lazy(() => import('./admin/pages/shared/InventoryPage'));
+const TicketsPage = React.lazy(() => import('./admin/pages/shared/TicketsPage'));
+const StaffPortalAdmin = React.lazy(() => import('./admin/pages/shared/StaffPortalAdmin'));
+const MessagesPage = React.lazy(() => import('./admin/pages/shared/MessagesPage'));
+const StaffInvitation = React.lazy(() => import('./admin/pages/shared/StaffInvitation'));
+const CRMPage = React.lazy(() => import('./admin/pages/shared/CRMPage'));
+const BillingPage = React.lazy(() => import('./admin/pages/shared/BillingPage'));
+const InternetLanding = React.lazy(() => import('./admin/pages/internet/Landing'));
+const ISPClients = React.lazy(() => import('./admin/pages/internet/Clients'));
+const WebDevLanding = React.lazy(() => import('./admin/pages/webdev/Landing'));
+const ProjectsPage = React.lazy(() => import('./admin/pages/webdev/Projects'));
+const PlayStationLanding = React.lazy(() => import('./admin/pages/playstation/Landing'));
+const RepairLanding = React.lazy(() => import('./admin/pages/repair/Landing'));
+const CybersecurityLanding = React.lazy(() => import('./admin/pages/cybersecurity/Landing'));
+const SecurityContracts = React.lazy(() => import('./admin/pages/cybersecurity/Contracts'));
+const GovAdminLanding = React.lazy(() => import('./admin/pages/govadmin/Landing'));
+const GovDocs = React.lazy(() => import('./admin/pages/govadmin/GovDocs'));
 
 import DBStatusBanner from './components/DBStatusBanner';
+import BootScreen from './components/BootScreen';
+import ErrorBoundary from './components/ErrorBoundary';
+import PageTransition from './components/PageTransition';
 import { Spinner } from './components/UI';
 
 function ScrollToTop() {
@@ -91,10 +102,6 @@ function ScrollToTop() {
 }
 
 function RedirectToAppropriatePage() {
-  const { user, loading } = useAuth();
-
-  if (loading) return <Spinner />;
-  if (user) return <Navigate to="/dashboard" replace />;
   return <Navigate to="/store" replace />;
 }
 
@@ -114,19 +121,41 @@ function ConditionalChatWidget() {
 }
 
 export default function App() {
+  const [bootComplete, setBootComplete] = useState(sessionStorage.getItem('pcl_booted'));
+  const handleBootComplete = useCallback(() => {
+    sessionStorage.setItem('pcl_booted', '1');
+    setBootComplete(true);
+  }, []);
+
+  // Lock body scroll while boot screen is visible
+  useEffect(() => {
+    if (!bootComplete) {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+    };
+  }, [bootComplete]);
+
+  // Initialize auth state from persisted token
+  useEffect(() => {
+    useAuthStore.getState().initialize();
+    initializeAdminAuth();
+  }, []);
+
   // Initialize global socket connection
   useSocket();
 
   return (
     <div data-testid="app-container">
+      {!bootComplete && <BootScreen onComplete={handleBootComplete} />}
       <BrowserRouter>
-        <AuthProvider>
-          <AdminAuthProvider>
-            <CartProvider>
               <ScrollToTop />
               <DBStatusBanner />
 
-              <Routes>
+              <ErrorBoundary><PageTransition><Suspense fallback={<Spinner />}><Routes>
                 {/* ── Public pages ── */}
                 {/* NOTE: public /services must be registered before legacy admin routes */}
                 <Route path="/services" element={<PublicServices />} />
@@ -136,7 +165,7 @@ export default function App() {
                 <Route path="/forgot" element={<Login />} />
                 <Route path="/reset/:token" element={<Login />} />
                 <Route path="/verify/:token" element={<Login />} />
-                <Route path="/403" element={<div>Access Denied</div>} />
+                <Route path="/403" element={<React.Suspense fallback={<Spinner />}><AccessDenied /></React.Suspense>} />
                 <Route path="/404" element={<div>Page Not Found</div>} />
                 <Route path="/500" element={<div>Server Error</div>} />
                 <Route path="/maintenance" element={<div>Maintenance Mode</div>} />
@@ -157,137 +186,140 @@ export default function App() {
                 <Route path="/admin/login" element={<Login />} />
                 <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
 
-                {/* ── Legacy admin routes ── */}
+                {/* ── Legacy admin routes (AdminLayout handles auth for all admin roles) ── */}
                 <Route element={<AdminLayout />}>
-                  <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-                  <Route path="/clients" element={<PrivateRoute><Clients /></PrivateRoute>} />
-                  <Route path="/services" element={<PrivateRoute><Services /></PrivateRoute>} />
-                  <Route path="/bookings" element={<PrivateRoute><Bookings /></PrivateRoute>} />
-                  <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
-                  <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
-                  <Route path="/consultations" element={<PrivateRoute><Consultations /></PrivateRoute>} />
-                  <Route path="/revenue" element={<PrivateRoute><Revenue /></PrivateRoute>} />
-                  <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-                  <Route path="/staff-accounts" element={<PrivateRoute><DeptStaff /></PrivateRoute>} />
-                  <Route path="/admin/chat-control" element={<PrivateRoute><AdminChatControl /></PrivateRoute>} />
-                  <Route path="/admin/revenue" element={<PrivateRoute><AdminRevenueDashboard /></PrivateRoute>} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/clients" element={<Clients />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/bookings" element={<Bookings />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/consultations" element={<Consultations />} />
+                  <Route path="/revenue" element={<Revenue />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/staff-accounts" element={<DeptStaff />} />
+                  <Route path="/admin/chat-control" element={<AdminChatControl />} />
+                  <Route path="/admin/revenue" element={<AdminRevenueDashboard />} />
                 </Route>
 
                 {/* ── Super Admin ── */}
                 <Route path="/admin/super" element={<AdminPrivateRoute><SuperAdminLayout /></AdminPrivateRoute>}>
                   <Route index element={<SuperDashboard />} />
+                  <Route path="departments" element={<DepartmentsPage />} />
+                  <Route path="devices" element={<DeviceManagement />} />
                   <Route path="users" element={<UserManagement />} />
-                  <Route path="email" element={<Soon label="Email Allocation" />} />
-                  <Route path="finance" element={<Soon label="Finance" />} />
+                  <Route path="email" element={<EmailAllocationPage />} />
+                  <Route path="finance" element={<FinancePage />} />
                   <Route path="tickets" element={<TicketsPage color="#ff3366" />} />
-                  <Route path="inventory" element={<InventoryPage color="#00d4ff" />} />
-                  <Route path="audit" element={<Soon label="Audit Log" />} />
-                  <Route path="broadcast" element={<Soon label="Broadcast" />} />
-                  <Route path="settings" element={<Soon label="System Settings" />} />
+                  <Route path="inventory" element={<InventoryPage color="#EE6100" />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="broadcast" element={<BroadcastPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
-                  <Route path="staff-invitation" element={<StaffInvitation color="#a78bfa" />} />
+                  <Route path="staff-invitation" element={<StaffInvitation color="#a78bfa" />} />                   <Route path="health" element={<React.Suspense fallback={<Spinner />}><HealthDashboard /></React.Suspense>} />
+                   <Route path="blog" element={<React.Suspense fallback={<Spinner />}><BlogManagement /></React.Suspense>} />
                 </Route>
 
                 {/* ── Departments ── */}
                 <Route path="/admin/internet" element={<DeptLayout slug="internet" title="Internet Distribution" />}>
-                  <Route index element={<Soon label="Internet Distribution" />} />
-                  <Route path="clients" element={<Soon label="ISP Clients" />} />
-                  <Route path="transactions" element={<Soon label="Transactions" />} />
-                  <Route path="crm" element={<CRMPage color="#00d4ff" />} /> {/* Changed from Soon to CRMPage */}
-                  <Route path="billing" element={<BillingPage color="#00d4ff" />} /> {/* Changed from Soon to BillingPage */}
-                  <Route path="inventory" element={<InventoryPage color="#00d4ff" />} />
-                  <Route path="tickets" element={<TicketsPage color="#00d4ff" />} />
-                  <Route path="staff-portal" element={<StaffPortalAdmin color="#00d4ff" />} />
-                  <Route path="staff" element={<StaffInvitation color="#00d4ff" />} />
-                  <Route path="expenses" element={<Soon label="Expenses" />} />
-                  <Route path="audit" element={<Soon label="Audit Log" />} />
-                  <Route path="settings" element={<Soon label="Settings" />} />
+                  <Route index element={<InternetLanding />} />
+                  <Route path="clients" element={<ISPClients />} />
+                  <Route path="transactions" element={<TransactionsPage />} />
+                  <Route path="crm" element={<CRMPage color="#2BB6A3" />} />
+                  <Route path="billing" element={<BillingPage color="#2BB6A3" />} />
+                  <Route path="inventory" element={<InventoryPage color="#2BB6A3" />} />
+                  <Route path="tickets" element={<TicketsPage color="#2BB6A3" />} />
+                  <Route path="staff-portal" element={<StaffPortalAdmin color="#2BB6A3" />} />
+                  <Route path="staff" element={<StaffInvitation color="#2BB6A3" />} />
+                  <Route path="expenses" element={<ExpensesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
-                  <Route path="staff-invitation" element={<StaffInvitation color="#00d4ff" />} />
+                  <Route path="staff-invitation" element={<StaffInvitation color="#2BB6A3" />} />
                 </Route>
 
                 <Route path="/admin/webdev" element={<DeptLayout slug="webdev" title="Web Development" />}>
-                  <Route index element={<Soon label="Web Development" />} />
-                  <Route path="projects" element={<Soon label="Projects" />} />
-                  <Route path="transactions" element={<Soon label="Transactions" />} />
+                  <Route index element={<WebDevLanding />} />
+                  <Route path="projects" element={<ProjectsPage />} />
+                  <Route path="transactions" element={<TransactionsPage />} />
                   <Route path="crm" element={<CRMPage color="#a78bfa" />} /> {/* Changed from Soon to CRMPage */}
                   <Route path="billing" element={<BillingPage color="#a78bfa" />} /> {/* Changed from Soon to BillingPage */}
                   <Route path="inventory" element={<InventoryPage color="#a78bfa" />} />
                   <Route path="tickets" element={<TicketsPage color="#a78bfa" />} />
                   <Route path="staff-portal" element={<StaffPortalAdmin color="#a78bfa" />} />
                   <Route path="staff" element={<StaffInvitation color="#a78bfa" />} />
-                  <Route path="expenses" element={<Soon label="Expenses" />} />
-                  <Route path="audit" element={<Soon label="Audit Log" />} />
-                  <Route path="settings" element={<Soon label="Settings" />} />
+                  <Route path="expenses" element={<ExpensesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
                   <Route path="staff-invitation" element={<StaffInvitation color="#a78bfa" />} />
                 </Route>
 
                 <Route path="/admin/playstation" element={<DeptLayout slug="playstation" title="PlayStation Arena" />}>
-                  <Route index element={<Soon label="PlayStation Arena" />} />
+                  <Route index element={<PlayStationLanding />} />
                   <Route path="sessions" element={<SessionsPage />} />
 
-                  <Route path="transactions" element={<Soon label="Transactions" />} />
+                  <Route path="transactions" element={<TransactionsPage />} />
                   <Route path="crm" element={<CRMPage color="#ffd700" />} /> {/* Changed from Soon to CRMPage */}
                   <Route path="billing" element={<BillingPage color="#ffd700" />} /> {/* Changed from Soon to BillingPage */}
                   <Route path="inventory" element={<InventoryPage color="#ffd700" />} />
                   <Route path="tickets" element={<TicketsPage color="#ffd700" />} />
                   <Route path="staff-portal" element={<StaffPortalAdmin color="#ffd700" />} />
                   <Route path="staff" element={<StaffInvitation color="#ffd700" />} />
-                  <Route path="expenses" element={<Soon label="Expenses" />} />
-                  <Route path="audit" element={<Soon label="Audit Log" />} />
-                  <Route path="settings" element={<Soon label="Settings" />} />
+                  <Route path="expenses" element={<ExpensesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
                   <Route path="staff-invitation" element={<StaffInvitation color="#ffd700" />} />
                 </Route>
 
                 <Route path="/admin/repair" element={<DeptLayout slug="repair" title="Hardware Repair" />}>
-                  <Route index element={<Soon label="Hardware Repair" />} />
+                  <Route index element={<RepairLanding />} />
                   <Route path="jobcards" element={<JobCards />} /> {/* Changed from Soon to JobCards */}
-                  <Route path="transactions" element={<Soon label="Transactions" />} />
+                  <Route path="transactions" element={<TransactionsPage />} />
                   <Route path="crm" element={<CRMPage color="#ff8800" />} /> {/* Changed from Soon to CRMPage */}
                   <Route path="billing" element={<BillingPage color="#ff8800" />} /> {/* Changed from Soon to BillingPage */}
                   <Route path="inventory" element={<InventoryPage color="#ff8800" />} />
                   <Route path="tickets" element={<TicketsPage color="#ff8800" />} />
                   <Route path="staff-portal" element={<StaffPortalAdmin color="#ff8800" />} />
                   <Route path="staff" element={<StaffInvitation color="#ff8800" />} />
-                  <Route path="expenses" element={<Soon label="Expenses" />} />
-                  <Route path="audit" element={<Soon label="Audit Log" />} />
-                  <Route path="settings" element={<Soon label="Settings" />} />
+                  <Route path="expenses" element={<ExpensesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
                   <Route path="staff-invitation" element={<StaffInvitation color="#ff8800" />} />
                 </Route>
 
                 <Route path="/admin/cybersecurity" element={<DeptLayout slug="cybersecurity" title="Cybersecurity" />}>
-                  <Route index element={<Soon label="Cybersecurity" />} />
-                  <Route path="contracts" element={<Soon label="Contracts" />} />
-                  <Route path="transactions" element={<Soon label="Transactions" />} />
+                  <Route index element={<CybersecurityLanding />} />
+                  <Route path="contracts" element={<SecurityContracts />} />
+                  <Route path="transactions" element={<TransactionsPage />} />
                   <Route path="crm" element={<CRMPage color="#ff3366" />} /> {/* Changed from Soon to CRMPage */}
                   <Route path="billing" element={<BillingPage color="#ff3366" />} /> {/* Changed from Soon to BillingPage */}
                   <Route path="inventory" element={<InventoryPage color="#ff3366" />} />
                   <Route path="tickets" element={<TicketsPage color="#ff3366" />} />
                   <Route path="staff-portal" element={<StaffPortalAdmin color="#ff3366" />} />
                   <Route path="staff" element={<StaffInvitation color="#ff3366" />} />
-                  <Route path="expenses" element={<Soon label="Expenses" />} />
-                  <Route path="audit" element={<Soon label="Audit Log" />} />
-                  <Route path="settings" element={<Soon label="Settings" />} />
+                  <Route path="expenses" element={<ExpensesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
                   <Route path="staff-invitation" element={<StaffInvitation color="#ff3366" />} />
                 </Route>
 
                 <Route path="/admin/govadmin" element={<DeptLayout slug="govadmin" title="Gov Admin Assistance" />}>
-                  <Route index element={<Soon label="Gov Admin Assistance" />} />
-                  <Route path="govdocs" element={<Soon label="Documents" />} />
-                  <Route path="transactions" element={<Soon label="Transactions" />} />
+                  <Route index element={<GovAdminLanding />} />
+                  <Route path="govdocs" element={<GovDocs />} />
+                  <Route path="transactions" element={<TransactionsPage />} />
                   <Route path="crm" element={<CRMPage color="#00ff88" />} /> {/* Changed from Soon to CRMPage */}
                   <Route path="billing" element={<BillingPage color="#00ff88" />} /> {/* Changed from Soon to BillingPage */}
                   <Route path="inventory" element={<InventoryPage color="#00ff88" />} />
                   <Route path="tickets" element={<TicketsPage color="#00ff88" />} />
                   <Route path="staff-portal" element={<StaffPortalAdmin color="#00ff88" />} />
                   <Route path="staff" element={<StaffInvitation color="#00ff88" />} />
-                  <Route path="expenses" element={<Soon label="Expenses" />} />
-                  <Route path="audit" element={<Soon label="Audit Log" />} />
-                  <Route path="settings" element={<Soon label="Settings" />} />
+                  <Route path="expenses" element={<ExpensesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
                   <Route path="staff-invitation" element={<StaffInvitation color="#00ff88" />} />
                 </Route>
@@ -308,22 +340,22 @@ export default function App() {
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/order-status" element={<OrderStatus />} />
+                  <Route path="/receipt/:orderNumber" element={<ReceiptPage />} />
                   <Route path="/calculator" element={<Calculator />} />
                   <Route path="/consult" element={<ConsultLanding />} />
                   <Route path="/consult/book" element={<ConsultBook />} />
                   <Route path="/services" element={<PublicServices />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/help" element={<HelpDesk />} />
+                  <Route path="/contact" element={<Contact />} />                   <Route path="/help" element={<HelpDesk />} />
+                   <Route path="/tech-insights" element={<React.Suspense fallback={<Spinner />}><TechInsights /></React.Suspense>} />
+                   <Route path="/tech-hub" element={<React.Suspense fallback={<Spinner />}><TechHubLocal /></React.Suspense>} />
                   <Route path="/track" element={<TrackTicket />} />
                   <Route path="/client/portal/:projectToken" element={<PublicWebPortal />} />
                 </Route>
-              </Routes>
+              </Routes></Suspense></PageTransition></ErrorBoundary>
 
               <ConditionalChatWidget />
               <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
-            </CartProvider>
-          </AdminAuthProvider>
-        </AuthProvider>
+
       </BrowserRouter>
     </div>
   );

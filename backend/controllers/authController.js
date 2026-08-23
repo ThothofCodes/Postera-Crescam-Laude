@@ -2,9 +2,11 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
+const RegisteredDevice = require('../models/RegisteredDevice');
+const ActiveSession = require('../models/ActiveSession');
 
-// Sign token — algorithm explicitly pinned to HS256
-const signToken = (user) => jwt.sign(
+// Sign token — algorithm explicitly pinned to HS256, includes jti for session tracking
+const signToken = (user, jti) => jwt.sign(
   {
     id: user._id,
     email: user.email,
@@ -12,16 +14,20 @@ const signToken = (user) => jwt.sign(
     departmentId: user.department?._id || user.department || null,
     departmentSlug: user.departmentSlug || null,
     isOwner: user.isOwner || false,
+    jti, // JWT ID for session invalidation
   },
   process.env.JWT_SECRET,
   {
     expiresIn: process.env.JWT_EXPIRE || '8h',
-    algorithm: 'HS256', // explicit — prevents alg:none attack
+    algorithm: 'HS256',
   },
 );
 
 // Validate email format
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+// SHA256 hash for device fingerprints
+const hashFingerprint = (fp) => crypto.createHash('sha256').update(fp).digest('hex');
 
 exports.verifyToken = async (req, res, next) => {
   try {
@@ -36,7 +42,6 @@ exports.verifyToken = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if token matches and hasn't expired
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
     const isTokenValid = hashedToken === user.passwordResetToken;
     const isTokenExpired = user.tokenExpiry && user.tokenExpiry < new Date();
@@ -80,7 +85,6 @@ exports.setPassword = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Check if token matches and hasn't expired
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
     const isTokenValid = hashedToken === user.passwordResetToken;
     const isTokenExpired = user.tokenExpiry && user.tokenExpiry < new Date();
@@ -89,12 +93,11 @@ exports.setPassword = async (req, res, next) => {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
-    // Update password
     user.password = password;
     user.passwordResetToken = undefined;
     user.tokenExpiry = undefined;
-    user.isActive = true; // Activate the user account
-    user.isEmailVerified = true; // Mark as verified
+    user.isActive = true;
+    user.isEmailVerified = true;
 
     await user.save();
 
@@ -118,7 +121,6 @@ exports.register = async (req, res, next) => {
       name, email, password, role, department, departmentSlug, isOwner,
     } = req.body;
 
-    // Input validation
     if (!name || typeof name !== 'string' || name.trim().length < 2) {
       return res.status(400).json({ message: 'Name must be at least 2 characters' });
     }
@@ -129,7 +131,6 @@ exports.register = async (req, res, next) => {
       return res.status(400).json({ message: 'Password must be at least 8 characters' });
     }
 
-    // Prevent SUPER_ADMIN creation via API
     if (role === 'SUPER_ADMIN') {
       return res.status(403).json({ message: 'Forbidden' });
     }
@@ -145,7 +146,7 @@ exports.register = async (req, res, next) => {
     });
 
     res.status(201).json({
-      token: signToken(user),
+      token: signToken(user, crypto.randomUUID()),
       user: {
         id: user._id, name: user.name, email: user.email, role: user.role, departmentSlug: user.departmentSlug,
       },
@@ -153,11 +154,11 @@ exports.register = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// ── Enhanced Login with Device Checking + Session Kick ──────────────────
 exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, deviceFingerprint, deviceName } = req.body;
 
-    // Input validation
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password required' });
     }
@@ -169,15 +170,13 @@ exports.login = async (req, res, next) => {
       .select('+password')
       .populate('department', 'name slug');
 
-    // Always run matchPassword even if user not found — prevents timing attack
-    // that reveals whether an email exists based on response time
+    // Timing-attack prevention
     const dummyHash = '$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345';
     const passwordMatch = user
       ? await user.matchPassword(password)
-      : await require('bcryptjs').compare(password, dummyHash); // constant-time dummy
+      : await require('bcryptjs').compare(password, dummyHash);
 
     if (!user || !passwordMatch) {
-      // Generic message — don't reveal whether email exists
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -185,11 +184,98 @@ exports.login = async (req, res, next) => {
       return res.status(403).json({ message: 'Account deactivated — contact your administrator' });
     }
 
+    // ── Device fingerprint check ────────────────────────────────────────
+    let deviceHash = null;
+
+    if (deviceFingerprint) {
+      deviceHash = hashFingerprint(deviceFingerprint);
+
+      // Check if this user has ANY registered devices
+      const totalDevices = await RegisteredDevice.countDocuments({ admin: user._id, isActive: true });
+
+      if (totalDevices > 0) {
+        // User has registered devices — check if THIS device is one of them
+        const device = await RegisteredDevice.findOne({
+          admin: user._id,
+          deviceHash,
+          isActive: true,
+        });
+
+        if (!device) {
+          return res.status(403).json({
+            message: 'Device not authorized. Contact your Super Admin to register this device.',
+            code: 'DEVICE_NOT_REGISTERED',
+          });
+        }
+
+        // Update device last seen
+        device.lastSeenAt = new Date();
+        device.lastSeenIp = req.ip;
+        device.userAgent = req.headers['user-agent'] || '';
+        await device.save();
+      }
+      // If totalDevices === 0, allow login without device registration (first-time setup)
+    }
+
+    // ── Kick existing sessions (enforce 1 concurrent session) ────────────
+    if (deviceHash) {
+      // Delete ALL existing sessions for this user (kicks other devices)
+      await ActiveSession.deleteMany({ admin: user._id });
+
+      // Create new session
+      const jti = crypto.randomUUID();
+      const expiresIn = parseInt(process.env.JWT_EXPIRE_HOURS || '8', 10);
+      const expiresAt = new Date(Date.now() + expiresIn * 60 * 60 * 1000);
+
+      await ActiveSession.create({
+        admin: user._id,
+        deviceHash,
+        jti,
+        userAgent: req.headers['user-agent'] || '',
+        ip: req.ip,
+        expiresAt,
+      });
+
+      user.lastLogin = new Date();
+      await user.save({ validateBeforeSave: false });
+
+      return res.json({
+        token: signToken(user, jti),
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          department: user.department,
+          departmentSlug: user.departmentSlug,
+          isOwner: user.isOwner,
+        },
+        session: { jti, expiresAt },
+      });
+    }
+
+    // ── Fallback: no device fingerprint (backward compatible) ─────────────
+    // Also kick old sessions and create a new one (same as device path)
+    await ActiveSession.deleteMany({ admin: user._id });
+
+    const jti = crypto.randomUUID();
+    const expiresIn = parseInt(process.env.JWT_EXPIRE_HOURS || '8', 10);
+    const expiresAt = new Date(Date.now() + expiresIn * 60 * 60 * 1000);
+
+    await ActiveSession.create({
+      admin: user._id,
+      deviceHash: 'no-fingerprint',
+      jti,
+      userAgent: req.headers['user-agent'] || '',
+      ip: req.ip,
+      expiresAt,
+    });
+
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
 
     res.json({
-      token: signToken(user),
+      token: signToken(user, jti),
       user: {
         id: user._id,
         name: user.name,
@@ -205,7 +291,6 @@ exports.login = async (req, res, next) => {
 
 exports.getMe = async (req, res, next) => {
   try {
-    // Re-fetch from DB — never trust stale JWT payload for sensitive data
     const user = await User.findById(req.user._id)
       .populate('department', 'name slug logoUrl')
       .select('-password');

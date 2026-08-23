@@ -74,17 +74,17 @@ export default function Settings() {
             <button onClick={seedRules} style={btn('ghost')}>Seed Default Rules</button>
           </div>
           {Object.keys(grouped).length === 0 && (
-            <p style={{ color: '#6a5a8a', fontFamily: "'Inter',sans-serif" }}>No pricing rules found. Click "Seed Default Rules" to populate.</p>
+            <p style={{ color: '#6A8A82', fontFamily: "'Inter',sans-serif" }}>No pricing rules found. Click "Seed Default Rules" to populate.</p>
           )}
           {Object.entries(grouped).map(([service, serviceRules]) => (
             <div key={service} style={T.card}>
-              <h4 style={{ margin: '0 0 1rem', color: '#f0eeff', fontFamily: "'Poppins',sans-serif", fontSize: 15 }}>{service}</h4>
+              <h4 style={{ margin: '0 0 1rem', color: '#F4F1EA', fontFamily: "'Poppins',sans-serif", fontSize: 15 }}>{service}</h4>
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 {serviceRules.map((r) => (
-                  <div key={r._id} style={{ background: 'rgba(14,10,20,0.5)', border: '1px solid rgba(240,238,255,0.08)', borderRadius: 10, padding: '0.85rem 1rem', minWidth: 150 }}>
-                    <div style={{ fontSize: 10, color: '#6a5a8a', textTransform: 'capitalize', letterSpacing: '0.1em', marginBottom: 6, fontFamily: "'Inter',sans-serif" }}>{r.tier}</div>
-                    <div style={{ fontWeight: 800, fontSize: 20, color: '#f0eeff', fontFamily: "'Poppins',sans-serif" }}>{formatKES(r.price)}</div>
-                    <div style={{ fontSize: 11, color: '#6a5a8a', marginTop: 3, fontFamily: "'Inter',sans-serif" }}>Rush: ×{r.rushMultiplier}</div>
+                  <div key={r._id} style={{ background: 'rgba(14,10,20,0.5)', border: '1px solid rgba(244,241,234,0.08)', borderRadius: 10, padding: '0.85rem 1rem', minWidth: 150 }}>
+                    <div style={{ fontSize: 10, color: '#6A8A82', textTransform: 'capitalize', letterSpacing: '0.1em', marginBottom: 6, fontFamily: "'Inter',sans-serif" }}>{r.tier}</div>
+                    <div style={{ fontWeight: 800, fontSize: 20, color: '#F4F1EA', fontFamily: "'Poppins',sans-serif" }}>{formatKES(r.price)}</div>
+                    <div style={{ fontSize: 11, color: '#6A8A82', marginTop: 3, fontFamily: "'Inter',sans-serif" }}>Rush: ×{r.rushMultiplier}</div>
                     <button onClick={() => { setEditRule(r); setRuleForm({ price: r.price, rushMultiplier: r.rushMultiplier }); }}
                       style={{ ...btn('blue'), padding: '3px 12px', fontSize: 11, marginTop: 10 }}>Edit</button>
                   </div>
@@ -96,7 +96,7 @@ export default function Settings() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={T.card}>
-            <h4 style={{ margin: '0 0 1rem', color: '#f0eeff', fontFamily: "'Poppins',sans-serif" }}>Add Availability Slot</h4>
+            <h4 style={{ margin: '0 0 1rem', color: '#F4F1EA', fontFamily: "'Poppins',sans-serif" }}>Add Availability Slot</h4>
             <form onSubmit={addSlot} style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
               <div><label style={T.label}>Date</label><input type="date" value={slotForm.date} onChange={(e) => setSlotForm({ ...slotForm, date: e.target.value })} required style={{ ...T.input, width: 160 }} /></div>
               <div><label style={T.label}>Start</label><input type="time" value={slotForm.startTime} onChange={(e) => setSlotForm({ ...slotForm, startTime: e.target.value })} required style={{ ...T.input, width: 120 }} /></div>
@@ -106,11 +106,11 @@ export default function Settings() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {slots.length === 0
-              ? <p style={{ color: '#6a5a8a', fontFamily: "'Inter',sans-serif" }}>No upcoming slots. Add some above.</p>
+              ? <p style={{ color: '#6A8A82', fontFamily: "'Inter',sans-serif" }}>No upcoming slots. Add some above.</p>
               : slots.map((s) => (
                 <div key={s._id} style={{ ...T.card, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0.85rem 1.25rem' }}>
-                  <span style={{ fontSize: 14, color: '#b8a8d8', fontFamily: "'Inter',sans-serif" }}>{new Date(s.date).toDateString()} · {s.startTime} – {s.endTime}</span>
-                  <span style={{ fontSize: 12, color: s.isBooked ? '#e74c3c' : '#2ecc71', fontWeight: 700, fontFamily: "'Inter',sans-serif" }}>{s.isBooked ? 'Booked' : 'Available'}</span>
+                  <span style={{ fontSize: 14, color: '#A9C4BE', fontFamily: "'Inter',sans-serif" }}>{new Date(s.date).toDateString()} · {s.startTime} – {s.endTime}</span>
+                  <span style={{ fontSize: 12, color: s.isBooked ? '#FF8A3D' : '#2ecc71', fontWeight: 700, fontFamily: "'Inter',sans-serif" }}>{s.isBooked ? 'Booked' : 'Available'}</span>
                 </div>
               ))
             }
@@ -121,7 +121,7 @@ export default function Settings() {
       {editRule && (
         <div style={T.overlay}>
           <div style={{ ...T.modal, maxWidth: 380 }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#c0392b,#2980b9)', borderRadius: '14px 14px 0 0' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EE6100,#2BB6A3)', borderRadius: '14px 14px 0 0' }} />
             <h3 style={T.modalH3}>Edit: {editRule.service} — {editRule.tier}</h3>
             <form onSubmit={saveRule} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div><label style={T.label}>Price (KES)</label><input type="number" value={ruleForm.price} onChange={(e) => setRuleForm({ ...ruleForm, price: e.target.value })} required min={0} style={T.input} /></div>

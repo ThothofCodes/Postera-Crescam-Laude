@@ -3,15 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { api, publicApi } from '../utils/api';
 
 const styles = {
-  wrap: { minHeight: '100vh', background: '#020408', color: '#c0d8f0', fontFamily: "'Inter',sans-serif" },
+  wrap: { minHeight: '100vh', background: '#081916', color: '#c0d8f0', fontFamily: "'Inter',sans-serif" },
   card: {
     maxWidth: 860,
     margin: '0 auto',
     padding: '1.5rem',
   },
   header: {
-    background: 'linear-gradient(90deg,#060d14,#0a1628)',
-    borderBottom: '1px solid rgba(0,212,255,0.12)',
+    background: 'linear-gradient(90deg,#0B1F1B,#0F2620)',
+    borderBottom: '1px solid rgba(238,97,0,0.12)',
     padding: '0.9rem 1rem',
     position: 'sticky',
     top: 0,
@@ -19,15 +19,15 @@ const styles = {
   title: { fontSize: 14, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', margin: 0 },
   subtitle: { fontSize: 11, color: '#4a6a8a', marginTop: 4 },
   panel: {
-    background: '#060d14',
-    border: '1px solid rgba(0,212,255,0.12)',
+    background: '#0B1F1B',
+    border: '1px solid rgba(238,97,0,0.12)',
     borderRadius: 12,
     padding: '1rem',
     marginTop: '1rem',
   },
   grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  label: { fontSize: 10, color: '#7a9ab0', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 800 },
-  value: { fontSize: 13, color: '#e2eeff', fontWeight: 700, marginTop: 4 },
+  label: { fontSize: 10, color: '#A9C4BE', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 800 },
+  value: { fontSize: 13, color: '#F4F1EA', fontWeight: 700, marginTop: 4 },
   btnRow: { display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 16 },
   btn: {
     padding: '0.45rem 1rem',
@@ -41,16 +41,16 @@ const styles = {
 };
 
 function statusAccent(status) {
-  if (!status) return '#00d4ff';
+  if (!status) return '#EE6100';
   const map = {
     proposal: '#ffd700',
-    active: '#00d4ff',
+    active: '#EE6100',
     review: '#a78bfa',
     delivered: '#00ff88',
     'on-hold': '#ff8800',
     cancelled: '#ff3366',
   };
-  return map[status] || '#00d4ff';
+  return map[status] || '#EE6100';
 }
 
 export default function PublicWebPortal() {
@@ -98,9 +98,9 @@ export default function PublicWebPortal() {
         <div style={styles.card}>
           <div style={{ ...styles.panel, textAlign: 'center' }}>
             <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>Project Not Available</div>
-            <div style={{ fontSize: 12, color: '#7a9ab0', marginBottom: 14 }}>{error}</div>
+            <div style={{ fontSize: 12, color: '#A9C4BE', marginBottom: 14 }}>{error}</div>
             <button
-              style={{ ...styles.btn, background: 'rgba(0,212,255,0.12)', border: '1px solid rgba(0,212,255,0.35)', color: '#00d4ff' }}
+              style={{ ...styles.btn, background: 'rgba(238,97,0,0.12)', border: '1px solid rgba(238,97,0,0.35)', color: '#EE6100' }}
               onClick={() => navigate('/store')}
             >
               Back
@@ -134,8 +134,8 @@ export default function PublicWebPortal() {
         <div style={styles.panel}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
             <div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: '#e2eeff' }}>{project.projectName || 'Project'}</div>
-              <div style={{ marginTop: 6, fontSize: 12, color: '#7a9ab0' }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: '#F4F1EA' }}>{project.projectName || 'Project'}</div>
+              <div style={{ marginTop: 6, fontSize: 12, color: '#A9C4BE' }}>
                 Client: <span style={{ color: '#c0d8f0', fontWeight: 800 }}>{project.clientName}</span>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function PublicWebPortal() {
               <div style={{ display: 'inline-block', padding: '6px 10px', borderRadius: 99, border: `1px solid ${accent}55`, background: `${accent}22`, color: accent, fontWeight: 900, fontSize: 11 }}>
                 {project.status}
               </div>
-              <div style={{ marginTop: 8, fontSize: 11, color: '#7a9ab0' }}>
+              <div style={{ marginTop: 8, fontSize: 11, color: '#A9C4BE' }}>
                 Deadline: {project.deadline ? new Date(project.deadline).toLocaleDateString('en-KE') : '—'}
               </div>
             </div>
@@ -162,21 +162,21 @@ export default function PublicWebPortal() {
         </div>
 
         <div style={styles.panel}>
-          <div style={{ fontSize: 12, fontWeight: 900, color: '#00d4ff', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: 12, fontWeight: 900, color: '#EE6100', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
             Milestone Progress
           </div>
 
           {Array.isArray(project.milestones) && project.milestones.length ? (
             <div style={{ marginTop: 12, display: 'grid', gap: 10 }}>
               {project.milestones.map((m, idx) => (
-                <div key={idx} style={{ border: '1px solid rgba(0,212,255,0.12)', background: '#060d14', borderRadius: 10, padding: '0.85rem' }}>
+                <div key={idx} style={{ border: '1px solid rgba(238,97,0,0.12)', background: '#0B1F1B', borderRadius: 10, padding: '0.85rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 900, color: '#e2eeff' }}>{m.title || `Milestone ${idx + 1}`}</div>
-                      <div style={{ fontSize: 11, color: '#7a9ab0', marginTop: 4, lineHeight: 1.4 }}>{m.description || ''}</div>
+                      <div style={{ fontSize: 13, fontWeight: 900, color: '#F4F1EA' }}>{m.title || `Milestone ${idx + 1}`}</div>
+                      <div style={{ fontSize: 11, color: '#A9C4BE', marginTop: 4, lineHeight: 1.4 }}>{m.description || ''}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: 10, color: '#7a9ab0', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 900 }}>Status</div>
+                      <div style={{ fontSize: 10, color: '#A9C4BE', letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 900 }}>Status</div>
                       <div style={{ marginTop: 6, fontSize: 12, fontWeight: 900, color: statusAccent(m.status) }}>{m.status || 'pending'}</div>
                     </div>
                   </div>
@@ -188,7 +188,7 @@ export default function PublicWebPortal() {
               ))}
             </div>
           ) : (
-            <div style={{ marginTop: 12, fontSize: 12, color: '#7a9ab0' }}>No milestones configured yet.</div>
+            <div style={{ marginTop: 12, fontSize: 12, color: '#A9C4BE' }}>No milestones configured yet.</div>
           )}
         </div>
 
@@ -196,7 +196,7 @@ export default function PublicWebPortal() {
           <div style={{ fontSize: 12, fontWeight: 900, color: '#00ff88', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
             Delivery & Approval
           </div>
-          <div style={{ marginTop: 10, fontSize: 12, color: '#7a9ab0', lineHeight: 1.5 }}>
+          <div style={{ marginTop: 10, fontSize: 12, color: '#A9C4BE', lineHeight: 1.5 }}>
             This portal is currently read-only for milestones. Digital signature + proposal-to-project conversion can be added once the back-end has proposal objects or signature capture endpoints.
           </div>
         </div>

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { emitTicketReply } = require('../socket');
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const Ticket = require('../models/Ticket');
 const { notifyCustomer } = require('../config/africastalking');
@@ -11,13 +10,13 @@ const safeLimit = (l) => Math.max(1, Math.min(Number(l) || 20, 100));
 exports.createTicket = async (req, res, next) => {
   try {
     const {
-      title, description, category, priority,
+      title, description, category, priority, departmentSlug,
     } = req.body;
     if (!title || !description) return res.status(400).json({ message: 'Title and description required' });
     const isClient = req.user.role === 'CLIENT';
     const ticket = await Ticket.create({
-      department: req.user.department?._id || req.user.department,
-      departmentSlug: req.user.departmentSlug,
+      department: req.user.department?._id || req.user.department || null,
+      departmentSlug: departmentSlug || req.user.departmentSlug || 'general',
       raisedBy: req.user._id,
       raisedByRole: isClient ? 'CLIENT' : 'STAFF',
       title: title.trim().slice(0, 200),
@@ -100,10 +99,14 @@ exports.updateStatus = async (req, res, next) => {
     const VALID = ['OPEN', 'IN_PROGRESS', 'AWAITING_CLIENT', 'RESOLVED', 'CLOSED', 'REOPENED'];
     if (!VALID.includes(req.body.status)) return res.status(400).json({ message: 'Invalid status' });
 
-    const previousTicket = await Ticket.findById(req.params.id).select('status');
+    const previousTicket = await Ticket.findById(req.params.id).select('status assignedTo');
     const update = { status: req.body.status };
     if (req.body.status === 'RESOLVED') update.resolvedAt = new Date();
     if (req.body.status === 'CLOSED') update.closedAt = new Date();
+    // Auto-assign to claiming admin when moving to IN_PROGRESS
+    if (req.body.status === 'IN_PROGRESS' && !previousTicket?.assignedTo) {
+      update.assignedTo = req.user.id;
+    }
 
     const ticket = await Ticket.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
@@ -198,5 +201,36 @@ exports.getEscalated = async (req, res, next) => {
   try {
     const tickets = await Ticket.find({ status: 'ESCALATED' }).populate('department', 'name slug').sort('-createdAt');
     res.json(tickets);
+  } catch (err) { next(err); }
+};
+
+// Public ticket creation — no auth required, customers submit directly
+exports.createPublicTicket = async (req, res, next) => {
+  try {
+    const { title, description, category, priority, departmentSlug, name, email, phone } = req.body;
+    if (!title || !description) return res.status(400).json({ message: 'Title and description required' });
+
+    const ticket = await Ticket.create({
+      department: null,
+      departmentSlug: departmentSlug || 'general',
+      raisedBy: null, // No user account required
+      raisedByRole: 'CLIENT',
+      title: title.trim().slice(0, 200),
+      description: description.trim().slice(0, 5000),
+      category: category || 'General',
+      priority: priority || 'MEDIUM',
+      // Store contact info in thread for admin reference
+      thread: (name || email || phone) ? [{
+        author: null,
+        authorRole: 'CLIENT',
+        message: `Contact: ${name || 'Anonymous'} | ${email || 'no email'} | ${phone || 'no phone'}`,
+      }] : [],
+    });
+
+    res.status(201).json({
+      success: true,
+      ticketId: ticket.ticketId,
+      message: `Ticket ${ticket.ticketId} created. Save this reference to track your request.`,
+    });
   } catch (err) { next(err); }
 };

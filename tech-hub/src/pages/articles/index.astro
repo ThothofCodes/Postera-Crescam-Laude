@@ -1,0 +1,200 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getArticles, getCategories } from '../../lib/sanity';
+
+const category = Astro.url.searchParams.get('category');
+const page = parseInt(Astro.url.searchParams.get('page') || '1');
+
+const [articlesData, categories] = await Promise.all([
+  getArticles({ page, limit: 12, category }),
+  getCategories(),
+]);
+
+const articles = articlesData.articles || [];
+const total = articlesData.total || 0;
+const totalPages = Math.ceil(total / 12);
+---
+
+<Layout title="Articles — PCL Tech Hub">
+  <main class="articles-page">
+    <div class="container">
+      <header class="page-header">
+        <h1>📚 Tech Articles</h1>
+        <p>In-depth articles on hardware, software, networking, and more</p>
+      </header>
+
+      <!-- Category Filter -->
+      <div class="filters">
+        <a href="/articles" class={!category ? 'filter active' : 'filter'}>All</a>
+        {categories.map((cat) => (
+          <a href={`/articles?category=${cat}`} class={category === cat ? 'filter active' : 'filter'}>
+            {cat}
+          </a>
+        ))}
+      </div>
+
+      <!-- Articles Grid -->
+      <div class="article-grid">
+        {articles.map((article) => (
+          <a href={`/articles/${article.slug?.current}`} class="article-card">
+            {article.imageUrl && (
+              <img src={article.imageUrl} alt={article.title} class="article-image" loading="lazy" />
+            )}
+            <div class="article-content">
+              <span class="article-category">{article.category}</span>
+              <h2>{article.title}</h2>
+              <p>{article.excerpt}</p>
+              <div class="article-meta">
+                {article.author && <span class="author">By {article.author.name}</span>}
+                <time>{new Date(article.publishedAt).toLocaleDateString('en-KE')}</time>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {articles.length === 0 && (
+        <div class="empty-state">
+          <p>No articles found{category ? ` in "${category}"` : ''}.</p>
+        </div>
+      )}
+
+      <!-- Pagination -->
+      {totalPages > 1 && (
+        <div class="pagination">
+          {page > 1 && (
+            <a href={`/articles?page=${page - 1}${category ? `&category=${category}` : ''}`} class="page-link">
+              ← Previous
+            </a>
+          )}
+          <span class="page-info">Page {page} of {totalPages}</span>
+          {page < totalPages && (
+            <a href={`/articles?page=${page + 1}${category ? `&category=${category}` : ''}`} class="page-link">
+              Next →
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+  .articles-page { padding: 2rem 0; }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header p { color: #A9C4BE; }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+
+  .filter {
+    padding: 0.4rem 1rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: #A9C4BE;
+    background: rgba(43, 182, 163, 0.1);
+    border: 1px solid rgba(43, 182, 163, 0.3);
+    transition: all 0.2s;
+  }
+
+  .filter:hover, .filter.active {
+    background: #EE6100;
+    color: #000;
+    border-color: #EE6100;
+  }
+
+  .article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .article-card {
+    background: #050d0a;
+    border: 1px solid rgba(43, 182, 163, 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .article-card:hover {
+    transform: translateY(-4px);
+    border-color: #EE6100;
+  }
+
+  .article-image { width: 100%; height: 200px; object-fit: cover; }
+
+  .article-content { padding: 1rem; }
+
+  .article-category {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2BB6A3;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .article-card h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .article-card p { font-size: 0.9rem; color: #A9C4BE; margin-bottom: 0.75rem; }
+
+  .article-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #4a6a8a;
+  }
+
+  .author { color: #EE6100; }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #4a6a8a;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .page-link {
+    padding: 0.5rem 1rem;
+    background: rgba(238, 97, 0, 0.2);
+    color: #EE6100;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+
+  .page-link:hover { background: #EE6100; color: #000; }
+
+  .page-info { color: #4a6a8a; font-size: 0.9rem; }
+</style>

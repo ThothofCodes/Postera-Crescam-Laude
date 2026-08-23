@@ -40,7 +40,8 @@ publicApi.interceptors.request.use(setContentTypeByPayload);
 // ── Request interceptor — attach token ────────────────────────────────────
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // Check both user token and admin token — admin pages use 'adminToken'
+    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
     if (token) {
       // Basic token format validation before sending
       if (typeof token === 'string' && token.split('.').length === 3) {
@@ -48,6 +49,7 @@ api.interceptors.request.use(
       } else {
         // Malformed token — clear it
         localStorage.removeItem('token');
+        localStorage.removeItem('adminToken');
       }
     }
     return config;
@@ -60,8 +62,25 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      // Token expired or invalid — clear and redirect to login
+      const data = err.response?.data || {};
+      
+      // Session killed by another login — show specific message
+      if (data.code === 'SESSION_KILLED') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('pcl-admin-auth');
+        sessionStorage.clear();
+        
+        // Show session killed notification before redirect
+        const msg = encodeURIComponent(data.message || 'You were logged out because your account was accessed from another device.');
+        window.location.href = `/admin/login?reason=session_killed&msg=${msg}`;
+        return Promise.reject(err);
+      }
+      
+      // Token expired or invalid — clear both token keys and redirect
       localStorage.removeItem('token');
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('pcl-admin-auth');
       // Only redirect if not already on login page
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';

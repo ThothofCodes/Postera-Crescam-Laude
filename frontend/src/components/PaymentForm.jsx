@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 import { useState, useEffect, useRef } from 'react';
-import { api } from '../utils/api';
+import { publicApi } from '../utils/api';
 import { formatKES } from '../utils/helpers';
 
 export default function PaymentForm({ orderId, amount, onSuccess }) {
@@ -16,7 +16,7 @@ export default function PaymentForm({ orderId, amount, onSuccess }) {
     };
   }, []);
 
-  const poll = async (id, attempts = 0) => {
+  const poll = async (orderNumber, attempts = 0) => {
     if (!mountedRef.current) return;
     if (attempts > 30) {
       setStatus('failed');
@@ -24,7 +24,7 @@ export default function PaymentForm({ orderId, amount, onSuccess }) {
       return;
     }
     try {
-      const { data } = await api.get(`/orders/${id}`);
+      const { data } = await publicApi.get(`/orders/status/${orderNumber}`);
       if (data.paymentStatus === 'paid') {
         setStatus('success');
         onSuccess(data);
@@ -33,7 +33,7 @@ export default function PaymentForm({ orderId, amount, onSuccess }) {
     } catch {
       // network hiccup — keep polling
     }
-    pollRef.current = setTimeout(() => poll(id, attempts + 1), 3000);
+    pollRef.current = setTimeout(() => poll(orderNumber, attempts + 1), 3000);
   };
 
   const handlePay = async () => {
@@ -41,8 +41,10 @@ export default function PaymentForm({ orderId, amount, onSuccess }) {
     setError('');
     try {
       // STK push was already triggered at order creation for mpesa orders.
-      // We just start polling for the callback result.
+      // We just start polling for the callback result via the public status endpoint.
+      // We need the orderNumber, not the ObjectId — fetch it first if we only have the ID.
       setStatus('polling');
+      // Try polling with the orderId directly (might be orderNumber or ObjectId)
       poll(orderId);
     } catch (err) {
       setStatus('failed');

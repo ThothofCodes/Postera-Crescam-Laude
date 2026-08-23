@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const { validateCallback } = require('../middleware/mpesa');
 const Order = require('../models/Order');
+const Product = require('../models/Product');
 const Consultation = require('../models/Consultation');
 const Client = require('../models/Client');
 const Revenue = require('../models/Revenue');
@@ -53,6 +54,23 @@ exports.mpesaCallback = async (req, res) => {
         paymentMethod: 'mpesa',
         reference: mpesaRef,
       });
+
+      // Deduct stock for physical products
+      if (isOrder && order.items?.length) {
+        for (const item of order.items) {
+          if (!item.product) continue;
+          const p = await Product.findById(item.product);
+          if (p && !p.isDigital) {
+            await Product.findByIdAndUpdate(item.product, {
+              $inc: { soldCount: item.quantity, stock: -item.quantity },
+            });
+          } else if (p) {
+            await Product.findByIdAndUpdate(item.product, {
+              $inc: { soldCount: item.quantity },
+            });
+          }
+        }
+      }
 
       if (isOrder) {
         sendSMS(order.customer.phone, `Payment of KES ${order.total} confirmed. Ref: ${mpesaRef}. Order: ${order.orderNumber}`);

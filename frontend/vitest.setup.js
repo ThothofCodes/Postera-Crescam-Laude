@@ -3,19 +3,21 @@ import { vi } from 'vitest';
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
+  store: {},
+  getItem: vi.fn((key) => localStorageMock.store[key] ?? null),
+  setItem: vi.fn((key, value) => { localStorageMock.store[key] = String(value); }),
+  removeItem: vi.fn((key) => { delete localStorageMock.store[key]; }),
+  clear: vi.fn(() => { localStorageMock.store = {}; }),
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock sessionStorage
 const sessionStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
+  store: {},
+  getItem: vi.fn((key) => sessionStorageMock.store[key] ?? null),
+  setItem: vi.fn((key, value) => { sessionStorageMock.store[key] = String(value); }),
+  removeItem: vi.fn((key) => { delete sessionStorageMock.store[key]; }),
+  clear: vi.fn(() => { sessionStorageMock.store = {}; }),
 };
 Object.defineProperty(window, 'sessionStorage', { value: sessionStorageMock });
 

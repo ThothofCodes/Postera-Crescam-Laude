@@ -4,17 +4,17 @@ import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
 const STATUS_COLORS = {
-  DRAFT:'#7a9ab0', SENT:'#00d4ff', PAYMENT_SENT:'#ffd700',
+  DRAFT:'#A9C4BE', SENT:'#EE6100', PAYMENT_SENT:'#ffd700',
   PAID:'#00ff88', PARTIAL:'#ff8800', OVERDUE:'#ff3366', CANCELLED:'#4a6a8a'
 };
 
 const Tag = ({ label }) => {
-  const color = STATUS_COLORS[label] || '#7a9ab0';
+  const color = STATUS_COLORS[label] || '#A9C4BE';
   return <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:99,
     background:`${color}22`, color, border:`1px solid ${color}44` }}>{label}</span>;
 };
 
-export default function BillingPage({ color = '#00d4ff' }) {
+export default function BillingPage({ color = '#EE6100' }) {
   const [invoices, setInvoices] = useState([]);
   const [total, setTotal]       = useState(0);
   const [loading, setLoading]   = useState(true);
@@ -125,7 +125,7 @@ export default function BillingPage({ color = '#00d4ff' }) {
       {/* Filter */}
       <div style={{ marginBottom:'1rem' }}>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          style={{ padding:'0.45rem 0.75rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:12 }}>
+          style={{ padding:'0.45rem 0.75rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:12 }}>
           {STATUSES.map(s => <option key={s} value={s}>{s || 'All Statuses'}</option>)}
         </select>
       </div>
@@ -143,26 +143,26 @@ export default function BillingPage({ color = '#00d4ff' }) {
           <tbody>
             {invoices.map((inv, i) => (
               <tr key={inv._id} style={{ borderBottom:'1px solid #040c1a', background: i%2===0?'transparent':'#050d1a' }}>
-                <td style={{ padding:'0.6rem 0.75rem', fontFamily:'monospace', fontSize:11, color:'#00d4ff' }}>{inv.invoiceId}</td>
-                <td style={{ padding:'0.6rem 0.75rem', color:'#e0f0ff' }}>{inv.client?.fullName || '—'}</td>
-                <td style={{ padding:'0.6rem 0.75rem', fontWeight:700, color:'#e0f0ff' }}>{inv.totalAmount?.toLocaleString()}</td>
+                <td style={{ padding:'0.6rem 0.75rem', fontFamily:'monospace', fontSize:11, color:'#EE6100' }}>{inv.invoiceId}</td>
+                <td style={{ padding:'0.6rem 0.75rem', color:'#F4F1EA' }}>{inv.client?.fullName || '—'}</td>
+                <td style={{ padding:'0.6rem 0.75rem', fontWeight:700, color:'#F4F1EA' }}>{inv.totalAmount?.toLocaleString()}</td>
                 <td style={{ padding:'0.6rem 0.75rem', color: inv.balance > 0 ? '#ff3366' : '#00ff88' }}>{inv.balance?.toLocaleString()}</td>
-                <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>{new Date(inv.dueDate).toLocaleDateString('en-KE')}</td>
+                <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>{new Date(inv.dueDate).toLocaleDateString('en-KE')}</td>
                 <td style={{ padding:'0.6rem 0.75rem' }}><Tag label={inv.status} /></td>
-                <td style={{ padding:'0.6rem 0.75rem', color: '#7a9ab0' }}>
+                <td style={{ padding:'0.6rem 0.75rem', color: '#A9C4BE' }}>
                   {inv.etimsStatus === 'SUBMITTED' ? (
                     <span style={{ color: '#00ff88' }}>✓ {inv.etimsInvoiceNumber || 'Submitted'}</span>
                   ) : inv.etimsStatus === 'FAILED' ? (
                     <span style={{ color: '#ff3366' }}>✗ Failed</span>
                   ) : (
-                    <span style={{ color: '#7a9ab0' }}>Not sent</span>
+                    <span style={{ color: '#A9C4BE' }}>Not sent</span>
                   )}
                 </td>
                 <td style={{ padding:'0.6rem 0.75rem' }}>
                   <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
                     {inv.status === 'DRAFT' && (
                       <button onClick={() => sendInvoice(inv._id)}
-                        style={{ padding:'3px 8px', background:'#00d4ff22', color:'#00d4ff', border:'1px solid #00d4ff44', borderRadius:4, fontSize:10, cursor:'pointer', fontWeight:700 }}>SEND</button>
+                        style={{ padding:'3px 8px', background:'#EE610022', color:'#EE6100', border:'1px solid #EE610044', borderRadius:4, fontSize:10, cursor:'pointer', fontWeight:700 }}>SEND</button>
                     )}
                     {['SENT','PARTIAL'].includes(inv.status) && (
                       <button onClick={() => requestPayment(inv)}
@@ -174,7 +174,7 @@ export default function BillingPage({ color = '#00d4ff' }) {
                     )}
                     {inv.status === 'PAID' && !inv.etimsInvoiceNumber && (
                       <button onClick={() => submitToETIMS(inv._id)}
-                        style={{ padding:'3px 8px', background:'#00d4ff22', color:'#00d4ff', border:'1px solid #00d4ff44', borderRadius:4, fontSize:10, cursor:'pointer', fontWeight:700 }}>eTIMS</button>
+                        style={{ padding:'3px 8px', background:'#EE610022', color:'#EE6100', border:'1px solid #EE610044', borderRadius:4, fontSize:10, cursor:'pointer', fontWeight:700 }}>eTIMS</button>
                     )}
                   </div>
                 </td>
@@ -190,26 +190,26 @@ export default function BillingPage({ color = '#00d4ff' }) {
       {/* Create Invoice Modal */}
       {showForm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:540, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:540, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16 }}>New Invoice</h3>
             <form onSubmit={createInvoice} style={{ display:'flex', flexDirection:'column', gap:12 }}>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Client *
                 <select value={form.clientId} onChange={e => setForm(p=>({...p,clientId:e.target.value}))} required
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                   <option value="">Select client…</option>
                   {clients.map(c => <option key={c._id} value={c._id}>{c.fullName} — {c.phone}</option>)}
                 </select>
               </label>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Due Date *
                 <input type="date" value={form.dueDate} onChange={e => setForm(p=>({...p,dueDate:e.target.value}))} required
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }} />
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }} />
               </label>
 
               {/* Line Items */}
               <div>
-                <div style={{ fontSize:11, color:'#7a9ab0', marginBottom:6, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div style={{ fontSize:11, color:'#A9C4BE', marginBottom:6, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                   LINE ITEMS
                   <button type="button" onClick={addLine}
                     style={{ fontSize:10, padding:'2px 8px', background:`${color}22`, color, border:`1px solid ${color}44`, borderRadius:4, cursor:'pointer' }}>+ Add Line</button>
@@ -217,11 +217,11 @@ export default function BillingPage({ color = '#00d4ff' }) {
                 {form.lineItems.map((line, i) => (
                   <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr auto', gap:6, marginBottom:6, alignItems:'center' }}>
                     <input placeholder="Description" value={line.description} onChange={e => updateLine(i,'description',e.target.value)}
-                      style={{ padding:'0.4rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:4, color:'#e0f0ff', fontSize:12, outline:'none' }} />
+                      style={{ padding:'0.4rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:4, color:'#F4F1EA', fontSize:12, outline:'none' }} />
                     <input placeholder="Qty" type="number" value={line.qty} min={1} onChange={e => updateLine(i,'qty',e.target.value)}
-                      style={{ padding:'0.4rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:4, color:'#e0f0ff', fontSize:12, outline:'none' }} />
+                      style={{ padding:'0.4rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:4, color:'#F4F1EA', fontSize:12, outline:'none' }} />
                     <input placeholder="Unit Price" type="number" value={line.unitPrice} min={0} onChange={e => updateLine(i,'unitPrice',e.target.value)}
-                      style={{ padding:'0.4rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:4, color:'#e0f0ff', fontSize:12, outline:'none' }} />
+                      style={{ padding:'0.4rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:4, color:'#F4F1EA', fontSize:12, outline:'none' }} />
                     <button type="button" onClick={() => removeLine(i)}
                       style={{ background:'transparent', border:'none', color:'#ff3366', fontSize:14, cursor:'pointer', padding:0 }}>✕</button>
                   </div>
@@ -229,26 +229,26 @@ export default function BillingPage({ color = '#00d4ff' }) {
               </div>
 
               {/* Totals */}
-              <div style={{ background:'#0a1628', borderRadius:8, padding:'0.75rem', fontSize:12 }}>
-                <div style={{ display:'flex', justifyContent:'space-between', color:'#7a9ab0', marginBottom:4 }}>
+              <div style={{ background:'#0F2620', borderRadius:8, padding:'0.75rem', fontSize:12 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', color:'#A9C4BE', marginBottom:4 }}>
                   <span>Subtotal</span><span>KES {subtotal.toLocaleString()}</span>
                 </div>
-                <div style={{ display:'flex', justifyContent:'space-between', color:'#7a9ab0', marginBottom:4 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', color:'#A9C4BE', marginBottom:4 }}>
                   <span>VAT (16%)</span><span>KES {tax.toFixed(2)}</span>
                 </div>
-                <div style={{ display:'flex', justifyContent:'space-between', color, fontWeight:700, fontSize:14, borderTop:'1px solid #1a3050', paddingTop:6, marginTop:6 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', color, fontWeight:700, fontSize:14, borderTop:'1px solid rgba(36,74,68,0.4)', paddingTop:6, marginTop:6 }}>
                   <span>TOTAL</span><span>KES {total_.toFixed(2)}</span>
                 </div>
               </div>
 
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Notes
                 <textarea value={form.notes} onChange={e => setForm(p=>({...p,notes:e.target.value}))} rows={2}
-                  style={{ padding:'0.45rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13, resize:'none', outline:'none' }} />
+                  style={{ padding:'0.45rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13, resize:'none', outline:'none' }} />
               </label>
 
               {/* KRA eTIMS Integration Notice */}
-              <div style={{ background:'#0a1628', borderLeft:`3px solid ${color}`, borderRadius:6, padding:'0.75rem', fontSize:11, color:'#7a9ab0' }}>
+              <div style={{ background:'#0F2620', borderLeft:`3px solid ${color}`, borderRadius:6, padding:'0.75rem', fontSize:11, color:'#A9C4BE' }}>
                 <div style={{ fontWeight:700, color, marginBottom:4 }}>KRA eTIMS Compliance</div>
                 <div>After payment is confirmed, submit this invoice to KRA eTIMS for tax compliance.</div>
                 <div style={{ marginTop: 4, fontSize:10, color:'#4a6a8a' }}>Required for invoices over KES 500</div>
@@ -257,7 +257,7 @@ export default function BillingPage({ color = '#00d4ff' }) {
               <div style={{ display:'flex', gap:10 }}>
                 <button type="submit" style={{ flex:1, padding:'0.6rem', background:color, color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}>Create Invoice</button>
                 <button type="button" onClick={() => setShowForm(false)}
-                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>Cancel</button>
+                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>Cancel</button>
               </div>
             </form>
           </div>

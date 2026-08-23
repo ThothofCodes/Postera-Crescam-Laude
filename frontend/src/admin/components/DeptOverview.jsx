@@ -5,7 +5,7 @@ import { formatKES } from '../../utils/helpers';
 import IncomeProjectionChart from './IncomeProjectionChart';
 import { Spinner } from '../../components/UI';
 
-export default function DeptOverview({ slug, title, color = '#00d4ff', departmentId, extraStats = [] }) {
+export default function DeptOverview({ slug, title, color = '#EE6100', departmentId, extraStats = [] }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,9 +25,9 @@ export default function DeptOverview({ slug, title, color = '#00d4ff', departmen
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(0,212,255,0.08)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid rgba(238,97,0,0.08)' }}>
         <h2 style={{ margin: 0, fontSize: 18, letterSpacing: '0.08em', textTransform: 'uppercase', color }}>{title}</h2>
-        <span style={{ fontSize: 10, color: '#4a6580', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+        <span style={{ fontSize: 10, color: '#6A8A82', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
           {new Date().toLocaleDateString('en-KE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
         </span>
       </div>
@@ -41,9 +41,9 @@ export default function DeptOverview({ slug, title, color = '#00d4ff', departmen
           { label: 'Growth Rate', value: `${stats?.growthRate || 0}%`, accent: '#ffd700' },
           ...extraStats,
         ].map(({ label, value, accent }) => (
-          <div key={label} style={{ background: 'linear-gradient(160deg,#0d1f35,#0a1628)', border: '1px solid rgba(0,212,255,0.1)', borderRadius: 8, padding: '1rem', position: 'relative', overflow: 'hidden' }}>
+          <div key={label} style={{ background: 'linear-gradient(160deg,#0F2620,#0F2620)', border: '1px solid rgba(238,97,0,0.1)', borderRadius: 8, padding: '1rem', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: accent, opacity: 0.7 }} />
-            <div style={{ fontSize: 10, color: '#4a6580', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
+            <div style={{ fontSize: 10, color: '#6A8A82', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
             <div style={{ fontSize: 20, fontWeight: 800, background: `linear-gradient(90deg,${accent},#a8c0d8)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{value}</div>
           </div>
         ))}

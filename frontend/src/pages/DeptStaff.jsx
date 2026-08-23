@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAdminAuth } from '../admin/context/AdminAuthContext';
 import { useChat } from '../hooks/useChat';
 import ChatWidget from '../components/ChatWidget';
 import { api } from '../utils/api';
@@ -9,11 +9,11 @@ import { Spinner, EmptyState } from '../components/UI';
 
 const DeptStaff = () => {
   const { slug } = useParams();
-  const { user } = useAuth();
+  const { user } = useAdminAuth();
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('staff'); // 'staff', 'chat'
-  const authToken = localStorage.getItem('token');
+  const authToken = localStorage.getItem('adminToken');
 
   const { 
     connected, 
@@ -48,8 +48,8 @@ const DeptStaff = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <div>
-                <h1 style={{ fontSize: '1.8rem', margin: 0, color: '#f0eeff' }}>Department Staff</h1>
-                <p style={{ color: '#b8a8d8', margin: '0.5rem 0 0' }}>Manage your team members</p>
+                <h1 style={{ fontSize: '1.8rem', margin: 0, color: '#F4F1EA' }}>Department Staff</h1>
+                <p style={{ color: '#A9C4BE', margin: '0.5rem 0 0' }}>Manage your team members</p>
               </div>
             </div>
             

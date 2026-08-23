@@ -99,7 +99,7 @@ export default function Clients() {
       {modal && (
         <div style={T.overlay}>
           <div style={T.modal}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#c0392b,#8e44ad,#2980b9)', borderRadius: '14px 14px 0 0' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'linear-gradient(90deg,#EE6100,#244A44,#2BB6A3)', borderRadius: '14px 14px 0 0' }} />
             <h3 style={T.modalH3}>{modal === 'create' ? 'New Client' : 'Edit Client'}</h3>
             <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[['name', 'Name'], ['phone', 'Phone'], ['email', 'Email (optional)']].map(([k, l]) => (

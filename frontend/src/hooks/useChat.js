@@ -16,9 +16,15 @@ export function useChat({ authToken = null } = {}) {
   const [messages, setMessages] = useState([]);
   const [conversations, setConversations] = useState([]); // Track all conversations
   const [currentConversation, setCurrentConversation] = useState(null); // Current active conversation
+  const currentConversationRef = useRef(null); // Always holds latest value for event listeners
   const [callbackSubmitted, setCallbackSubmitted] = useState(false);
   const [adminAvailableAlert, setAdminAvailableAlert] = useState(false);
   const [guestUsers, setGuestUsers] = useState({}); // Track guest user info
+
+  // Keep ref in sync with state for use inside event listeners (avoids stale closures)
+  useEffect(() => {
+    currentConversationRef.current = currentConversation;
+  }, [currentConversation]);
 
   useEffect(() => {
     // Build socket options
@@ -63,8 +69,14 @@ export function useChat({ authToken = null } = {}) {
     socket.on('connect', () => {
       console.log('[CHAT] Connected:', socket.id);
       setConnected(true);
-      // Request admin status immediately upon connection to ensure freshness
-      // This ensures the status is up-to-date even on new device connections
+      // Fetch existing conversations if this is an admin
+      if (authToken) {
+        api.get('/chat/conversations').then(({ data }) => {
+          if (data.success && data.data) {
+            setConversations(data.data);
+          }
+        }).catch(() => {});
+      }
     });
 
     socket.on('disconnect', (reason) => {
@@ -177,20 +189,17 @@ export function useChat({ authToken = null } = {}) {
       console.log('[CHAT] Reconnected — fetching latest messages');
       setConnected(true);
       
-      // Fetch conversation history if we have a current conversation
-      if (currentConversation) {
+      const conv = currentConversationRef.current; // Use ref to avoid stale closure
+      if (conv) {
         try {
-          const response = await fetch(`${SOCKET_URL.replace('http://', 'http://').replace('https://', 'https://')}/api/chat/conversations/${currentConversation.replace('conversation-', '')}`, {
-            headers: {
-              'Authorization': `Bearer ${authToken}`
-            }
-          });
-          
-          if (response.ok) {
-            const result = await response.json();
-            if (result.success && result.data) {
-              setMessages(result.data);
-            }
+          const apiId = conv.replace(/^conversation-/, '');
+          const { data: result } = await api.get(`/chat/conversation/${apiId}`);
+          if (result.success && result.data) {
+            setMessages(result.data.map(msg => ({
+              ...msg,
+              conversationId: msg.conversationId || conv,
+              direction: msg.senderType === 'admin' ? 'outgoing' : 'incoming',
+            })));
           }
         } catch (error) {
           console.error('Error fetching conversation history on reconnect:', error);
@@ -202,7 +211,7 @@ export function useChat({ authToken = null } = {}) {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [authToken, currentConversation]);
+  }, [authToken]); // Only reconnect when auth token changes, not on conversation switch
 
   // ── Functions for admin to interact with customers ───────────────
   const joinConversation = useCallback((conversationId) => {
@@ -279,42 +288,28 @@ export function useChat({ authToken = null } = {}) {
   }, []);
 
   const getMessagesForConversation = useCallback(async (conversationId) => {
-    // First get from local state
     const localMessages = messages.filter(msg => msg.conversationId === conversationId);
     
-    // Then fetch from server to ensure we have the latest
     try {
-      // Normalize conversation ID for API call
-      const apiConversationId = conversationId.replace('conversation-guest-', '');
-      const response = await fetch(`${SOCKET_URL.replace('http://', 'http://').replace('https://', 'https://')}/api/chat/conversations/${apiConversationId}`, {
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          // Update local state with latest messages
-          setMessages(prev => {
-            // Remove messages from this conversation and add the fresh ones
-            const otherMessages = prev.filter(msg => msg.conversationId !== conversationId);
-            return [...otherMessages, ...result.data.map(msg => ({
-              ...msg,
-              conversationId: msg.conversationId || `conversation-guest-${msg.senderId}`,
-              direction: msg.direction || (authToken ? (msg.senderType === 'admin' ? 'outgoing' : 'incoming') : (msg.senderType === 'admin' ? 'incoming' : 'outgoing'))
-            }))];
-          });
-          return result.data;
-        }
+      // Normalize conversation ID: strip 'conversation-' prefix for the API param
+      const apiId = conversationId.replace(/^conversation-/, '');
+      const { data: result } = await api.get(`/chat/conversation/${apiId}`);
+      if (result.success && result.data) {
+        setMessages(prev => {
+          const otherMessages = prev.filter(msg => msg.conversationId !== conversationId);
+          return [...otherMessages, ...result.data.map(msg => ({
+            ...msg,
+            conversationId: msg.conversationId || conversationId,
+            direction: msg.senderType === 'admin' ? 'outgoing' : 'incoming',
+          }))];
+        });
+        return result.data;
       }
     } catch (error) {
       console.error('Error fetching messages for conversation:', error);
-      // Fall back to local messages if API fails
     }
-    
     return localMessages;
-  }, [messages, authToken]);
+  }, [messages]);
 
   const getActiveConversations = useCallback(() => {
     // Return sorted conversations with most recent first
@@ -359,10 +354,12 @@ export function useChat({ authToken = null } = {}) {
     messages,
     setMessages,
     conversations,
+    setConversations,
     currentConversation,
     setCurrentConversation,
     joinConversation,
     sendMessageToCustomer,
+    getMessagesForConversation,
     callbackSubmitted,
     setCallbackSubmitted,
     adminAvailableAlert,

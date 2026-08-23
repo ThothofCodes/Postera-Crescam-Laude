@@ -35,22 +35,22 @@ const publicApi = axios.create({ baseURL: '/api', timeout: 30000,
   headers: { 'Content-Type': 'application/json' } });
 
 const STATUS_COLORS = {
-  DRAFT:'#7a9ab0', SENT:'#00d4ff', PAYMENT_SENT:'#ffd700',
+  DRAFT:'#A9C4BE', SENT:'#EE6100', PAYMENT_SENT:'#ffd700',
   PAID:'#00ff88', PARTIAL:'#ff8800', OVERDUE:'#ff3366', CANCELLED:'#4a6a8a',
-  OPEN:'#00d4ff', IN_PROGRESS:'#a78bfa', AWAITING_CLIENT:'#ffd700',
+  OPEN:'#EE6100', IN_PROGRESS:'#a78bfa', AWAITING_CLIENT:'#ffd700',
   ESCALATED:'#ff3366', RESOLVED:'#00ff88', CLOSED:'#4a6a8a',
 };
 
 const Tag = ({ label }) => {
-  const color = STATUS_COLORS[label] || '#7a9ab0';
+  const color = STATUS_COLORS[label] || '#A9C4BE';
   return (
     <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:99,
       background:`${color}22`, color, border:`1px solid ${color}44` }}>{label}</span>
   );
 };
 
-const Card = ({ title, children, accent='#00d4ff' }) => (
-  <div style={{ background:'#060d14', borderRadius:10, border:`1px solid ${accent}22`, overflow:'hidden', marginBottom:'1rem' }}>
+const Card = ({ title, children, accent='#EE6100' }) => (
+  <div style={{ background:'#0B1F1B', borderRadius:10, border:`1px solid ${accent}22`, overflow:'hidden', marginBottom:'1rem' }}>
     <div style={{ padding:'0.6rem 1rem', borderBottom:`1px solid ${accent}22`,
       fontSize:11, fontWeight:700, color:accent, letterSpacing:'0.1em', textTransform:'uppercase' }}>{title}</div>
     <div style={{ padding:'1rem' }}>{children}</div>
@@ -58,13 +58,13 @@ const Card = ({ title, children, accent='#00d4ff' }) => (
 );
 
 const DEPT_COLORS = {
-  internet:'#00d4ff', webdev:'#a78bfa', playstation:'#ffd700',
+  internet:'#2BB6A3', webdev:'#a78bfa', playstation:'#ffd700',
   repair:'#ff8800', cybersecurity:'#ff3366', govadmin:'#00ff88',
 };
 
 // ── OTP Login ─────────────────────────────────────────────
 function ClientLogin({ slug, onLogin }) {
-  const color = DEPT_COLORS[slug] || '#00d4ff';
+  const color = DEPT_COLORS[slug] || '#EE6100';
   const [phone, setPhone]   = useState('');
   const [otp, setOtp]       = useState('');
   const [step, setStep]     = useState('phone');
@@ -97,9 +97,9 @@ function ClientLogin({ slug, onLogin }) {
   };
 
   return (
-    <div style={{ minHeight:'100vh', background:'#020408', display:'flex', alignItems:'center',
+    <div style={{ minHeight:'100vh', background:'#081916', display:'flex', alignItems:'center',
       justifyContent:'center', fontFamily:"'Inter',sans-serif" }}>
-      <div style={{ width:380, background:'#060d14', border:`1px solid ${color}33`, borderRadius:14, padding:'2rem' }}>
+      <div style={{ width:380, background:'#0B1F1B', border:`1px solid ${color}33`, borderRadius:14, padding:'2rem' }}>
         <div style={{ textAlign:'center', marginBottom:'1.5rem' }}>
           <div style={{ fontSize:28, fontWeight:800, color, letterSpacing:'0.05em' }}>RUAI TECH</div>
           <div style={{ fontSize:11, color:'#4a6a8a', letterSpacing:'0.15em', textTransform:'uppercase', marginTop:4 }}>
@@ -109,19 +109,19 @@ function ClientLogin({ slug, onLogin }) {
 
         {step === 'phone' ? (
           <form onSubmit={requestOTP} style={{ display:'flex', flexDirection:'column', gap:14 }}>
-            <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:6 }}>
+            <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:6 }}>
               Your Phone Number
               <input value={phone} onChange={e => setPhone(e.target.value)}
                 placeholder="254712345678" required
-                style={{ padding:'0.6rem 0.75rem', background:'#0a1628', border:`1px solid ${color}44`,
-                  borderRadius:6, color:'#e0f0ff', fontSize:15, outline:'none', textAlign:'center',
+                style={{ padding:'0.6rem 0.75rem', background:'#0F2620', border:`1px solid ${color}44`,
+                  borderRadius:6, color:'#F4F1EA', fontSize:15, outline:'none', textAlign:'center',
                   letterSpacing:'0.05em' }} />
             </label>
             <p style={{ fontSize:11, color:'#4a6a8a', textAlign:'center', margin:0 }}>
               Enter your registered phone number. We'll send a one-time code.
             </p>
             <button type="submit" disabled={loading}
-              style={{ padding:'0.7rem', background: loading ? '#1a3050' : color, color:'#000',
+              style={{ padding:'0.7rem', background: loading ? 'rgba(36,74,68,0.4)' : color, color:'#000',
                 border:'none', borderRadius:6, fontWeight:700, fontSize:14,
                 cursor: loading ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Sending…' : 'Send OTP →'}
@@ -129,19 +129,19 @@ function ClientLogin({ slug, onLogin }) {
           </form>
         ) : (
           <form onSubmit={verifyOTP} style={{ display:'flex', flexDirection:'column', gap:14 }}>
-            <div style={{ textAlign:'center', fontSize:12, color:'#7a9ab0' }}>
-              OTP sent to <strong style={{ color:'#e0f0ff' }}>{phone}</strong>
+            <div style={{ textAlign:'center', fontSize:12, color:'#A9C4BE' }}>
+              OTP sent to <strong style={{ color:'#F4F1EA' }}>{phone}</strong>
             </div>
-            <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:6 }}>
+            <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:6 }}>
               Enter 6-Digit OTP
               <input value={otp} onChange={e => setOtp(e.target.value)}
                 placeholder="123456" required maxLength={6}
-                style={{ padding:'0.75rem', background:'#0a1628', border:`1px solid ${color}44`,
-                  borderRadius:6, color:'#e0f0ff', fontSize:22, outline:'none',
+                style={{ padding:'0.75rem', background:'#0F2620', border:`1px solid ${color}44`,
+                  borderRadius:6, color:'#F4F1EA', fontSize:22, outline:'none',
                   textAlign:'center', letterSpacing:'0.3em', fontWeight:700 }} />
             </label>
             <button type="submit" disabled={loading}
-              style={{ padding:'0.7rem', background: loading ? '#1a3050' : color, color:'#000',
+              style={{ padding:'0.7rem', background: loading ? 'rgba(36,74,68,0.4)' : color, color:'#000',
                 border:'none', borderRadius:6, fontWeight:700, fontSize:14,
                 cursor: loading ? 'not-allowed' : 'pointer' }}>
               {loading ? 'Verifying…' : 'Verify & Enter Portal'}
@@ -160,7 +160,7 @@ function ClientLogin({ slug, onLogin }) {
 
 // ── Client Portal Dashboard ────────────────────────────────
 function ClientPortal({ slug, client, token, onLogout }) {
-  const color    = DEPT_COLORS[slug] || '#00d4ff';
+  const color    = DEPT_COLORS[slug] || '#EE6100';
   const clientApi = buildClientApi(token);
 
   const [tab, setTab]         = useState('home');
@@ -217,13 +217,13 @@ function ClientPortal({ slug, client, token, onLogout }) {
   const openTickets = tickets.filter(t => !['CLOSED','RESOLVED'].includes(t.status)).length;
 
   return (
-    <div style={{ minHeight:'100vh', background:'#020408', fontFamily:"'Inter',sans-serif", color:'#c0d8f0' }}>
+    <div style={{ minHeight:'100vh', background:'#081916', fontFamily:"'Inter',sans-serif", color:'#c0d8f0' }}>
       {/* Topbar */}
-      <header style={{ height:52, background:'linear-gradient(90deg,#060d14,#0a1628)',
+      <header style={{ height:52, background:'linear-gradient(90deg,#0B1F1B,#0F2620)',
         borderBottom:`1px solid ${color}22`, display:'flex', alignItems:'center',
         justifyContent:'space-between', padding:'0 1.5rem' }}>
         <div style={{ fontSize:13, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color }}>
-          Ruai Tech — {slug.toUpperCase()} Portal
+          Postera — {slug.toUpperCase()} Portal
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:12 }}>
           <span style={{ fontSize:11, color:'#4a6a8a' }}>{client?.fullName || 'Client'}</span>
@@ -236,7 +236,7 @@ function ClientPortal({ slug, client, token, onLogout }) {
       </header>
 
       {/* Tab bar */}
-      <div style={{ background:'#060d14', borderBottom:'1px solid #0a2040', display:'flex', padding:'0 1rem' }}>
+      <div style={{ background:'#0B1F1B', borderBottom:'1px solid #0a2040', display:'flex', padding:'0 1rem' }}>
         {TABS.map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)}
             style={{ padding:'0.55rem 1rem', border:'none', background:'transparent', fontSize:11,
@@ -253,7 +253,7 @@ function ClientPortal({ slug, client, token, onLogout }) {
         {/* HOME */}
         {tab === 'home' && (
           <div>
-            <h2 style={{ margin:'0 0 1.25rem', fontSize:18, fontWeight:700, color:'#e0f0ff' }}>
+            <h2 style={{ margin:'0 0 1.25rem', fontSize:18, fontWeight:700, color:'#F4F1EA' }}>
               Welcome back, {client?.fullName?.split(' ')[0] || 'Client'} 👋
             </h2>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',
@@ -268,7 +268,7 @@ function ClientPortal({ slug, client, token, onLogout }) {
                 { label:'Total Invoices', value: invoices.length, color, action: () => setTab('invoices'), cta:'View All' },
                 { label:'Loyalty Points', value: client?.loyaltyPoints || 0, color:'#a78bfa', action:null },
               ].map(({ label, value, color: c, action, cta }) => (
-                <div key={label} style={{ background:'#060d14', borderRadius:10, padding:'1rem',
+                <div key={label} style={{ background:'#0B1F1B', borderRadius:10, padding:'1rem',
                   border:`1px solid ${c}22`, cursor: action ? 'pointer' : 'default' }}
                   onClick={action || undefined}>
                   <div style={{ fontSize:11, color:'#4a6a8a', letterSpacing:'0.06em', marginBottom:6 }}>{label}</div>
@@ -282,7 +282,7 @@ function ClientPortal({ slug, client, token, onLogout }) {
                 <div key={inv._id} style={{ display:'flex', justifyContent:'space-between',
                   alignItems:'center', padding:'0.5rem 0', borderBottom:'1px solid #0a2040' }}>
                   <div>
-                    <div style={{ fontSize:12, fontFamily:'monospace', color:'#00d4ff' }}>{inv.invoiceId}</div>
+                    <div style={{ fontSize:12, fontFamily:'monospace', color:'#EE6100' }}>{inv.invoiceId}</div>
                     <div style={{ fontSize:11, color:'#4a6a8a' }}>
                       KES {inv.totalAmount?.toLocaleString()} · Due {new Date(inv.dueDate).toLocaleDateString('en-KE')}
                     </div>
@@ -306,16 +306,16 @@ function ClientPortal({ slug, client, token, onLogout }) {
         {/* INVOICES */}
         {tab === 'invoices' && (
           <div>
-            <h2 style={{ margin:'0 0 1.25rem', fontSize:18, fontWeight:700, color:'#e0f0ff' }}>My Invoices</h2>
+            <h2 style={{ margin:'0 0 1.25rem', fontSize:18, fontWeight:700, color:'#F4F1EA' }}>My Invoices</h2>
             {invoices.length === 0
               ? <div style={{ textAlign:'center', padding:'3rem', color:'#2a4a6a' }}>No invoices yet</div>
               : invoices.map(inv => (
-                <div key={inv._id} style={{ background:'#060d14', borderRadius:10, padding:'1rem',
+                <div key={inv._id} style={{ background:'#0B1F1B', borderRadius:10, padding:'1rem',
                   marginBottom:'0.75rem', border:'1px solid #0a2040' }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
                     <div>
-                      <div style={{ fontSize:11, fontFamily:'monospace', color:'#00d4ff', marginBottom:2 }}>{inv.invoiceId}</div>
-                      <div style={{ fontSize:14, fontWeight:700, color:'#e0f0ff' }}>KES {inv.totalAmount?.toLocaleString()}</div>
+                      <div style={{ fontSize:11, fontFamily:'monospace', color:'#EE6100', marginBottom:2 }}>{inv.invoiceId}</div>
+                      <div style={{ fontSize:14, fontWeight:700, color:'#F4F1EA' }}>KES {inv.totalAmount?.toLocaleString()}</div>
                       <div style={{ fontSize:11, color:'#4a6a8a', marginTop:2 }}>
                         Balance: <span style={{ color: inv.balance > 0 ? '#ff3366' : '#00ff88', fontWeight:700 }}>
                           KES {inv.balance?.toLocaleString()}
@@ -333,10 +333,10 @@ function ClientPortal({ slug, client, token, onLogout }) {
                     </div>
                   </div>
                   {inv.lineItems?.length > 0 && (
-                    <div style={{ background:'#0a1628', borderRadius:6, padding:'0.5rem 0.75rem' }}>
+                    <div style={{ background:'#0F2620', borderRadius:6, padding:'0.5rem 0.75rem' }}>
                       {inv.lineItems.map((line, j) => (
                         <div key={j} style={{ display:'flex', justifyContent:'space-between',
-                          fontSize:11, color:'#7a9ab0', padding:'2px 0' }}>
+                          fontSize:11, color:'#A9C4BE', padding:'2px 0' }}>
                           <span>{line.description} × {line.qty}</span>
                           <span>KES {(line.total || line.qty * line.unitPrice)?.toLocaleString()}</span>
                         </div>
@@ -353,7 +353,7 @@ function ClientPortal({ slug, client, token, onLogout }) {
         {tab === 'tickets' && (
           <div>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.25rem' }}>
-              <h2 style={{ margin:0, fontSize:18, fontWeight:700, color:'#e0f0ff' }}>Support Tickets</h2>
+              <h2 style={{ margin:0, fontSize:18, fontWeight:700, color:'#F4F1EA' }}>Support Tickets</h2>
               <button onClick={() => setShowTicketForm(true)}
                 style={{ padding:'0.45rem 1.1rem', background:color, color:'#000', border:'none',
                   borderRadius:6, fontWeight:700, fontSize:12, cursor:'pointer' }}>
@@ -364,13 +364,13 @@ function ClientPortal({ slug, client, token, onLogout }) {
             {tickets.length === 0
               ? <div style={{ textAlign:'center', padding:'3rem', color:'#2a4a6a' }}>No tickets raised yet</div>
               : tickets.map(t => (
-                <div key={t._id} style={{ background:'#060d14', borderRadius:10, padding:'1rem',
+                <div key={t._id} style={{ background:'#0B1F1B', borderRadius:10, padding:'1rem',
                   marginBottom:'0.75rem', border:'1px solid #0a2040',
                   borderLeft:`3px solid ${STATUS_COLORS[t.status] || '#4a6a8a'}` }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                     <div>
                       <div style={{ fontSize:10, fontFamily:'monospace', color:'#4a6a8a', marginBottom:2 }}>{t.ticketId}</div>
-                      <div style={{ fontSize:13, fontWeight:700, color:'#e0f0ff' }}>{t.title}</div>
+                      <div style={{ fontSize:13, fontWeight:700, color:'#F4F1EA' }}>{t.title}</div>
                       <div style={{ fontSize:11, color:'#4a6a8a', marginTop:2 }}>
                         {t.category} · {new Date(t.createdAt).toLocaleDateString('en-KE')}
                       </div>
@@ -381,7 +381,7 @@ function ClientPortal({ slug, client, token, onLogout }) {
                     </div>
                   </div>
                   {t.thread?.length > 0 && (
-                    <div style={{ marginTop:8, background:'#0a1628', borderRadius:6, padding:'0.5rem 0.75rem' }}>
+                    <div style={{ marginTop:8, background:'#0F2620', borderRadius:6, padding:'0.5rem 0.75rem' }}>
                       <div style={{ fontSize:10, color:'#4a6a8a', marginBottom:4 }}>Latest response:</div>
                       <div style={{ fontSize:12, color:'#c0d8f0', lineHeight:1.5 }}>
                         {t.thread[t.thread.length-1]?.message?.slice(0,200)}
@@ -395,44 +395,44 @@ function ClientPortal({ slug, client, token, onLogout }) {
             {showTicketForm && (
               <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex',
                 alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-                <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12,
+                <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12,
                   padding:'1.5rem', width:460 }}>
                   <h3 style={{ margin:'0 0 1rem', color, fontSize:16 }}>Raise Support Ticket</h3>
                   <form onSubmit={submitTicket} style={{ display:'flex', flexDirection:'column', gap:12 }}>
                     {[['Title *','title','text',true],['Category','category','text',false]].map(([label,key,type,required]) => (
-                      <label key={key} style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                      <label key={key} style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                         {label}
                         <input type={type} value={newTicket[key]} required={required}
                           onChange={e => setNewTicket(p => ({...p,[key]:e.target.value}))}
-                          style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050',
-                            borderRadius:5, color:'#e0f0ff', fontSize:13, outline:'none' }} />
+                          style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+                            borderRadius:5, color:'#F4F1EA', fontSize:13, outline:'none' }} />
                       </label>
                     ))}
-                    <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                    <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                       Priority
                       <select value={newTicket.priority}
                         onChange={e => setNewTicket(p => ({...p,priority:e.target.value}))}
-                        style={{ padding:'0.45rem', background:'#0a1628', border:'1px solid #1a3050',
-                          borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                        style={{ padding:'0.45rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+                          borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                         <option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option>
                       </select>
                     </label>
-                    <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                    <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                       Description *
                       <textarea value={newTicket.description} required rows={4}
                         onChange={e => setNewTicket(p => ({...p,description:e.target.value}))}
-                        style={{ padding:'0.45rem', background:'#0a1628', border:'1px solid #1a3050',
-                          borderRadius:5, color:'#e0f0ff', fontSize:13, resize:'vertical', outline:'none' }} />
+                        style={{ padding:'0.45rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+                          borderRadius:5, color:'#F4F1EA', fontSize:13, resize:'vertical', outline:'none' }} />
                     </label>
                     <div style={{ display:'flex', gap:10 }}>
                       <button type="submit" disabled={loading}
-                        style={{ flex:1, padding:'0.6rem', background: loading ? '#1a3050' : color,
+                        style={{ flex:1, padding:'0.6rem', background: loading ? 'rgba(36,74,68,0.4)' : color,
                           color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}>
                         {loading ? 'Submitting…' : 'Submit Ticket'}
                       </button>
                       <button type="button" onClick={() => setShowTicketForm(false)}
-                        style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0',
-                          border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>Cancel</button>
+                        style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE',
+                          border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>Cancel</button>
                     </div>
                   </form>
                 </div>
@@ -444,7 +444,7 @@ function ClientPortal({ slug, client, token, onLogout }) {
         {/* PROFILE */}
         {tab === 'profile' && (
           <div style={{ maxWidth:440 }}>
-            <h2 style={{ margin:'0 0 1.25rem', fontSize:18, fontWeight:700, color:'#e0f0ff' }}>My Profile</h2>
+            <h2 style={{ margin:'0 0 1.25rem', fontSize:18, fontWeight:700, color:'#F4F1EA' }}>My Profile</h2>
             <Card title="Account Details" accent={color}>
               {[
                 ['Full Name',      client?.fullName],
@@ -455,8 +455,8 @@ function ClientPortal({ slug, client, token, onLogout }) {
               ].map(([label, value]) => (
                 <div key={label} style={{ display:'flex', justifyContent:'space-between',
                   padding:'0.45rem 0', borderBottom:'1px solid #0a2040', fontSize:13 }}>
-                  <span style={{ color:'#7a9ab0' }}>{label}</span>
-                  <span style={{ fontWeight:600, color:'#e0f0ff' }}>{value}</span>
+                  <span style={{ color:'#A9C4BE' }}>{label}</span>
+                  <span style={{ fontWeight:600, color:'#F4F1EA' }}>{value}</span>
                 </div>
               ))}
             </Card>

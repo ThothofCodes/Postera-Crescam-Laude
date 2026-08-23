@@ -59,7 +59,7 @@ function SessionCountdown({ startTime, plannedDurationMinutes, hourlyRate }) {
   const cost = ((plannedDurationMinutes / 60) * hourlyRate).toFixed(0);
   const expiring = remaining <= 120 && remaining > 0; // last 2 minutes — warn
   const expired   = remaining === 0;
-  const color = expired ? '#ff3366' : expiring ? '#ffaa00' : '#00d4ff';
+  const color = expired ? '#ff3366' : expiring ? '#ffaa00' : '#EE6100';
 
   return (
     <div>
@@ -143,21 +143,21 @@ export default function Sessions() {
               <div key={n} style={{
                 background: active
                   ? 'linear-gradient(160deg,#1a2a10,#0d1f05)'
-                  : 'linear-gradient(160deg,#0d1f35,#0a1628)',
-                border:`1px solid ${active ? 'rgba(0,255,136,0.4)' : 'rgba(0,212,255,0.12)'}`,
+                  : 'linear-gradient(160deg,#0F2620,#0F2620)',
+                border:`1px solid ${active ? 'rgba(0,255,136,0.4)' : 'rgba(238,97,0,0.12)'}`,
                 borderRadius:10, padding:'1rem', position:'relative', overflow:'hidden',
               }}>
                 <div style={{ position:'absolute', top:0, left:0, right:0, height:2,
-                  background: active ? '#00ff88' : 'rgba(0,212,255,0.2)' }} />
+                  background: active ? '#00ff88' : 'rgba(238,97,0,0.2)' }} />
 
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
                   <span style={{ fontSize:11, fontWeight:700, letterSpacing:'0.1em',
-                    textTransform:'uppercase', color: active ? '#00ff88' : '#4a6580' }}>
+                    textTransform:'uppercase', color: active ? '#00ff88' : '#6A8A82' }}>
                     Station {n}
                   </span>
                   <span style={{ fontSize:10, padding:'2px 8px', borderRadius:3,
                     background: active ? 'rgba(0,255,136,0.12)' : 'rgba(74,101,128,0.12)',
-                    color: active ? '#00ff88' : '#4a6580',
+                    color: active ? '#00ff88' : '#6A8A82',
                     border:`1px solid ${active ? 'rgba(0,255,136,0.3)' : 'rgba(74,101,128,0.3)'}`,
                     fontWeight:700, textTransform:'uppercase' }}>
                     {active ? 'Active' : 'Free'}
@@ -166,10 +166,10 @@ export default function Sessions() {
 
                 {active ? (
                   <>
-                    <div style={{ fontSize:13, color:'#e2eeff', fontWeight:600, marginBottom:4 }}>
+                    <div style={{ fontSize:13, color:'#F4F1EA', fontWeight:600, marginBottom:4 }}>
                       {active.clientName || 'Walk-in'}
                     </div>
-                    <div style={{ fontSize:11, color:'#4a6580', marginBottom:8 }}>
+                    <div style={{ fontSize:11, color:'#6A8A82', marginBottom:8 }}>
                       {active.gameTitle || 'No game selected'}
                     </div>
                     {active.plannedDurationMinutes ? (
@@ -241,7 +241,7 @@ export default function Sessions() {
                   onChange={(e) => setForm({ ...form, plannedDurationMinutes:e.target.value })} style={inp} />
               </div>
               <div style={{ display:'flex', gap:8, justifyContent:'flex-end' }}>
-                <button type="button" onClick={() => setStartModal(null)} style={btn('#4a6580')}>Cancel</button>
+                <button type="button" onClick={() => setStartModal(null)} style={btn('#6A8A82')}>Cancel</button>
                 <button type="submit" disabled={saving} style={btn('#ffd700')}>
                   {saving ? 'Starting…' : '▶ Start'}
                 </button>
@@ -256,6 +256,6 @@ export default function Sessions() {
 
 const btn     = (c) => ({ padding:'0.45rem 1rem', background:`${c}18`, color:c, border:`1px solid ${c}44`, borderRadius:4, cursor:'pointer', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase' });
 const overlay = { position:'fixed', inset:0, background:'rgba(2,4,8,0.88)', backdropFilter:'blur(6px)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 };
-const box     = { background:'linear-gradient(160deg,#0d1f35,#0a1628)', border:'1px solid rgba(0,212,255,0.25)', borderRadius:8, padding:'1.5rem', width:'100%', maxWidth:440 };
-const inp     = { width:'100%', padding:'0.5rem 0.7rem', background:'rgba(6,13,20,0.8)', border:'1px solid rgba(0,212,255,0.15)', borderRadius:4, color:'#e2eeff', fontSize:13, outline:'none', boxSizing:'border-box' };
-const lbl     = { display:'block', marginBottom:4, fontSize:10, color:'#00d4ff', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase' };
+const box     = { background:'linear-gradient(160deg,#0F2620,#0F2620)', border:'1px solid rgba(238,97,0,0.25)', borderRadius:8, padding:'1.5rem', width:'100%', maxWidth:440 };
+const inp     = { width:'100%', padding:'0.5rem 0.7rem', background:'rgba(6,13,20,0.8)', border:'1px solid rgba(238,97,0,0.15)', borderRadius:4, color:'#F4F1EA', fontSize:13, outline:'none', boxSizing:'border-box' };
+const lbl     = { display:'block', marginBottom:4, fontSize:10, color:'#EE6100', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase' };

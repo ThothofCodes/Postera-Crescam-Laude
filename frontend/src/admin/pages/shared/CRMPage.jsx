@@ -36,24 +36,24 @@ const Tag = ({ label, color = '#4a6a8a' }) => (
 );
 
 const Input = ({ label, ...props }) => (
-  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#7a9ab0', letterSpacing:'0.06em' }}>
+  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#A9C4BE', letterSpacing:'0.06em' }}>
     {label}
-    <input {...props} style={{ padding:'0.5rem 0.75rem', background:'#0a1628', border:'1px solid #1a3050',
-      borderRadius:6, color:'#e0f0ff', fontSize:13, outline:'none', ...props.style }} />
+    <input {...props} style={{ padding:'0.5rem 0.75rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+      borderRadius:6, color:'#F4F1EA', fontSize:13, outline:'none', ...props.style }} />
   </label>
 );
 
 const Select = ({ label, children, ...props }) => (
-  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#7a9ab0', letterSpacing:'0.06em' }}>
+  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#A9C4BE', letterSpacing:'0.06em' }}>
     {label}
-    <select {...props} style={{ padding:'0.5rem 0.75rem', background:'#0a1628', border:'1px solid #1a3050',
-      borderRadius:6, color:'#e0f0ff', fontSize:13, outline:'none' }}>
+    <select {...props} style={{ padding:'0.5rem 0.75rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+      borderRadius:6, color:'#F4F1EA', fontSize:13, outline:'none' }}>
       {children}
     </select>
   </label>
 );
 
-export default function CRMPage({ slug, color = '#00d4ff' }) {
+export default function CRMPage({ slug, color = '#EE6100' }) {
   const [clients, setClients]         = useState([]);
   const [total, setTotal]             = useState(0);
   const [loading, setLoading]         = useState(true);
@@ -250,10 +250,10 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
       {/* Filters */}
       <div style={{ display:'flex', gap:12, marginBottom:'1rem' }}>
         <input placeholder="Search name or phone…" value={search} onChange={e => setSearch(e.target.value)}
-          style={{ flex:1, padding:'0.5rem 0.75rem', background:'#0a1628', border:'1px solid #1a3050',
-            borderRadius:6, color:'#e0f0ff', fontSize:13, outline:'none' }} />
+          style={{ flex:1, padding:'0.5rem 0.75rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+            borderRadius:6, color:'#F4F1EA', fontSize:13, outline:'none' }} />
         <select value={segment} onChange={e => setSegment(e.target.value)}
-          style={{ padding:'0.5rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:6, color:'#e0f0ff', fontSize:13 }}>
+          style={{ padding:'0.5rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, color:'#F4F1EA', fontSize:13 }}>
           <option value="">All Segments</option>
           {['LEAD','ACTIVE','INACTIVE','CHURNED'].map(s => <option key={s}>{s}</option>)}
         </select>
@@ -274,22 +274,22 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
             <tbody>
               {clients.map((c, i) => (
                 <tr key={c._id} style={{ borderBottom:'1px solid #040c1a', background: i%2===0?'transparent':'#050d1a' }}>
-                  <td style={{ padding:'0.6rem 0.75rem', fontWeight:600, color:'#e0f0ff' }}>{c.fullName}</td>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>{c.phone}</td>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>{c.email || '—'}</td>
+                  <td style={{ padding:'0.6rem 0.75rem', fontWeight:600, color:'#F4F1EA' }}>{c.fullName}</td>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>{c.phone}</td>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>{c.email || '—'}</td>
                   <td style={{ padding:'0.6rem 0.75rem' }}><Tag label={c.segment} color={SEGMENT_COLORS[c.segment]} /></td>
                   <td style={{ padding:'0.6rem 0.75rem' }}><Tag label={c.kycStatus} color={KYC_COLORS[c.kycStatus]} /></td>
                   <td style={{ padding:'0.6rem 0.75rem', color: c.outstandingBalance > 0 ? '#ff3366':'#00ff88' }}>
                     {c.outstandingBalance?.toLocaleString() || '0'}
                   </td>
-                  <td style={{ padding:'0.6rem 0.75rem', color: '#7a9ab0' }}>
+                  <td style={{ padding:'0.6rem 0.75rem', color: '#A9C4BE' }}>
                     {c.govApplications && c.govApplications.length > 0 ? (
-                      <span style={{ color: '#00d4ff' }}>📋 {c.govApplications.length}</span>
+                      <span style={{ color: '#EE6100' }}>📋 {c.govApplications.length}</span>
                     ) : (
                       <span>—</span>
                     )}
                   </td>
-                  <td style={{ padding:'0.6rem 0.75rem', color: '#7a9ab0' }}>
+                  <td style={{ padding:'0.6rem 0.75rem', color: '#A9C4BE' }}>
                     {c.bundledServices && c.bundledServices.length > 0 ? (
                       <span style={{ color: '#00ff88' }}>묶 {c.bundledServices.length}</span>
                     ) : (
@@ -301,7 +301,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                       <button onClick={() => editClient(c)}
                         style={{ padding:'3px 10px', background:`${color}22`, color, border:`1px solid ${color}44`, borderRadius:4, fontSize:10, cursor:'pointer', fontWeight:700 }}>EDIT</button>
                       <button onClick={() => setInteracting(c)}
-                        style={{ padding:'3px 10px', background:'#1a304022', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:4, fontSize:10, cursor:'pointer' }}>LOG</button>
+                        style={{ padding:'3px 10px', background:'#1a304022', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:4, fontSize:10, cursor:'pointer' }}>LOG</button>
                       {!c.portalAccess && (
                         <button onClick={() => sendPortalInvite(c._id)}
                           style={{ padding:'3px 10px', background:'#00ff8822', color:'#00ff88', border:'1px solid #00ff8844', borderRadius:4, fontSize:10, cursor:'pointer' }}>INVITE</button>
@@ -321,7 +321,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
       {/* Create/Edit Modal */}
       {showForm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16, fontWeight:700 }}>{selected ? 'Edit Client' : 'New Client'}</h3>
             <form onSubmit={submit} style={{ display:'flex', flexDirection:'column', gap:12 }}>
               <Input label="Full Name *" value={form.fullName} onChange={e => setForm(p=>({...p,fullName:e.target.value}))} required />
@@ -337,17 +337,17 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                 {['LEAD','ACTIVE','INACTIVE','CHURNED'].map(s => <option key={s}>{s}</option>)}
               </Select>
               <Input label="Address" value={form.address} onChange={e => setForm(p=>({...p,address:e.target.value}))} />
-              <label style={{ fontSize:11, color:'#7a9ab0', letterSpacing:'0.06em', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', letterSpacing:'0.06em', display:'flex', flexDirection:'column', gap:4 }}>
                 Internal Notes
                 <textarea value={form.notes} onChange={e => setForm(p=>({...p,notes:e.target.value}))} rows={3}
-                  style={{ padding:'0.5rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:6,
-                    color:'#e0f0ff', fontSize:13, resize:'vertical', outline:'none' }} />
+                  style={{ padding:'0.5rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6,
+                    color:'#F4F1EA', fontSize:13, resize:'vertical', outline:'none' }} />
               </label>
               
               {/* Government Applications Section */}
-              <div style={{ borderTop: '1px solid #1a3050', paddingTop: '1rem' }}>
+              <div style={{ borderTop: '1px solid rgba(36,74,68,0.4)', paddingTop: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <h4 style={{ margin: 0, color: '#e0f0ff', fontSize: '14px' }}>Government Applications</h4>
+                  <h4 style={{ margin: 0, color: '#F4F1EA', fontSize: '14px' }}>Government Applications</h4>
                   <button 
                     type="button" 
                     onClick={() => setShowGovForm(true)}
@@ -360,8 +360,8 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                 {selected && selected.govApplications && selected.govApplications.length > 0 ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
                     {selected.govApplications.map((app, idx) => (
-                      <div key={idx} style={{ background: '#0a1628', borderRadius: '6px', padding: '0.5rem', fontSize: '11px' }}>
-                        <div style={{ color: '#00d4ff', fontWeight: 'bold' }}>{APPLICATION_TYPES[app.applicationType]?.name || app.applicationType}</div>
+                      <div key={idx} style={{ background: '#0F2620', borderRadius: '6px', padding: '0.5rem', fontSize: '11px' }}>
+                        <div style={{ color: '#EE6100', fontWeight: 'bold' }}>{APPLICATION_TYPES[app.applicationType]?.name || app.applicationType}</div>
                         <div>Step: {app.currentStep + 1}/{APPLICATION_TYPES[app.applicationType]?.steps.length || 'N/A'}</div>
                         
                         {/* Document completeness check */}
@@ -386,9 +386,9 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
               </div>
               
               {/* Bundled Services Section */}
-              <div style={{ borderTop: '1px solid #1a3050', paddingTop: '1rem' }}>
+              <div style={{ borderTop: '1px solid rgba(36,74,68,0.4)', paddingTop: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <h4 style={{ margin: 0, color: '#e0f0ff', fontSize: '14px' }}>Bundled Services</h4>
+                  <h4 style={{ margin: 0, color: '#F4F1EA', fontSize: '14px' }}>Bundled Services</h4>
                   <button 
                     type="button" 
                     onClick={() => setShowBundleForm(true)}
@@ -401,7 +401,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                 {selected && selected.bundledServices && selected.bundledServices.length > 0 ? (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
                     {selected.bundledServices.map((bundle, idx) => (
-                      <div key={idx} style={{ background: '#0a1628', borderRadius: '6px', padding: '0.5rem', fontSize: '11px' }}>
+                      <div key={idx} style={{ background: '#0F2620', borderRadius: '6px', padding: '0.5rem', fontSize: '11px' }}>
                         <div style={{ color: '#00ff88', fontWeight: 'bold' }}>{bundle.services.length} services</div>
                         <div>Total: KES {bundle.totalPrice}</div>
                       </div>
@@ -417,7 +417,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                   {selected ? 'Update' : 'Create'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setSelected(null); }}
-                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, fontWeight:700, fontSize:13, cursor:'pointer' }}>
+                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, fontWeight:700, fontSize:13, cursor:'pointer' }}>
                   Cancel
                 </button>
               </div>
@@ -429,7 +429,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
       {/* Government Application Modal */}
       {showGovForm && selected && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16, fontWeight:700 }}>Add Government Application</h3>
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
               <Select 
@@ -447,16 +447,16 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
               
               {govForm.applicationType && (
                 <>
-                  <div style={{ fontSize: '12px', color: '#7a9ab0', marginBottom: '0.5rem' }}>
+                  <div style={{ fontSize: '12px', color: '#A9C4BE', marginBottom: '0.5rem' }}>
                     Steps: {APPLICATION_TYPES[govForm.applicationType]?.steps.join(' → ')}
                   </div>
                   
-                  <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                  <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                     Current Step
                     <select 
                       value={govForm.currentStep} 
                       onChange={e => setGovForm({...govForm, currentStep: parseInt(e.target.value)})}
-                      style={{ padding:'0.5rem 0.75rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:6, color:'#e0f0ff', fontSize:13, outline:'none' }}
+                      style={{ padding:'0.5rem 0.75rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, color:'#F4F1EA', fontSize:13, outline:'none' }}
                     >
                       {APPLICATION_TYPES[govForm.applicationType]?.steps.map((step, index) => (
                         <option key={index} value={index}>{index + 1}. {step}</option>
@@ -464,7 +464,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                     </select>
                   </label>
                   
-                  <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                  <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                     Required Documents
                     <div style={{ fontSize: '11px', color: '#b8c8e0' }}>
                       {APPLICATION_TYPES[govForm.applicationType]?.requiredDocs.map((doc, idx) => (
@@ -473,7 +473,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                     </div>
                   </label>
                   
-                  <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                  <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                     Submitted Documents
                     <textarea 
                       value={govForm.submittedDocuments.join('\n')} 
@@ -483,19 +483,19 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                       })}
                       placeholder="List submitted documents, one per line"
                       rows={3}
-                      style={{ padding:'0.5rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:6,
-                        color:'#e0f0ff', fontSize:13, resize:'vertical', outline:'none' }}
+                      style={{ padding:'0.5rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6,
+                        color:'#F4F1EA', fontSize:13, resize:'vertical', outline:'none' }}
                     />
                   </label>
                   
-                  <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                  <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                     Notes
                     <textarea 
                       value={govForm.notes} 
                       onChange={e => setGovForm({...govForm, notes: e.target.value})}
                       rows={3}
-                      style={{ padding:'0.5rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:6,
-                        color:'#e0f0ff', fontSize:13, resize:'vertical', outline:'none' }}
+                      style={{ padding:'0.5rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6,
+                        color:'#F4F1EA', fontSize:13, resize:'vertical', outline:'none' }}
                     />
                   </label>
                   
@@ -511,7 +511,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                         setShowGovForm(false);
                         setGovForm({ applicationType: '', currentStep: 0, submittedDocuments: [], notes: '' });
                       }}
-                      style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, fontWeight:700, fontSize:13, cursor:'pointer' }}>
+                      style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, fontWeight:700, fontSize:13, cursor:'pointer' }}>
                       Cancel
                     </button>
                   </div>
@@ -525,14 +525,14 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
       {/* Bundle Services Modal */}
       {showBundleForm && selected && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16, fontWeight:700 }}>Bundle Services</h3>
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Select Services
                 <select 
                   multiple
-                  style={{ padding:'0.5rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:6, color:'#e0f0ff', fontSize:13, outline:'none', height: '120px' }}
+                  style={{ padding:'0.5rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, color:'#F4F1EA', fontSize:13, outline:'none', height: '120px' }}
                   onChange={e => {
                     const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
                     setBundleForm({...bundleForm, services: selectedOptions});
@@ -566,7 +566,7 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
                     setShowBundleForm(false);
                     setBundleForm({ services: [], totalPrice: 0 });
                   }}
-                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, fontWeight:700, fontSize:13, cursor:'pointer' }}>
+                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, fontWeight:700, fontSize:13, cursor:'pointer' }}>
                   Cancel
                 </button>
               </div>
@@ -578,16 +578,16 @@ export default function CRMPage({ slug, color = '#00d4ff' }) {
       {/* Log Interaction Modal */}
       {interacting && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:'1px solid #1a3050', borderRadius:12, padding:'1.5rem', width:420 }}>
-            <h3 style={{ margin:'0 0 0.75rem', color:'#e0f0ff', fontSize:15 }}>Log Interaction — {interacting.fullName}</h3>
+          <div style={{ background:'#0B1F1B', border:'1px solid rgba(36,74,68,0.4)', borderRadius:12, padding:'1.5rem', width:420 }}>
+            <h3 style={{ margin:'0 0 0.75rem', color:'#F4F1EA', fontSize:15 }}>Log Interaction — {interacting.fullName}</h3>
             <textarea value={interNote} onChange={e => setInterNote(e.target.value)} rows={4} placeholder="Summarise the interaction…"
-              style={{ width:'100%', padding:'0.5rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:6,
-                color:'#e0f0ff', fontSize:13, resize:'none', outline:'none', boxSizing:'border-box' }} />
+              style={{ width:'100%', padding:'0.5rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6,
+                color:'#F4F1EA', fontSize:13, resize:'none', outline:'none', boxSizing:'border-box' }} />
             <div style={{ display:'flex', gap:10, marginTop:12 }}>
               <button onClick={logInteraction}
                 style={{ flex:1, padding:'0.6rem', background:color, color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}>Log</button>
               <button onClick={() => { setInteracting(null); setInterNote(''); }}
-                style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>Cancel</button>
+                style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>Cancel</button>
             </div>
           </div>
         </div>

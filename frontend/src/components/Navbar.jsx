@@ -1,4 +1,5 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
+// PCL — Circuit Canopy Navbar
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import RuaiTechLogo from './Logo';
@@ -9,16 +10,14 @@ export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
 
   return (
     <nav style={{
-      background: 'linear-gradient(90deg, #0e0a14 0%, #130d1e 40%, #1a1030 60%, #0e0a14 100%)',
-      borderBottom: '1px solid rgba(192,57,43,0.2)',
-      boxShadow: '0 2px 20px rgba(0,0,0,0.6), 0 1px 0 rgba(192,57,43,0.08) inset',
+      background: 'linear-gradient(180deg, #0F2620 0%, #081916 100%)',
+      borderBottom: '1px solid rgba(36,74,68,0.4)',
       padding: '0 2rem',
       height: 66,
       display: 'flex',
@@ -27,39 +26,38 @@ export default function Navbar() {
       position: 'sticky',
       top: 0,
       zIndex: 200,
-      backdropFilter: 'blur(16px)',
+      backdropFilter: 'blur(12px)',
     }}>
       {/* Logo */}
       <Link to="/store" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }} title="Home">
-        <RuaiTechLogo size={38} showText={true} textSize="14px" />
+        <RuaiTechLogo size={30} showText={true} textSize="13px" />
       </Link>
 
-      {/* Desktop Navigation - Hidden on mobile */}
+      {/* Desktop Navigation */}
       <div className="desktop-nav" style={{ display: 'flex', gap: '0.15rem', alignItems: 'center' }}>
         {[
-          { to: '/store',      label: 'Store'      },
-          { to: '/calculator', label: 'Calculator' },
-          { to: '/consult',    label: 'Consult'    },
-          { to: '/services',   label: 'Services'   },
-          { to: '/help',       label: 'Help'       },
-          { to: '/contact',    label: 'Contact'    },
+          { to: '/store',         label: 'Store'         },
+          { to: '/calculator',    label: 'Calculator'    },
+          { to: '/consult',       label: 'Consult'       },
+          { to: '/services',      label: 'Services'      },
+          { to: '/tech-hub',      label: 'Tech Hub'      },
+          { to: '/help',          label: 'Help'          },
+          { to: '/contact',       label: 'Contact'       },
         ].map(({ to, label }) => (
           <NavLink key={to} to={to} style={({ isActive }) => ({
             padding: '0.4rem 0.9rem',
-            borderRadius: 6,
-            color: isActive ? '#fff' : 'rgba(240,238,255,0.65)',
+            borderRadius: 4,
+            color: isActive ? '#EE6100' : '#A9C4BE',
             textDecoration: 'none',
             fontSize: 13,
             fontWeight: isActive ? 700 : 500,
-            fontFamily: "'Inter', sans-serif",
-            background: isActive
-              ? 'linear-gradient(135deg, rgba(192,57,43,0.3), rgba(41,128,185,0.2))'
-              : 'transparent',
-            border: isActive ? '1px solid rgba(192,57,43,0.35)' : '1px solid transparent',
+            fontFamily: "'Poppins', sans-serif",
+            background: isActive ? 'rgba(238,97,0,0.12)' : 'transparent',
+            borderBottom: isActive ? '2px solid #EE6100' : '2px solid transparent',
             transition: 'all 0.2s ease',
           })}
-            onMouseOver={(e) => { if (!e.currentTarget.style.background.includes('gradient(135deg, rgba(192')) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(240,238,255,0.06)'; } }}
-            onMouseOut={(e) => { if (!e.currentTarget.style.background.includes('gradient(135deg, rgba(192')) { e.currentTarget.style.color = 'rgba(240,238,255,0.65)'; e.currentTarget.style.background = 'transparent'; } }}>
+            onMouseOver={(e) => { if (!e.currentTarget.style.borderBottom.includes('#EE6100')) { e.currentTarget.style.color = '#F4F1EA'; e.currentTarget.style.background = 'rgba(43,182,163,0.08)'; } }}
+            onMouseOut={(e) => { if (!e.currentTarget.style.borderBottom.includes('#EE6100')) { e.currentTarget.style.color = '#A9C4BE'; e.currentTarget.style.background = 'transparent'; } }}>
             {label}
           </NavLink>
         ))}
@@ -68,10 +66,10 @@ export default function Navbar() {
         <Link to="/cart" style={{
           marginLeft: 10,
           padding: '0.4rem 0.9rem',
-          borderRadius: 6,
-          border: '1px solid rgba(192,57,43,0.35)',
-          background: 'rgba(192,57,43,0.1)',
-          color: '#f0eeff',
+          borderRadius: 4,
+          border: '1px solid rgba(36,74,68,0.4)',
+          background: 'transparent',
+          color: '#A9C4BE',
           textDecoration: 'none',
           fontSize: 13,
           fontWeight: 600,
@@ -83,26 +81,26 @@ export default function Navbar() {
           🛒
           {count > 0 && (
             <span style={{
-              background: 'linear-gradient(135deg, #c0392b, #e74c3c)',
+              background: '#EE6100',
               color: '#fff',
               borderRadius: '50%',
               width: 18, height: 18,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 10, fontWeight: 800,
-              boxShadow: '0 0 8px rgba(192,57,43,0.6)',
+              boxShadow: '0 0 8px rgba(238,97,0,0.4)',
             }}>{count}</span>
           )}
         </Link>
       </div>
 
-      {/* Mobile Menu Button - Hidden on desktop */}
-      <button 
+      {/* Mobile Menu Button */}
+      <button
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         style={{
           display: 'none',
           background: 'none',
           border: 'none',
-          color: 'var(--text-primary)',
+          color: '#A9C4BE',
           fontSize: '1.5rem',
           cursor: 'pointer',
           padding: '0.5rem',
@@ -112,61 +110,62 @@ export default function Navbar() {
         ☰
       </button>
 
-      {/* Mobile Menu - Hidden on desktop */}
-      <div 
+      {/* Mobile Menu */}
+      <div
         style={{
           display: 'none',
           position: 'fixed',
           top: 66,
           left: 0,
           right: 0,
-          background: 'var(--bg-panel)',
+          background: '#0F2620',
           zIndex: 199,
           flexDirection: 'column',
           padding: '1rem',
           gap: '0.5rem',
           boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          borderBottom: '1px solid rgba(36,74,68,0.4)',
         }}
         className="mobile-menu"
       >
         {[
-          { to: '/store',      label: 'Store'      },
-          { to: '/calculator', label: 'Calculator' },
-          { to: '/consult',    label: 'Consult'    },
-          { to: '/services',   label: 'Services'   },
-          { to: '/help',       label: 'Help'       },
-          { to: '/contact',    label: 'Contact'    },
+          { to: '/store',         label: 'Store'         },
+          { to: '/calculator',    label: 'Calculator'    },
+          { to: '/consult',       label: 'Consult'       },
+          { to: '/services',      label: 'Services'      },
+          { to: '/tech-hub',      label: 'Tech Hub'      },
+          { to: '/help',          label: 'Help'          },
+          { to: '/contact',       label: 'Contact'       },
         ].map(({ to, label }) => (
-          <NavLink 
-            key={to} 
-            to={to} 
+          <NavLink
+            key={to}
+            to={to}
             onClick={() => setIsMenuOpen(false)}
             style={({ isActive }) => ({
               padding: '0.8rem 1rem',
-              borderRadius: 6,
-              color: isActive ? '#fff' : 'rgba(240,238,255,0.65)',
+              borderRadius: 4,
+              color: isActive ? '#EE6100' : '#A9C4BE',
               textDecoration: 'none',
               fontSize: 16,
               fontWeight: isActive ? 700 : 500,
-              fontFamily: "'Inter', sans-serif",
-              background: isActive
-                ? 'linear-gradient(135deg, rgba(192,57,43,0.3), rgba(41,128,185,0.2))'
-                : 'transparent',
-              border: isActive ? '1px solid rgba(192,57,43,0.35)' : '1px solid transparent',
+              fontFamily: "'Poppins', sans-serif",
+              background: isActive ? 'rgba(238,97,0,0.12)' : 'transparent',
+              borderLeft: isActive ? '3px solid #EE6100' : '3px solid transparent',
               transition: 'all 0.2s ease',
             })}
           >
             {label}
           </NavLink>
         ))}
-        <Link 
-          to="/cart" 
+        <Link
+          to="/cart"
+          onClick={() => setIsMenuOpen(false)}
           style={{
             padding: '0.8rem 1rem',
-            borderRadius: 6,
-            border: '1px solid rgba(192,57,43,0.35)',
-            background: 'rgba(192,57,43,0.1)',
-            color: '#f0eeff',
+            borderRadius: 4,
+            border: '1px solid rgba(36,74,68,0.4)',
+            background: 'transparent',
+            color: '#A9C4BE',
             textDecoration: 'none',
             fontSize: 16,
             fontWeight: 600,
@@ -179,13 +178,13 @@ export default function Navbar() {
           <span>🛒 Cart</span>
           {count > 0 && (
             <span style={{
-              background: 'linear-gradient(135deg, #c0392b, #e74c3c)',
+              background: '#EE6100',
               color: '#fff',
               borderRadius: '50%',
               width: 24, height: 24,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 12, fontWeight: 800,
-              boxShadow: '0 0 8px rgba(192,57,43,0.6)',
+              boxShadow: '0 0 8px rgba(238,97,0,0.4)',
             }}>{count}</span>
           )}
         </Link>
@@ -193,17 +192,9 @@ export default function Navbar() {
 
       <style>{`
         @media (max-width: 768px) {
-          .mobile-menu-button {
-            display: block !important;
-          }
-          
-          .desktop-nav {
-            display: none !important;
-          }
-          
-          .mobile-menu {
-            display: ${isMenuOpen ? 'flex' : 'none'} !important;
-          }
+          .mobile-menu-button { display: block !important; }
+          .desktop-nav { display: none !important; }
+          .mobile-menu { display: ${isMenuOpen ? 'flex' : 'none'} !important; }
         }
       `}</style>
     </nav>

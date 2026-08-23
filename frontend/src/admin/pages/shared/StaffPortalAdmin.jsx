@@ -3,24 +3,24 @@ import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../utils/api';
 import toast from 'react-hot-toast';
 
-const PRIORITY_COLORS = { ROUTINE:'#7a9ab0', IMPORTANT:'#ffd700', URGENT:'#ff3366' };
-const STATUS_COLORS   = { PENDING_LOG:'#4a6a8a', LOG_SUBMITTED:'#ffd700', ASSESSED:'#00ff88', REVIEWED:'#00d4ff' };
+const PRIORITY_COLORS = { ROUTINE:'#A9C4BE', IMPORTANT:'#ffd700', URGENT:'#ff3366' };
+const STATUS_COLORS   = { PENDING_LOG:'#4a6a8a', LOG_SUBMITTED:'#ffd700', ASSESSED:'#00ff88', REVIEWED:'#EE6100' };
 
 const Tag = ({ label, map }) => {
-  const color = (map||{})[label] || '#7a9ab0';
+  const color = (map||{})[label] || '#A9C4BE';
   return <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:99,
     background:`${color}22`, color, border:`1px solid ${color}44` }}>{label}</span>;
 };
 
 const Textarea = ({ label, ...props }) => (
-  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#7a9ab0' }}>
+  <label style={{ display:'flex', flexDirection:'column', gap:4, fontSize:11, color:'#A9C4BE' }}>
     {label}
-    <textarea {...props} style={{ padding:'0.45rem', background:'#0a1628', border:'1px solid #1a3050',
-      borderRadius:5, color:'#e0f0ff', fontSize:13, resize:'vertical', outline:'none', ...props.style }} />
+    <textarea {...props} style={{ padding:'0.45rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)',
+      borderRadius:5, color:'#F4F1EA', fontSize:13, resize:'vertical', outline:'none', ...props.style }} />
   </label>
 );
 
-export default function StaffPortalAdmin({ color = '#00d4ff' }) {
+export default function StaffPortalAdmin({ color = '#EE6100' }) {
   const [tab, setTab]               = useState('memos');
   const [memos, setMemos]           = useState([]);
   const [assessments, setAssessments] = useState([]);
@@ -179,11 +179,11 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
       {loading ? <p style={{ color:'#4a6a8a' }}>Loading…</p> : tab === 'memos' ? (
         <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
           {memos.map(memo => (
-            <div key={memo._id} style={{ background:'#0a1628', borderRadius:10, padding:'1rem',
+            <div key={memo._id} style={{ background:'#0F2620', borderRadius:10, padding:'1rem',
               borderLeft:`3px solid ${PRIORITY_COLORS[memo.priority] || '#4a6a8a'}` }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                 <div>
-                  <div style={{ fontWeight:700, color:'#e0f0ff', fontSize:14, marginBottom:4 }}>{memo.title}</div>
+                  <div style={{ fontWeight:700, color:'#F4F1EA', fontSize:14, marginBottom:4 }}>{memo.title}</div>
                   <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
                     <Tag label={memo.priority} map={PRIORITY_COLORS} />
                     <Tag label={memo.status} map={{ DRAFT:'#ffd700', PUBLISHED:'#00ff88', ARCHIVED:'#4a6a8a' }} />
@@ -198,7 +198,7 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
                     style={{ padding:'3px 8px', background:'#ff336622', color:'#ff3366', border:'1px solid #ff336644', borderRadius:4, fontSize:10, cursor:'pointer' }}>ARCHIVE</button>
                 )}
               </div>
-              <p style={{ margin:'0.5rem 0 0', fontSize:12, color:'#7a9ab0', lineHeight:1.5,
+              <p style={{ margin:'0.5rem 0 0', fontSize:12, color:'#A9C4BE', lineHeight:1.5,
                 display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
                 {memo.body}
               </p>
@@ -220,13 +220,13 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
             <tbody>
               {assessments.map((a, i) => (
                 <tr key={a._id} style={{ borderBottom:'1px solid #040c1a', background: i%2===0?'transparent':'#050d1a' }}>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#e0f0ff', fontWeight:600 }}>{a.staffId?.name || a.staffId}</td>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#F4F1EA', fontWeight:600 }}>{a.staffId?.name || a.staffId}</td>
                   <td style={{ padding:'0.6rem 0.75rem', fontWeight:700,
                     color: (a.compositeScore||0) >= 7 ? '#00ff88' : (a.compositeScore||0) >= 4 ? '#ffd700' : '#ff3366' }}>
                     {a.compositeScore?.toFixed(1) || '—'} / 10
                   </td>
                   <td style={{ padding:'0.6rem 0.75rem' }}><Tag label={a.status} map={STATUS_COLORS} /></td>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0', maxWidth:200 }}>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE', maxWidth:200 }}>
                     <span style={{ display:'block', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                       {a.adminFeedback || '—'}
                     </span>
@@ -254,9 +254,9 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
             <tbody>
               {warrantyTracking.map((w, i) => (
                 <tr key={w._id} style={{ borderBottom:'1px solid #040c1a', background: i%2===0?'transparent':'#050d1a' }}>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#e0f0ff', fontWeight:600 }}>{w.staffId?.name || w.staffId}</td>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#e0f0ff' }}>{w.deviceName}</td>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0' }}>{w.issueDate}</td>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#F4F1EA', fontWeight:600 }}>{w.staffId?.name || w.staffId}</td>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#F4F1EA' }}>{w.deviceName}</td>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE' }}>{w.issueDate}</td>
                   <td style={{ padding:'0.6rem 0.75rem', color: new Date(w.warrantyEndDate) < new Date() ? '#ff3366' : '#00ff88' }}>
                     {w.warrantyEndDate} {new Date(w.warrantyEndDate) < new Date() ? '(EXPIRED)' : ''}
                   </td>
@@ -264,7 +264,7 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
                     <Tag label={new Date(w.warrantyEndDate) < new Date() ? 'EXPIRED' : 'ACTIVE'} 
                          map={{ 'ACTIVE':'#00ff88', 'EXPIRED':'#ff3366' }} />
                   </td>
-                  <td style={{ padding:'0.6rem 0.75rem', color:'#7a9ab0', maxWidth:200 }}>
+                  <td style={{ padding:'0.6rem 0.75rem', color:'#A9C4BE', maxWidth:200 }}>
                     <span style={{ display:'block', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                       {w.description || '—'}
                     </span>
@@ -282,30 +282,30 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
       {/* Memo Form Modal */}
       {showMemoForm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:500, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:500, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16 }}>New Memo</h3>
             <form onSubmit={sendMemo} style={{ display:'flex', flexDirection:'column', gap:12 }}>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Title *
                 <input value={memoForm.title} onChange={e => setMemoForm(p=>({...p,title:e.target.value}))} required maxLength={120}
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13, outline:'none' }} />
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13, outline:'none' }} />
               </label>
               <Textarea label="Body *" value={memoForm.body} onChange={e => setMemoForm(p=>({...p,body:e.target.value}))} rows={5} required />
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Priority
                 <select value={memoForm.priority} onChange={e => setMemoForm(p=>({...p,priority:e.target.value}))}
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                   <option>ROUTINE</option><option>IMPORTANT</option><option>URGENT</option>
                 </select>
               </label>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', gap:8, alignItems:'center', cursor:'pointer' }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', gap:8, alignItems:'center', cursor:'pointer' }}>
                 <input type="checkbox" checked={memoForm.requiresAck} onChange={e => setMemoForm(p=>({...p,requiresAck:e.target.checked}))} />
                 Require Acknowledgement
               </label>
               <div style={{ display:'flex', gap:10 }}>
                 <button type="submit" style={{ flex:1, padding:'0.6rem', background:color, color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}>Publish Memo</button>
                 <button type="button" onClick={() => setShowMemoForm(false)}
-                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>Cancel</button>
+                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>Cancel</button>
               </div>
             </form>
           </div>
@@ -315,19 +315,19 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
       {/* Assessment Form Modal */}
       {showAssessForm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16 }}>Score Assessment</h3>
             <form onSubmit={submitAssessment} style={{ display:'flex', flexDirection:'column', gap:12 }}>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Staff Member *
                 <select value={assessForm.staffId} onChange={e => setAssessForm(p=>({...p,staffId:e.target.value}))} required
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                   <option value="">Select staff…</option>
                   {staff.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
                 </select>
               </label>
 
-              <div style={{ fontSize:11, color:'#7a9ab0', marginBottom:2 }}>KPI SCORES (1–10)</div>
+              <div style={{ fontSize:11, color:'#A9C4BE', marginBottom:2 }}>KPI SCORES (1–10)</div>
               {assessForm.kpiScores.map((kpi, i) => (
                 <div key={i} style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:10, alignItems:'center' }}>
                   <div style={{ fontSize:12, color:'#c0d8f0' }}>{kpi.kpiLabel}</div>
@@ -337,7 +337,7 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
                       scores[i] = { ...scores[i], score: e.target.value };
                       setAssessForm(p=>({...p,kpiScores:scores}));
                     }}
-                    style={{ width:60, padding:'0.35rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13, textAlign:'center', outline:'none' }} />
+                    style={{ width:60, padding:'0.35rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13, textAlign:'center', outline:'none' }} />
                 </div>
               ))}
 
@@ -349,7 +349,7 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
               <div style={{ display:'flex', gap:10 }}>
                 <button type="submit" style={{ flex:1, padding:'0.6rem', background:color, color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}>Save Assessment</button>
                 <button type="button" onClick={() => setShowAssessForm(false)}
-                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>Cancel</button>
+                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>Cancel</button>
               </div>
             </form>
           </div>
@@ -359,31 +359,31 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
       {/* Warranty Tracking Form Modal */}
       {showWarrantyForm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000 }}>
-          <div style={{ background:'#060d14', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
+          <div style={{ background:'#0B1F1B', border:`1px solid ${color}44`, borderRadius:12, padding:'1.5rem', width:480, maxHeight:'90vh', overflowY:'auto' }}>
             <h3 style={{ margin:'0 0 1rem', color, fontSize:16 }}>New Warranty Record</h3>
             <form onSubmit={submitWarrantyRecord} style={{ display:'flex', flexDirection:'column', gap:12 }}>
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Staff Member *
                 <select value={warrantyForm.staffId} onChange={e => setWarrantyForm(p=>({...p,staffId:e.target.value}))} required
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                   <option value="">Select staff…</option>
                   {staff.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
                 </select>
               </label>
 
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Device/Equipment Name *
                 <input value={warrantyForm.deviceName} onChange={e => setWarrantyForm(p=>({...p,deviceName:e.target.value}))} required
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13, outline:'none' }} />
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13, outline:'none' }} />
               </label>
 
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Issue Date *
                 <input type="date" value={warrantyForm.issueDate} onChange={e => setWarrantyForm(p=>({...p,issueDate:e.target.value}))} required
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }} />
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }} />
               </label>
 
-              <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+              <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                 Warranty Period (days) *
                 <input type="number" min={1} max={365} value={warrantyForm.warrantyPeriod} 
                   onChange={e => {
@@ -399,13 +399,13 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
                       }));
                     }
                   }}
-                  style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13, outline:'none' }} />
+                  style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13, outline:'none' }} />
               </label>
 
               {warrantyForm.warrantyEndDate && (
-                <label style={{ fontSize:11, color:'#7a9ab0', display:'flex', flexDirection:'column', gap:4 }}>
+                <label style={{ fontSize:11, color:'#A9C4BE', display:'flex', flexDirection:'column', gap:4 }}>
                   Calculated Warranty End Date
-                  <div style={{ padding:'0.45rem 0.7rem', background:'#0a1628', border:'1px solid #1a3050', borderRadius:5, color:'#e0f0ff', fontSize:13 }}>
+                  <div style={{ padding:'0.45rem 0.7rem', background:'#0F2620', border:'1px solid rgba(36,74,68,0.4)', borderRadius:5, color:'#F4F1EA', fontSize:13 }}>
                     {warrantyForm.warrantyEndDate}
                   </div>
                 </label>
@@ -417,7 +417,7 @@ export default function StaffPortalAdmin({ color = '#00d4ff' }) {
               <div style={{ display:'flex', gap:10 }}>
                 <button type="submit" style={{ flex:1, padding:'0.6rem', background:color, color:'#000', border:'none', borderRadius:6, fontWeight:700, cursor:'pointer' }}>Save Warranty</button>
                 <button type="button" onClick={() => setShowWarrantyForm(false)}
-                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#7a9ab0', border:'1px solid #1a3050', borderRadius:6, cursor:'pointer' }}>Cancel</button>
+                  style={{ flex:1, padding:'0.6rem', background:'transparent', color:'#A9C4BE', border:'1px solid rgba(36,74,68,0.4)', borderRadius:6, cursor:'pointer' }}>Cancel</button>
               </div>
             </form>
           </div>
