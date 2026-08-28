@@ -1,11 +1,11 @@
 /**
  * Development Seed Script
- * 
+ *
  * Creates realistic test data for local development.
  * Includes users, products, orders, tickets, and chat messages.
- * 
+ *
  * Usage: node seeds/seed-dev.js
- * 
+ *
  * Environment Variables:
  *   MONGO_URI - MongoDB connection string
  */
@@ -261,16 +261,36 @@ const PRODUCTS = [
 
 // ─── Services ───────────────────────────────────────────────────────────────
 const SERVICES = [
-  { name: 'Internet Access (per hour)', category: 'internet', basePrice: 50, priceUnit: 'per hour' },
-  { name: 'Internet Access (daily)', category: 'internet', basePrice: 200, priceUnit: 'per day' },
-  { name: 'Printing (B&W per page)', category: 'printing', basePrice: 10, priceUnit: 'per page' },
-  { name: 'Printing (Colour per page)', category: 'printing', basePrice: 30, priceUnit: 'per page' },
-  { name: 'Gaming (per hour)', category: 'gaming', basePrice: 60, priceUnit: 'per hour' },
-  { name: 'Website Design (Brochure)', category: 'web-dev', basePrice: 15000, priceUnit: 'per project', description: '5-page mobile-responsive brochure website.' },
-  { name: 'MERN Web Application', category: 'web-dev', basePrice: 40000, priceUnit: 'per project', description: 'Full-stack custom web application.' },
-  { name: 'E-Commerce Store', category: 'web-dev', basePrice: 35000, priceUnit: 'per project', description: 'Online store with M-Pesa checkout.' },
-  { name: 'Cybersecurity Audit', category: 'cybersecurity', basePrice: 5000, priceUnit: 'per audit', description: 'Threat assessment and security recommendations.' },
-  { name: 'Laptop Repair', category: 'hardware', basePrice: 500, priceUnit: 'per repair', description: 'Diagnosis, cleaning, OS reinstall, hardware fixes.' },
+  {
+    name: 'Internet Access (per hour)', category: 'internet', basePrice: 50, priceUnit: 'per hour',
+  },
+  {
+    name: 'Internet Access (daily)', category: 'internet', basePrice: 200, priceUnit: 'per day',
+  },
+  {
+    name: 'Printing (B&W per page)', category: 'printing', basePrice: 10, priceUnit: 'per page',
+  },
+  {
+    name: 'Printing (Colour per page)', category: 'printing', basePrice: 30, priceUnit: 'per page',
+  },
+  {
+    name: 'Gaming (per hour)', category: 'gaming', basePrice: 60, priceUnit: 'per hour',
+  },
+  {
+    name: 'Website Design (Brochure)', category: 'web-dev', basePrice: 15000, priceUnit: 'per project', description: '5-page mobile-responsive brochure website.',
+  },
+  {
+    name: 'MERN Web Application', category: 'web-dev', basePrice: 40000, priceUnit: 'per project', description: 'Full-stack custom web application.',
+  },
+  {
+    name: 'E-Commerce Store', category: 'web-dev', basePrice: 35000, priceUnit: 'per project', description: 'Online store with M-Pesa checkout.',
+  },
+  {
+    name: 'Cybersecurity Audit', category: 'cybersecurity', basePrice: 5000, priceUnit: 'per audit', description: 'Threat assessment and security recommendations.',
+  },
+  {
+    name: 'Laptop Repair', category: 'hardware', basePrice: 500, priceUnit: 'per repair', description: 'Diagnosis, cleaning, OS reinstall, hardware fixes.',
+  },
 ];
 
 // ─── Orders ─────────────────────────────────────────────────────────────────
@@ -279,7 +299,9 @@ const generateOrders = (userIds) => [
     orderNumber: 'ORD-DEV-001',
     userId: userIds[0],
     items: [
-      { product: null, name: 'Refurbished Laptop Core i5', quantity: 1, price: 45000 },
+      {
+        product: null, name: 'Refurbished Laptop Core i5', quantity: 1, price: 45000,
+      },
     ],
     subtotal: 45000,
     shipping: 500,
@@ -292,8 +314,12 @@ const generateOrders = (userIds) => [
     orderNumber: 'ORD-DEV-002',
     userId: userIds[0],
     items: [
-      { product: null, name: 'Wireless Mouse & Keyboard Combo', quantity: 2, price: 2500 },
-      { product: null, name: 'USB Flash Drive 32GB', quantity: 3, price: 600 },
+      {
+        product: null, name: 'Wireless Mouse & Keyboard Combo', quantity: 2, price: 2500,
+      },
+      {
+        product: null, name: 'USB Flash Drive 32GB', quantity: 3, price: 600,
+      },
     ],
     subtotal: 6800,
     shipping: 300,
@@ -306,7 +332,9 @@ const generateOrders = (userIds) => [
     orderNumber: 'ORD-DEV-003',
     userId: userIds[1],
     items: [
-      { product: null, name: 'Antivirus Licence 1 Year', quantity: 1, price: 3000 },
+      {
+        product: null, name: 'Antivirus Licence 1 Year', quantity: 1, price: 3000,
+      },
     ],
     subtotal: 3000,
     shipping: 0,

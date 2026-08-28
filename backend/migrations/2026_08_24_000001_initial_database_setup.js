@@ -107,7 +107,7 @@ module.exports = {
       'users', 'products', 'orders', 'tickets', 'chatmessages',
       'departments', 'services', 'invoices', 'consultations',
       'auditlogs', 'activesessions', 'registereddevices',
-      'inventories', 'jobcards'
+      'inventories', 'jobcards',
     ];
 
     for (const collName of collections) {

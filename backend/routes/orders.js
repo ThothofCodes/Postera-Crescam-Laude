@@ -43,7 +43,14 @@ function rgb(hex) { const c = hexToRgb(hex); return [c.r, c.g, c.b]; }
 
 // ── Receipt PDF Generator ────────────────────────────────────────────
 async function generateReceiptPDF(order) {
-  return new Promise(async (resolve, reject) => {
+  // Pre-fetch QR code outside the Promise executor
+  const trackingUrl = `${STORE.website}/track/${order.orderNumber}`;
+  let qrDataUri = null;
+  try {
+    qrDataUri = await QRCode.toDataURL(trackingUrl, { width: 160, margin: 1, color: { dark: '#244A44', light: '#F4F1EA' } });
+  } catch { /* QR generation failed — continue without it */ }
+
+  return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({
         size: 'A4',
@@ -61,12 +68,7 @@ async function generateReceiptPDF(order) {
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
 
-      // ── QR Code ──────────────────────────────────────────────────
-      const trackingUrl = `${STORE.website}/track/${order.orderNumber}`;
-      let qrDataUri = null;
-      try {
-        qrDataUri = await QRCode.toDataURL(trackingUrl, { width: 160, margin: 1, color: { dark: '#244A44', light: '#F4F1EA' } });
-      } catch { /* QR generation failed — continue without it */ }
+      // ── QR Code (pre-fetched above) ─────────────────────────────
 
       // ── Colors ───────────────────────────────────────────────────
       const emberRgb = rgb(COLORS.ember);
@@ -93,7 +95,8 @@ async function generateReceiptPDF(order) {
 
       // Divider
       doc.moveTo(40, 88).lineTo(doc.page.width - 40, 88)
-        .lineWidth(0.5).strokeColor(emberRgb).stroke();
+        .lineWidth(0.5).strokeColor(emberRgb)
+        .stroke();
 
       // ── Invoice Title ────────────────────────────────────────────
       doc.fontSize(14).font('Helvetica-Bold').fillColor(emberRgb)
@@ -176,7 +179,8 @@ async function generateReceiptPDF(order) {
 
       // Header underline
       doc.moveTo(leftX, y).lineTo(rightX, y)
-        .lineWidth(0.5).strokeColor(inkRgb).stroke();
+        .lineWidth(0.5).strokeColor(inkRgb)
+        .stroke();
       y += 6;
 
       // Items
@@ -199,7 +203,8 @@ async function generateReceiptPDF(order) {
 
         // Item row separator
         doc.moveTo(leftX, y - 4).lineTo(rightX, y - 4)
-          .lineWidth(0.2).strokeColor(mistRgb).stroke();
+          .lineWidth(0.2).strokeColor(mistRgb)
+          .stroke();
       });
 
       y += 8;
@@ -221,7 +226,8 @@ async function generateReceiptPDF(order) {
 
       // Grand total with highlight
       doc.moveTo(totalsX, y).lineTo(rightX, y)
-        .lineWidth(0.5).strokeColor(emberRgb).stroke();
+        .lineWidth(0.5).strokeColor(emberRgb)
+        .stroke();
       y += 6;
 
       doc.fontSize(11).font('Helvetica-Bold').fillColor(emberRgb)
@@ -232,7 +238,8 @@ async function generateReceiptPDF(order) {
 
       // ── Payment Info ─────────────────────────────────────────────
       doc.moveTo(leftX, y).lineTo(rightX, y)
-        .lineWidth(0.3).strokeColor(mistRgb).stroke();
+        .lineWidth(0.3).strokeColor(mistRgb)
+        .stroke();
       y += 8;
 
       doc.fontSize(7).font('Helvetica').fillColor(mistRgb)
@@ -263,7 +270,8 @@ async function generateReceiptPDF(order) {
 
       // Footer divider
       doc.moveTo(leftX, footerY - 10).lineTo(rightX, footerY - 10)
-        .lineWidth(0.3).strokeColor(inkRgb).stroke();
+        .lineWidth(0.3).strokeColor(inkRgb)
+        .stroke();
 
       doc.fontSize(7).font('Helvetica').fillColor(mistRgb)
         .text(`${STORE.returnPolicy}`, leftX, footerY, { align: 'center', width: doc.page.width - 80 });

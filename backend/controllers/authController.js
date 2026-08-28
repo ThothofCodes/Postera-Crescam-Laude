@@ -157,7 +157,9 @@ exports.register = async (req, res, next) => {
 // ── Enhanced Login with Device Checking + Session Kick ──────────────────
 exports.login = async (req, res, next) => {
   try {
-    const { email, password, deviceFingerprint, deviceName } = req.body;
+    const {
+      email, password, deviceFingerprint, deviceName,
+    } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password required' });

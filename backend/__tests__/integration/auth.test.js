@@ -7,14 +7,15 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-let mongoServer, app, server, User;
+let mongoServer; let app; let server; let
+  User;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri());
 
   // Clear and reimport model
-  delete mongoose.connection.models['User'];
+  delete mongoose.connection.models.User;
   User = require('../../models/User');
 
   // Build minimal Express app with auth routes
@@ -24,7 +25,9 @@ beforeAll(async () => {
   // POST /api/auth/register
   app.post('/api/auth/register', async (req, res) => {
     try {
-      const { name, email, password, role } = req.body;
+      const {
+        name, email, password, role,
+      } = req.body;
       if (!name || !email || !password) {
         return res.status(400).json({ message: 'All fields required' });
       }
@@ -32,9 +35,16 @@ beforeAll(async () => {
       if (existing) {
         return res.status(400).json({ message: 'Email already registered' });
       }
-      const user = await User.create({ name, email, password, role: role || 'STAFF' });
+      const user = await User.create({
+        name, email, password, role: role || 'STAFF',
+      });
       const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || 'test-secret', { expiresIn: '1h' });
-      res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+      res.status(201).json({
+        token,
+        user: {
+          id: user._id, name: user.name, email: user.email, role: user.role,
+        },
+      });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -69,7 +79,9 @@ beforeAll(async () => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'test-secret', { algorithms: ['HS256'] });
       const user = await User.findById(decoded.id);
       if (!user) return res.status(401).json({ message: 'User not found' });
-      res.json({ id: user._id, name: user.name, email: user.email, role: user.role });
+      res.json({
+        id: user._id, name: user.name, email: user.email, role: user.role,
+      });
     } catch {
       res.status(401).json({ message: 'Invalid token' });
     }
@@ -127,7 +139,9 @@ describe('POST /api/auth/register', () => {
   test('accepts custom role', async () => {
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ name: 'Admin', email: 'admin@test.com', password: 'pass123', role: 'SUPER_ADMIN' });
+      .send({
+        name: 'Admin', email: 'admin@test.com', password: 'pass123', role: 'SUPER_ADMIN',
+      });
 
     expect(res.status).toBe(201);
     expect(res.body.user.role).toBe('SUPER_ADMIN');
@@ -136,7 +150,9 @@ describe('POST /api/auth/register', () => {
 
 describe('POST /api/auth/login', () => {
   beforeEach(async () => {
-    await User.create({ name: 'Test', email: 'login@test.com', password: 'pass123', role: 'STAFF' });
+    await User.create({
+      name: 'Test', email: 'login@test.com', password: 'pass123', role: 'STAFF',
+    });
   });
 
   test('returns token for valid credentials', async () => {
@@ -187,7 +203,9 @@ describe('GET /api/auth/me', () => {
   let token;
 
   beforeEach(async () => {
-    const user = await User.create({ name: 'Me', email: 'me@test.com', password: 'pass123', role: 'STAFF' });
+    const user = await User.create({
+      name: 'Me', email: 'me@test.com', password: 'pass123', role: 'STAFF',
+    });
     token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET || 'test-secret', { expiresIn: '1h' });
   });
 

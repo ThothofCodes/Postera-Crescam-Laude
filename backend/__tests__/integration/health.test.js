@@ -6,7 +6,8 @@ const express = require('express');
 
 // We create a minimal Express app to test the health endpoints without
 // needing a full database connection or all route mounts.
-let app, server;
+let app; let
+  server;
 
 beforeAll((done) => {
   app = express();
@@ -16,7 +17,9 @@ beforeAll((done) => {
 
   app.get('/api/health', (req, res) => {
     const dbState = mongoose.connection.readyState;
-    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    const states = {
+      0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting',
+    };
     const ok = dbState === 1;
     const mem = process.memoryUsage();
     res.status(ok ? 200 : 503).json({
@@ -37,7 +40,9 @@ beforeAll((done) => {
     if (dbState === 1) {
       res.status(200).json({ status: 'ready', db: 'connected' });
     } else {
-      const dbStates = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+      const dbStates = {
+        0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting',
+      };
       res.status(503).json({ status: 'not ready', db: dbStates[dbState] || 'unknown' });
     }
   });

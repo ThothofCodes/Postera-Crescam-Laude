@@ -56,7 +56,7 @@ function initSocket(httpServer) {
         const isDev = process.env.NODE_ENV !== 'production';
         if (isDev && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
         if (isDev && /^https?:\/\/\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)) return cb(null, true);
-        const allowed = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map(o => o.trim());
+        const allowed = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map((o) => o.trim());
         if (allowed.includes(origin)) return cb(null, true);
         console.warn(`[SOCKET] CORS blocked: ${origin}`);
         cb(new Error('CORS'), false);

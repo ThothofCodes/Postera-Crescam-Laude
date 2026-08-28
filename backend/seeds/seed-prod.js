@@ -1,11 +1,11 @@
 /**
  * Production Seed Script
- * 
+ *
  * Creates minimal production data.
  * Only creates admin user and departments.
- * 
+ *
  * Usage: node seeds/seed-prod.js
- * 
+ *
  * Environment Variables:
  *   MONGO_URI - MongoDB connection string
  *   SUPER_ADMIN_EMAIL - Admin email (required)
@@ -16,8 +16,8 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
-const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD;
+const { SUPER_ADMIN_EMAIL } = process.env;
+const { SUPER_ADMIN_PASSWORD } = process.env;
 
 const DEPARTMENTS = [
   { name: 'Internet Distribution', slug: 'internet', description: 'ISP packages, hotspot sessions, network management' },
@@ -47,7 +47,7 @@ async function seed() {
 
   // Check if admin already exists
   const existingAdmin = await mongoose.connection.db.collection('users').findOne({ email: SUPER_ADMIN_EMAIL });
-  
+
   if (existingAdmin) {
     console.log(`ℹ️   Admin user already exists: ${SUPER_ADMIN_EMAIL}`);
     console.log('    Skipping admin creation.\n');
@@ -91,7 +91,7 @@ async function seed() {
   console.log('══════════════════════════════════════════════════');
   console.log('');
   console.log('  Admin Login:');
-  console.log(`    URL:      https://yourdomain.com/admin/super`);
+  console.log('    URL:      https://yourdomain.com/admin/super');
   console.log(`    Email:    ${SUPER_ADMIN_EMAIL}`);
   console.log('    Password: (as set in env)');
   console.log('');

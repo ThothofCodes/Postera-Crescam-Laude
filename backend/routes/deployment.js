@@ -1,18 +1,19 @@
 /**
  * Deployment Status Routes
- * 
+ *
  * Provides endpoints for monitoring deployment status and health.
  * Used by the blue-green deployment system to verify deployments.
  */
 
 const express = require('express');
+
 const router = express.Router();
 
 // Deployment status
 router.get('/status', (req, res) => {
   const deploymentEnv = process.env.DEPLOYMENT_ENV || 'blue';
   const startTime = process.env.START_TIME || new Date().toISOString();
-  
+
   res.json({
     environment: deploymentEnv,
     status: 'active',
@@ -33,7 +34,7 @@ router.get('/ready', (req, res) => {
   // Check if database is connected
   const mongoose = require('mongoose');
   const dbState = mongoose.connection.readyState;
-  
+
   // readyState: 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
   if (dbState === 1) {
     res.json({

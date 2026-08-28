@@ -1,11 +1,11 @@
 /**
  * Test Seed Script
- * 
+ *
  * Creates minimal test data for CI/CD environments.
  * Optimized for speed and minimal resource usage.
- * 
+ *
  * Usage: node seeds/seed-test.js
- * 
+ *
  * Environment Variables:
  *   MONGO_URI - MongoDB connection string
  */

@@ -11,12 +11,12 @@ class MetricsCollector {
     this.requestCount = 0;
     this.errorCount = 0;
     this.statusCodeCounts = {}; // { 200: 123, 404: 5, 500: 2 }
-    this.responseTimes = [];   // rolling window of last 200 response times (ms)
+    this.responseTimes = []; // rolling window of last 200 response times (ms)
     this.activeConnections = 0;
-    this.routes = {};          // { '/api/products': { count: 42, avgMs: 12, errors: 1 } }
-    this._maxWindow = 200;     // keep last N response time samples
-    this._errorWindow = [];    // rolling window of recent errors
-    this._maxErrors = 50;      // keep last N error entries
+    this.routes = {}; // { '/api/products': { count: 42, avgMs: 12, errors: 1 } }
+    this._maxWindow = 200; // keep last N response time samples
+    this._errorWindow = []; // rolling window of recent errors
+    this._maxErrors = 50; // keep last N error entries
   }
 
   // Call from middleware at start of request
@@ -124,7 +124,7 @@ class MetricsCollector {
       }));
 
     // CPU usage (average across cores)
-    const cpuUsage = cpus.map(c => {
+    const cpuUsage = cpus.map((c) => {
       const total = Object.values(c.times).reduce((a, b) => a + b, 0);
       return c.times.user + c.times.system;
     });
@@ -167,7 +167,7 @@ class MetricsCollector {
         nodeVersion: process.version,
         cpuCount: cpus.length,
         cpuModel: cpus[0]?.model || 'unknown',
-        loadAverage: os.loadavg().map(v => v.toFixed(2)),
+        loadAverage: os.loadavg().map((v) => v.toFixed(2)),
         freeMemory: this._formatBytes(os.freemem()),
         totalMemory: this._formatBytes(os.totalmem()),
       },

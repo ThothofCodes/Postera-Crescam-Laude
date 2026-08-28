@@ -207,7 +207,9 @@ exports.getEscalated = async (req, res, next) => {
 // Public ticket creation — no auth required, customers submit directly
 exports.createPublicTicket = async (req, res, next) => {
   try {
-    const { title, description, category, priority, departmentSlug, name, email, phone } = req.body;
+    const {
+      title, description, category, priority, departmentSlug, name, email, phone,
+    } = req.body;
     if (!title || !description) return res.status(400).json({ message: 'Title and description required' });
 
     const ticket = await Ticket.create({

@@ -45,7 +45,7 @@ router.post('/:id/notify', async (req, res) => {
 
     // Fallback: for public tickets, parse phone from first thread entry (contact info)
     if (!phone && ticket.thread?.length) {
-      const contactEntry = ticket.thread.find(t => t.authorRole === 'CLIENT');
+      const contactEntry = ticket.thread.find((t) => t.authorRole === 'CLIENT');
       if (contactEntry?.message) {
         const phoneMatch = contactEntry.message.match(/\+?\d{10,15}/);
         if (phoneMatch) phone = phoneMatch[0];

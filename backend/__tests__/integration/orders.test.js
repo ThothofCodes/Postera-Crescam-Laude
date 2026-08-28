@@ -6,13 +6,14 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
-let mongoServer, app, server, Order;
+let mongoServer; let app; let server; let
+  Order;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri());
 
-  delete mongoose.connection.models['Order'];
+  delete mongoose.connection.models.Order;
   Order = require('../../models/Order');
 
   app = express();
@@ -98,12 +99,14 @@ const request = require('supertest');
 const adminToken = jwt.sign(
   { id: 'admin1', email: 'admin@test.com', role: 'SUPER_ADMIN' },
   process.env.JWT_SECRET || 'test-secret',
-  { expiresIn: '1h' }
+  { expiresIn: '1h' },
 );
 
 const sampleOrder = {
   customer: { name: 'John Doe', phone: '+254700000000', email: 'john@test.com' },
-  items: [{ name: 'Laptop', price: 45000, quantity: 1, subtotal: 45000 }],
+  items: [{
+    name: 'Laptop', price: 45000, quantity: 1, subtotal: 45000,
+  }],
   subtotal: 45000,
   total: 45000,
 };

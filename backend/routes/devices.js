@@ -36,7 +36,7 @@ router.post('/register', protect, superAdminGuard, async (req, res) => {
         $setOnInsert: { deviceName: deviceName || 'Unknown Device', isActive: true },
         $set: { lastSeenIp: req.ip, lastSeenAt: new Date() },
       },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
 
     res.json({ message: 'Device registered', device: { id: device._id, name: device.deviceName, registeredAt: device.createdAt } });

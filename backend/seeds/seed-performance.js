@@ -1,11 +1,11 @@
 /**
  * Performance Test Seeder
- * 
+ *
  * Generates 1000+ realistic orders for performance testing.
  * Includes diverse customer data, order patterns, payment methods, and timestamps.
- * 
+ *
  * Usage: node seeds/seed-performance.js [--count=1000] [--with-users] [--with-products]
- * 
+ *
  * Environment Variables:
  *   MONGO_URI - MongoDB connection string
  */
@@ -137,7 +137,7 @@ function generateAddress() {
   const room = randomInt(1, 50);
   const street = randomItem(STREETS);
   const city = randomItem(CITIES);
-  
+
   return {
     street: `${building}, ${street}`,
     city,
@@ -150,7 +150,7 @@ function generateAddress() {
 function generateCustomer(index) {
   const firstName = randomItem(FIRST_NAMES);
   const lastName = randomItem(LAST_NAMES);
-  
+
   return {
     name: `${firstName} ${lastName}`,
     email: generateEmail(firstName, lastName),
@@ -163,13 +163,13 @@ function generateOrderItems() {
   const category = randomItem(PRODUCT_CATEGORIES);
   const itemCount = randomInt(1, 5);
   const items = [];
-  
+
   for (let i = 0; i < itemCount; i++) {
     const itemName = randomItem(category.items);
     const quantity = randomInt(1, 3);
     const price = randomFloat(50, 150000);
     const discount = randomFloat(0, 0.3);
-    
+
     items.push({
       name: `${itemName} - ${category.name}`,
       sku: `${category.name.slice(0, 3).toUpperCase()}-${randomInt(1000, 9999)}`,
@@ -179,14 +179,14 @@ function generateOrderItems() {
       total: parseFloat((price * quantity * (1 - discount)).toFixed(2)),
     });
   }
-  
+
   return items;
 }
 
 function generatePayment(method) {
   const status = randomItem(PAYMENT_STATUSES);
   const transactionId = generateTransactionId(method);
-  
+
   return {
     method,
     status,
@@ -215,12 +215,12 @@ function generateTimestamp(index, total) {
   const daysAgo = randomInt(0, 90);
   const hoursAgo = randomInt(0, 23);
   const minutesAgo = randomInt(0, 59);
-  
+
   const timestamp = new Date(now);
   timestamp.setDate(timestamp.getDate() - daysAgo);
   timestamp.setHours(timestamp.getHours() - hoursAgo);
   timestamp.setMinutes(timestamp.getMinutes() - minutesAgo);
-  
+
   return timestamp;
 }
 
@@ -235,26 +235,26 @@ function generateOrder(index) {
   const payment = generatePayment(method);
   const status = randomItem(ORDER_STATUSES);
   const createdAt = generateTimestamp(index, ORDER_COUNT);
-  
+
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + item.total, 0);
   const shipping = randomFloat(0, 500);
   const tax = parseFloat((subtotal * 0.16).toFixed(2)); // 16% VAT
   const discount = items.reduce((sum, item) => sum + item.discount, 0);
   const total = parseFloat((subtotal + shipping + tax - discount).toFixed(2));
-  
+
   payment.amount = total;
-  
+
   // Generate tracking number for shipped/delivered orders
-  const trackingNumber = ['shipped', 'delivered'].includes(status) 
+  const trackingNumber = ['shipped', 'delivered'].includes(status)
     ? `TRK-${randomInt(10000000, 99999999)}`
     : null;
-  
+
   // Generate delivery date for delivered orders
-  const deliveredAt = status === 'delivered' 
+  const deliveredAt = status === 'delivered'
     ? new Date(createdAt.getTime() + randomInt(1, 7) * 24 * 60 * 60 * 1000)
     : null;
-  
+
   return {
     orderNumber: generateOrderNumber(index),
     customer: {
@@ -312,7 +312,7 @@ function generateUsers() {
       isActive: true,
     },
   ];
-  
+
   // Generate additional customers
   for (let i = 0; i < 50; i++) {
     const customer = generateCustomer(i);
@@ -323,7 +323,7 @@ function generateUsers() {
       isActive: true,
     });
   }
-  
+
   return users;
 }
 
@@ -333,7 +333,7 @@ function generateUsers() {
 
 function generateProducts() {
   const products = [];
-  
+
   for (const category of PRODUCT_CATEGORIES) {
     for (const item of category.items) {
       products.push({
@@ -353,7 +353,7 @@ function generateProducts() {
       });
     }
   }
-  
+
   return products;
 }
 
@@ -366,28 +366,28 @@ async function seed() {
   console.log('══════════════════════════════════════════════════════════════════════════');
   console.log(`  Generating ${ORDER_COUNT} orders with realistic data...`);
   console.log('══════════════════════════════════════════════════════════════════════════\n');
-  
+
   if (!process.env.MONGO_URI) {
     console.error('\n❌  MONGO_URI not set in .env\n');
     process.exit(1);
   }
-  
+
   console.log('🔌  Connecting to MongoDB...');
   await mongoose.connect(process.env.MONGO_URI);
   console.log('✅  Connected.\n');
-  
+
   const startTime = Date.now();
-  
+
   // Clear existing performance test data
   console.log('🗑️   Clearing existing performance test data...');
   await mongoose.connection.db.collection('orders').deleteMany({});
   console.log('✅  Orders cleared.\n');
-  
+
   // Generate and insert users (if requested)
   if (WITH_USERS) {
     console.log('👤  Generating users...');
     const users = generateUsers();
-    
+
     for (const userData of users) {
       const hashed = await bcrypt.hash(userData.password, 10);
       await mongoose.connection.db.collection('users').insertOne({
@@ -399,12 +399,12 @@ async function seed() {
     }
     console.log(`✅  ${users.length} users created.\n`);
   }
-  
+
   // Generate and insert products (if requested)
   if (WITH_PRODUCTS) {
     console.log('📦  Generating products...');
     const products = generateProducts();
-    
+
     for (const product of products) {
       await mongoose.connection.db.collection('products').insertOne({
         ...product,
@@ -414,34 +414,34 @@ async function seed() {
     }
     console.log(`✅  ${products.length} products created.\n`);
   }
-  
+
   // Generate and insert orders in batches
   console.log('🛒  Generating orders...');
-  
+
   const batchSize = 100;
   const totalBatches = Math.ceil(ORDER_COUNT / batchSize);
   let insertedCount = 0;
-  
+
   for (let batch = 0; batch < totalBatches; batch++) {
     const batchStart = batch * batchSize;
     const batchEnd = Math.min(batchStart + batchSize, ORDER_COUNT);
     const batchSizeActual = batchEnd - batchStart;
-    
+
     const orders = [];
     for (let i = batchStart; i < batchEnd; i++) {
       orders.push(generateOrder(i));
     }
-    
+
     await mongoose.connection.db.collection('orders').insertMany(orders);
     insertedCount += batchSizeActual;
-    
+
     const progress = ((insertedCount / ORDER_COUNT) * 100).toFixed(1);
     process.stdout.write(`\r   Progress: ${progress}% (${insertedCount}/${ORDER_COUNT})`);
   }
-  
+
   console.log('\n');
   console.log(`✅  ${ORDER_COUNT} orders created.\n`);
-  
+
   // Create indexes
   console.log('📇  Creating indexes...');
   await mongoose.connection.db.collection('orders').createIndex({ orderNumber: 1 }, { unique: true });
@@ -450,10 +450,10 @@ async function seed() {
   await mongoose.connection.db.collection('orders').createIndex({ createdAt: -1 });
   await mongoose.connection.db.collection('orders').createIndex({ total: -1 });
   console.log('✅  Indexes created.\n');
-  
+
   const endTime = Date.now();
   const duration = ((endTime - startTime) / 1000).toFixed(2);
-  
+
   // Summary
   console.log('══════════════════════════════════════════════════════════════════════════');
   console.log('  Performance Test Data Generated Successfully!');
@@ -464,7 +464,7 @@ async function seed() {
   console.log(`  Batch Size:       ${batchSize}`);
   console.log('');
   console.log('  Order Statistics:');
-  
+
   // Get order statistics
   const stats = await mongoose.connection.db.collection('orders').aggregate([
     {
@@ -478,14 +478,14 @@ async function seed() {
     },
     { $sort: { count: -1 } },
   ]).toArray();
-  
+
   for (const stat of stats) {
     console.log(`    ${stat._id}: ${stat.count} orders (avg: KES ${stat.avgTotal.toFixed(2)})`);
   }
-  
+
   console.log('');
   console.log('  Payment Methods:');
-  
+
   const paymentStats = await mongoose.connection.db.collection('orders').aggregate([
     {
       $group: {
@@ -495,14 +495,14 @@ async function seed() {
     },
     { $sort: { count: -1 } },
   ]).toArray();
-  
+
   for (const stat of paymentStats) {
     console.log(`    ${stat._id}: ${stat.count} orders`);
   }
-  
+
   console.log('');
   console.log('══════════════════════════════════════════════════════════════════════════\n');
-  
+
   await mongoose.disconnect();
   process.exit(0);
 }

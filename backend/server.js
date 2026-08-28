@@ -8,12 +8,12 @@ const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 const mongoose = require('mongoose');
 const http = require('http');
+const swaggerUi = require('swagger-ui-express');
 const connectDB = require('./config/db');
 const setupIndexes = require('./utils/setupIndexes');
 const requestId = require('./middleware/requestId');
 const logger = require('./utils/logger');
 const { metrics, metricsMiddleware } = require('./utils/metrics');
-const swaggerUi = require('swagger-ui-express');
 const { swaggerSpec } = require('./swagger');
 
 mongoose.set('bufferCommands', false);
@@ -173,7 +173,9 @@ app.get('/api/ready', (req, res) => {
   if (dbState === 1) {
     res.status(200).json({ status: 'ready', db: 'connected' });
   } else {
-    const dbStates = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    const dbStates = {
+      0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting',
+    };
     res.status(503).json({ status: 'not ready', db: dbStates[dbState] || 'unknown' });
   }
 });
@@ -183,19 +185,21 @@ app.get('/api/ready', (req, res) => {
 app.get('/api/health/detail', async (req, res) => {
   try {
     const dbState = mongoose.connection.readyState;
-    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    const states = {
+      0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting',
+    };
 
     // Get metrics snapshot
     const metricsData = metrics.snapshot();
 
     // Get collection counts if DB is connected
-    let collections = {};
+    const collections = {};
     if (dbState === 1) {
       try {
-        const db = mongoose.connection.db;
+        const { db } = mongoose.connection;
         const collectionNames = ['users', 'products', 'orders', 'tickets', 'revenue', 'consultations', 'invoices', 'chatmessages', 'departments', 'services'];
         const counts = await Promise.all(
-          collectionNames.map(name => db.collection(name).countDocuments().catch(() => 0))
+          collectionNames.map((name) => db.collection(name).countDocuments().catch(() => 0)),
         );
         collectionNames.forEach((name, i) => { collections[name] = counts[i]; });
       } catch { /* collection counts unavailable */ }

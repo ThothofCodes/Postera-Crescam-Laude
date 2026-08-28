@@ -20,18 +20,18 @@ const connectDB = async () => {
 
   try {
     const isProduction = process.env.NODE_ENV === 'production';
-    
+
     mongoose.set('bufferCommands', false); // fail fast instead of buffering
-    
+
     // Use optimized connection pooling
     await ConnectionPoolManager.connect({
       mongoUri: uri,
       isProduction,
     });
-    
+
     // Warm up connection pool
     await ConnectionPoolManager.warmUpPool();
-    
+
     console.log(`✅  MongoDB connected with optimized pooling: ${mongoose.connection.host}`);
   } catch (err) {
     console.error(`❌  MongoDB connection failed: ${err.message}`);

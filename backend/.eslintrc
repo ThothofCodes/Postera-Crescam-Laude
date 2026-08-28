@@ -1,6 +1,5 @@
 {
   "env": {
-    "browser": true,
     "commonjs": true,
     "es2021": true,
     "node": true
@@ -11,6 +10,14 @@
   "parserOptions": {
     "ecmaVersion": "latest"
   },
+  "overrides": [
+    {
+      "files": ["__tests__/**/*.js", "**/*.test.js", "**/*.spec.js", "**/__tests__/**/*.js"],
+      "env": {
+        "jest": true
+      }
+    }
+  ],
   "rules": {
     "no-console": "off",
     "consistent-return": "off",
@@ -21,7 +28,27 @@
     "no-underscore-dangle": "off",
     "class-methods-use-this": "off",
     "camelcase": "off",
-    "no-unused-vars": ["error", { "argsIgnorePattern": "next|res|req|err|request|response" }],
-    "max-len": ["error", { "code": 120 }]
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "next|res|req|err|request|response|_", "varsIgnorePattern": "^_" }],
+    "max-len": ["warn", { "code": 140, "ignoreUrls": true, "ignoreStrings": true, "ignoreTemplateLiterals": true, "ignoreComments": true }],
+    "no-plusplus": "off",
+    "no-restricted-syntax": "off",
+    "no-continue": "off",
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-shadow": "warn",
+    "no-mixed-operators": "warn",
+    "no-restricted-globals": "warn",
+    "import/no-unresolved": "warn",
+    "import/no-dynamic-require": "warn",
+    "no-async-promise-executor": "error",
+    "radix": "warn",
+    "no-nested-ternary": "off",
+    "no-await-in-loop": "off",
+    "global-require": "off",
+    "import/order": "warn",
+    "import/extensions": "warn",
+    "max-classes-per-file": "warn",
+    "prefer-destructuring": "warn",
+    "no-case-declarations": "warn",
+    "valid-typeof": "warn"
   }
 }

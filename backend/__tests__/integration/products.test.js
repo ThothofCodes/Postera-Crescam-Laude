@@ -6,13 +6,14 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 
-let mongoServer, app, server, Product;
+let mongoServer; let app; let server; let
+  Product;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   await mongoose.connect(mongoServer.getUri());
 
-  delete mongoose.connection.models['Product'];
+  delete mongoose.connection.models.Product;
   Product = require('../../models/Product');
 
   app = express();
@@ -33,7 +34,9 @@ beforeAll(async () => {
   // GET /api/products — public listing
   app.get('/api/products', async (req, res) => {
     try {
-      const { category, search, sort, page = 1, limit = 12 } = req.query;
+      const {
+        category, search, sort, page = 1, limit = 12,
+      } = req.query;
       const filter = { isActive: true };
       if (category && category !== 'all') filter.category = category;
       if (search) filter.name = { $regex: search, $options: 'i' };
@@ -112,7 +115,7 @@ const request = require('supertest');
 const adminToken = jwt.sign(
   { id: 'admin1', email: 'admin@test.com', role: 'SUPER_ADMIN' },
   process.env.JWT_SECRET || 'test-secret',
-  { expiresIn: '1h' }
+  { expiresIn: '1h' },
 );
 
 const sampleProduct = {

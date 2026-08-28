@@ -4,10 +4,14 @@
 const winston = require('winston');
 const path = require('path');
 
-const { combine, timestamp, json, printf, colorize, errors } = winston.format;
+const {
+  combine, timestamp, json, printf, colorize, errors,
+} = winston.format;
 
 // ── Custom format for console readability in development ──────────────────────
-const devFormat = printf(({ level, message, timestamp, stack, ...meta }) => {
+const devFormat = printf(({
+  level, message, timestamp, stack, ...meta
+}) => {
   const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
   return stack
     ? `${timestamp} ${level}: ${message}\n${stack}${metaStr}`
@@ -30,7 +34,7 @@ transports.push(
     format: process.env.NODE_ENV === 'production'
       ? combine(timestamp(), json())
       : combine(colorize(), timestamp({ format: 'HH:mm:ss' }), devFormat),
-  })
+  }),
 );
 
 // File transports — production only
@@ -51,17 +55,19 @@ if (process.env.NODE_ENV === 'production') {
       maxsize: 5 * 1024 * 1024,
       maxFiles: 5,
       tailable: true,
-    })
+    }),
   );
 }
 
 // ── Create logger instance ────────────────────────────────────────────────────
 const logger = winston.createLogger({
   level: LOG_LEVEL,
-  levels: { error: 0, warn: 1, info: 2, http: 3, debug: 4 },
+  levels: {
+    error: 0, warn: 1, info: 2, http: 3, debug: 4,
+  },
   format: combine(
     errors({ stack: true }),
-    timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' })
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
   ),
   transports,
   // Don't exit on uncaught exceptions — let the process handler deal with it

@@ -1,6 +1,6 @@
 /**
  * MongoDB Connection Pool Optimization Module
- * 
+ *
  * Provides advanced connection pooling configuration and monitoring for
  * high-traffic scenarios. Includes:
  * - Optimized connection pool settings
@@ -25,7 +25,7 @@ class ConnectionPoolManager {
       peakConnections: 0,
       lastChecked: null,
     };
-    
+
     this.startTime = Date.now();
     this.isWarmedUp = false;
   }
@@ -52,36 +52,36 @@ class ConnectionPoolManager {
       // Pool size configuration
       maxPoolSize,
       minPoolSize,
-      
+
       // Timeout configuration
       maxIdleTimeMS,
       waitQueueTimeoutMS,
       serverSelectionTimeoutMS,
-      
+
       // Health check configuration
       heartbeatFrequencyMS,
-      
+
       // Retry configuration
       retryWrites,
       retryReads,
-      
+
       // Compression
       compressors,
-      
+
       // Additional options for high-traffic scenarios
       ...(isProduction && {
         // Use unified topology
         useUnifiedTopology: true,
-        
+
         // Enable auto index in production (disable for better performance)
         autoIndex: false,
-        
+
         // Connection timeout
         connectTimeoutMS: 10000,
-        
+
         // Socket timeout
         socketTimeoutMS: 45000,
-        
+
         // Family (IPv4 or IPv6)
         family: 4,
       }),
@@ -93,46 +93,46 @@ class ConnectionPoolManager {
    */
   static getOptimizedConnectionString(baseUri, options = {}) {
     const config = ConnectionPoolManager.getOptimizedConfig(options);
-    
+
     // Parse base URI
     let uri = baseUri;
-    
+
     // Add connection parameters if not already present
     const params = [];
-    
+
     if (!uri.includes('maxPoolSize')) {
       params.push(`maxPoolSize=${config.maxPoolSize}`);
     }
-    
+
     if (!uri.includes('minPoolSize')) {
       params.push(`minPoolSize=${config.minPoolSize}`);
     }
-    
+
     if (!uri.includes('maxIdleTimeMS')) {
       params.push(`maxIdleTimeMS=${config.maxIdleTimeMS}`);
     }
-    
+
     if (!uri.includes('waitQueueTimeoutMS')) {
       params.push(`waitQueueTimeoutMS=${config.waitQueueTimeoutMS}`);
     }
-    
+
     if (!uri.includes('serverSelectionTimeoutMS')) {
       params.push(`serverSelectionTimeoutMS=${config.serverSelectionTimeoutMS}`);
     }
-    
+
     if (!uri.includes('retryWrites')) {
       params.push(`retryWrites=${config.retryWrites}`);
     }
-    
+
     if (!uri.includes('retryReads')) {
       params.push(`retryReads=${config.retryReads}`);
     }
-    
+
     if (params.length > 0) {
       const separator = uri.includes('?') ? '&' : '?';
       uri += separator + params.join('&');
     }
-    
+
     return uri;
   }
 
@@ -156,8 +156,8 @@ class ConnectionPoolManager {
     console.log('🔌  Connecting to MongoDB with optimized pooling...');
     console.log(`   Max Pool Size: ${isProduction ? 50 : 20}`);
     console.log(`   Min Pool Size: ${isProduction ? 10 : 5}`);
-    console.log(`   Max Idle Time: 30s`);
-    console.log(`   Wait Queue Timeout: 5s`);
+    console.log('   Max Idle Time: 30s');
+    console.log('   Wait Queue Timeout: 5s');
     console.log('');
 
     await mongoose.connect(optimizedUri, ConnectionPoolManager.getOptimizedConfig({ isProduction }));
@@ -170,25 +170,25 @@ class ConnectionPoolManager {
    */
   static async warmUpPool() {
     console.log('🔥  Warming up connection pool...');
-    
+
     const startTime = Date.now();
     const warmUpQueries = 20; // Number of queries to warm up
-    
+
     try {
       // Execute multiple queries to warm up connections
       const promises = [];
-      
+
       for (let i = 0; i < warmUpQueries; i++) {
         promises.push(
-          mongoose.connection.db.admin().ping().catch(() => null)
+          mongoose.connection.db.admin().ping().catch(() => null),
         );
       }
-      
+
       await Promise.all(promises);
-      
+
       const duration = Date.now() - startTime;
       console.log(`✅  Pool warmed up with ${warmUpQueries} queries in ${duration}ms\n`);
-      
+
       return {
         success: true,
         queriesExecuted: warmUpQueries,
@@ -208,9 +208,9 @@ class ConnectionPoolManager {
    */
   static getPoolStats() {
     try {
-      const db = mongoose.connection.db;
+      const { db } = mongoose.connection;
       const state = mongoose.connection.readyState;
-      
+
       // Get server status for connection info
       return {
         readyState: state,
@@ -218,7 +218,7 @@ class ConnectionPoolManager {
         host: mongoose.connection.host,
         port: mongoose.connection.port,
         name: mongoose.connection.name,
-        
+
         // Connection pool configuration
         config: {
           maxPoolSize: mongoose.connection.options?.maxPoolSize || 'default',
@@ -226,7 +226,7 @@ class ConnectionPoolManager {
           maxIdleTimeMS: mongoose.connection.options?.maxIdleTimeMS || 'default',
           waitQueueTimeoutMS: mongoose.connection.options?.waitQueueTimeoutMS || 'default',
         },
-        
+
         // Runtime metrics (if available)
         runtime: {
           connectionsCreated: mongoose.connection.options?.poolSize || 0,
@@ -259,15 +259,15 @@ class ConnectionPoolManager {
    */
   static async monitorHealth() {
     const startTime = Date.now();
-    
+
     try {
-      const db = mongoose.connection.db;
-      
+      const { db } = mongoose.connection;
+
       // Test connection
       await db.admin().ping();
-      
+
       const pingTime = Date.now() - startTime;
-      
+
       // Get server status
       let serverStatus = null;
       try {
@@ -275,7 +275,7 @@ class ConnectionPoolManager {
       } catch {
         // Server status might not be available
       }
-      
+
       return {
         status: 'healthy',
         pingTime,
@@ -303,7 +303,7 @@ class ConnectionPoolManager {
   static getPerformanceRecommendations() {
     const recommendations = [];
     const config = mongoose.connection.options || {};
-    
+
     // Check pool size
     if (!config.maxPoolSize || config.maxPoolSize < 20) {
       recommendations.push({
@@ -314,7 +314,7 @@ class ConnectionPoolManager {
         recommended: process.env.NODE_ENV === 'production' ? 50 : 20,
       });
     }
-    
+
     // Check idle time
     if (!config.maxIdleTimeMS || config.maxIdleTimeMS > 60000) {
       recommendations.push({
@@ -325,7 +325,7 @@ class ConnectionPoolManager {
         recommended: 30000,
       });
     }
-    
+
     // Check wait queue timeout
     if (!config.waitQueueTimeoutMS || config.waitQueueTimeoutMS < 5000) {
       recommendations.push({
@@ -336,7 +336,7 @@ class ConnectionPoolManager {
         recommended: 5000,
       });
     }
-    
+
     // Check retry writes
     if (config.retryWrites === false) {
       recommendations.push({
@@ -347,7 +347,7 @@ class ConnectionPoolManager {
         recommended: true,
       });
     }
-    
+
     // Check compression
     if (!config.compressors || config.compressors.length === 0) {
       recommendations.push({
@@ -358,7 +358,7 @@ class ConnectionPoolManager {
         recommended: ['snappy', 'zlib'],
       });
     }
-    
+
     return {
       totalRecommendations: recommendations.length,
       recommendations,
@@ -371,10 +371,10 @@ class ConnectionPoolManager {
    */
   static calculateRecommendationScore(recommendations) {
     if (recommendations.length === 0) return 100;
-    
-    const warnings = recommendations.filter(r => r.type === 'warning').length;
-    const infos = recommendations.filter(r => r.type === 'info').length;
-    
+
+    const warnings = recommendations.filter((r) => r.type === 'warning').length;
+    const infos = recommendations.filter((r) => r.type === 'info').length;
+
     // Score: 100 - (warnings * 10) - (infos * 5)
     return Math.max(0, 100 - (warnings * 10) - (infos * 5));
   }
@@ -385,7 +385,7 @@ class ConnectionPoolManager {
   static getPrometheusMetrics() {
     const stats = ConnectionPoolManager.getPoolStats();
     const health = ConnectionPoolManager.monitorHealth();
-    
+
     return `
 # HELP mongodb_connection_pool_ready_state MongoDB connection ready state (0=disconnected, 1=connected, 2=connecting, 3=disconnecting)
 # TYPE mongodb_connection_pool_ready_state gauge

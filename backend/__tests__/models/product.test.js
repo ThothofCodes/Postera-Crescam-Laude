@@ -18,7 +18,7 @@ afterAll(async () => {
 
 let Product;
 beforeAll(() => {
-  delete mongoose.connection.models['Product'];
+  delete mongoose.connection.models.Product;
   Product = require('../../models/Product');
 });
 

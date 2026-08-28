@@ -19,6 +19,7 @@ function validate(data, schema) {
       continue;
     }
     if (value && rules.type) {
+      // eslint-disable-next-line valid-typeof
       if (typeof value !== rules.type) {
         errors[field] = `${field} must be ${rules.type}`;
       }

@@ -21,7 +21,7 @@ afterAll(async () => {
 let User;
 beforeAll(() => {
   // Clear any cached model to avoid OverwriteModelError
-  delete mongoose.connection.models['User'];
+  delete mongoose.connection.models.User;
   User = require('../../models/User');
 });
 

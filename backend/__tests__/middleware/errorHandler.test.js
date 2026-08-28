@@ -2,7 +2,9 @@
 // Unit tests for the unified error handler middleware.
 
 const errorHandler = require('../../middleware/errorHandler');
-const { AppError, ValidationError, NotFoundError, ConflictError } = require('../../utils/errors');
+const {
+  AppError, ValidationError, NotFoundError, ConflictError,
+} = require('../../utils/errors');
 
 function mockReqRes(overrides = {}) {
   return {

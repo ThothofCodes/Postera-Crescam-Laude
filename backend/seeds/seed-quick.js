@@ -1,11 +1,11 @@
 /**
  * Quick Seed Script
- * 
+ *
  * Generates a small set of test data for quick testing.
  * Useful for development and CI/CD environments.
- * 
+ *
  * Usage: node seeds/seed-quick.js
- * 
+ *
  * Environment Variables:
  *   MONGO_URI - MongoDB connection string
  */
@@ -91,7 +91,9 @@ const ORDERS = [
     orderNumber: 'ORD-TEST-001',
     customer: { name: 'Test Customer', email: 'customer@test.com', phone: '+254700000001' },
     items: [
-      { name: 'Refurbished Laptop Core i5', sku: 'ELEC-1001', quantity: 1, price: 45000, discount: 0, total: 45000 },
+      {
+        name: 'Refurbished Laptop Core i5', sku: 'ELEC-1001', quantity: 1, price: 45000, discount: 0, total: 45000,
+      },
     ],
     subtotal: 45000,
     shipping: 500,
@@ -105,8 +107,12 @@ const ORDERS = [
     orderNumber: 'ORD-TEST-002',
     customer: { name: 'Test Customer', email: 'customer@test.com', phone: '+254700000001' },
     items: [
-      { name: 'Wireless Mouse & Keyboard Combo', sku: 'ACC-2001', quantity: 2, price: 2500, discount: 0, total: 5000 },
-      { name: 'USB Flash Drive 32GB', sku: 'ACC-2002', quantity: 3, price: 600, discount: 0, total: 1800 },
+      {
+        name: 'Wireless Mouse & Keyboard Combo', sku: 'ACC-2001', quantity: 2, price: 2500, discount: 0, total: 5000,
+      },
+      {
+        name: 'USB Flash Drive 32GB', sku: 'ACC-2002', quantity: 3, price: 600, discount: 0, total: 1800,
+      },
     ],
     subtotal: 6800,
     shipping: 300,
@@ -125,23 +131,23 @@ const ORDERS = [
 async function seed() {
   console.log('\n⚡  Quick Seed Script');
   console.log('══════════════════════════════════════════════════════════════════════════\n');
-  
+
   if (!process.env.MONGO_URI) {
     console.error('\n❌  MONGO_URI not set in .env\n');
     process.exit(1);
   }
-  
+
   console.log('🔌  Connecting to MongoDB...');
   await mongoose.connect(process.env.MONGO_URI);
   console.log('✅  Connected.\n');
-  
+
   const startTime = Date.now();
-  
+
   // Clear existing data
   console.log('🗑️   Clearing existing data...');
   await mongoose.connection.db.dropDatabase();
   console.log('✅  Database cleared.\n');
-  
+
   // Create users
   console.log('👤  Creating users...');
   for (const userData of USERS) {
@@ -154,7 +160,7 @@ async function seed() {
     });
   }
   console.log(`✅  ${USERS.length} users created.\n`);
-  
+
   // Create departments
   console.log('🏢  Creating departments...');
   for (const dept of DEPARTMENTS) {
@@ -166,7 +172,7 @@ async function seed() {
     });
   }
   console.log(`✅  ${DEPARTMENTS.length} departments created.\n`);
-  
+
   // Create products
   console.log('📦  Creating products...');
   for (const product of PRODUCTS) {
@@ -181,7 +187,7 @@ async function seed() {
     });
   }
   console.log(`✅  ${PRODUCTS.length} products created.\n`);
-  
+
   // Create orders
   console.log('🛒  Creating orders...');
   for (const order of ORDERS) {
@@ -192,10 +198,10 @@ async function seed() {
     });
   }
   console.log(`✅  ${ORDERS.length} orders created.\n`);
-  
+
   const endTime = Date.now();
   const duration = ((endTime - startTime) / 1000).toFixed(2);
-  
+
   // Summary
   console.log('══════════════════════════════════════════════════════════════════════════');
   console.log('  Quick Seed Completed Successfully!');
@@ -210,7 +216,7 @@ async function seed() {
   console.log('    Customer:    customer@test.com / TestPass@123');
   console.log('');
   console.log('══════════════════════════════════════════════════════════════════════════\n');
-  
+
   await mongoose.disconnect();
   process.exit(0);
 }

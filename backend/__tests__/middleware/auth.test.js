@@ -12,7 +12,9 @@ jest.mock('../../models/AuditLog', () => ({
 }));
 
 const User = require('../../models/User');
-const { protect, superAdminGuard, deptHeadGuard, staffGuard, staffReadScope, deptScope, authorize } = require('../../middleware/auth');
+const {
+  protect, superAdminGuard, deptHeadGuard, staffGuard, staffReadScope, deptScope, authorize,
+} = require('../../middleware/auth');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
 
@@ -22,9 +24,11 @@ afterAll(() => { delete process.env.JWT_SECRET; });
 
 function makeToken(payload) {
   return jwt.sign(
-    { id: payload.id || 'user1', email: payload.email || 'test@example.com', role: payload.role || 'STAFF', ...payload },
+    {
+      id: payload.id || 'user1', email: payload.email || 'test@example.com', role: payload.role || 'STAFF', ...payload,
+    },
     JWT_SECRET,
-    { algorithm: 'HS256', expiresIn: '1h' }
+    { algorithm: 'HS256', expiresIn: '1h' },
   );
 }
 
@@ -89,7 +93,9 @@ describe('protect — JWT verification middleware', () => {
   test('returns 401 when user is deactivated', async () => {
     const token = makeToken({ id: 'u2', email: 'active@test.com' });
     User.findById.mockReturnValue({
-      populate: jest.fn().mockResolvedValue({ _id: 'u2', email: 'active@test.com', isActive: false, role: 'STAFF' }),
+      populate: jest.fn().mockResolvedValue({
+        _id: 'u2', email: 'active@test.com', isActive: false, role: 'STAFF',
+      }),
     });
     const { req, res, next } = mockReqRes({ headers: { authorization: `Bearer ${token}` } });
     await protect(req, res, next);
@@ -100,7 +106,9 @@ describe('protect — JWT verification middleware', () => {
   test('returns 401 when email changed after token issued', async () => {
     const token = makeToken({ id: 'u3', email: 'old@test.com' });
     User.findById.mockReturnValue({
-      populate: jest.fn().mockResolvedValue({ _id: 'u3', email: 'new@test.com', isActive: true, role: 'STAFF' }),
+      populate: jest.fn().mockResolvedValue({
+        _id: 'u3', email: 'new@test.com', isActive: true, role: 'STAFF',
+      }),
     });
     const { req, res, next } = mockReqRes({ headers: { authorization: `Bearer ${token}` } });
     await protect(req, res, next);
@@ -109,7 +117,9 @@ describe('protect — JWT verification middleware', () => {
   });
 
   test('calls next() and attaches user for valid token', async () => {
-    const userDoc = { _id: 'u4', email: 'ok@test.com', isActive: true, role: 'STAFF' };
+    const userDoc = {
+      _id: 'u4', email: 'ok@test.com', isActive: true, role: 'STAFF',
+    };
     const token = makeToken({ id: 'u4', email: 'ok@test.com', role: 'STAFF' });
     User.findById.mockReturnValue({ populate: jest.fn().mockResolvedValue(userDoc) });
     const { req, res, next } = mockReqRes({ headers: { authorization: `Bearer ${token}` } });

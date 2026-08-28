@@ -18,7 +18,7 @@ afterAll(async () => {
 
 let Order;
 beforeAll(() => {
-  delete mongoose.connection.models['Order'];
+  delete mongoose.connection.models.Order;
   Order = require('../../models/Order');
 });
 
@@ -30,7 +30,9 @@ describe('Order model', () => {
   const validOrder = {
     customer: { name: 'John Doe', phone: '+254700000000' },
     items: [
-      { name: 'Laptop', price: 45000, quantity: 1, subtotal: 45000 },
+      {
+        name: 'Laptop', price: 45000, quantity: 1, subtotal: 45000,
+      },
     ],
     subtotal: 45000,
     total: 45000,

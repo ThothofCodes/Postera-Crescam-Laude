@@ -1,6 +1,6 @@
 /**
  * Database Health Monitoring Routes
- * 
+ *
  * Provides comprehensive health check endpoints for monitoring:
  * - Overall database health
  * - Connection pool status
@@ -12,9 +12,11 @@
  */
 
 const express = require('express');
+
 const router = express.Router();
 const dbHealthMonitor = require('../utils/dbHealth');
 const { protect } = require('../middleware/auth');
+
 const authGuard = protect;
 
 // ============================================================================
@@ -30,7 +32,7 @@ router.get('/basic', async (req, res) => {
     const mongoose = require('mongoose');
     const dbState = mongoose.connection.readyState;
     const isConnected = dbState === 1;
-    
+
     res.json({
       status: isConnected ? 'ok' : 'error',
       database: isConnected ? 'connected' : 'disconnected',
@@ -56,10 +58,10 @@ router.get('/basic', async (req, res) => {
 router.get('/', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
-    const statusCode = healthStatus.status === 'healthy' ? 200 : 
-                       healthStatus.status === 'warning' ? 200 : 503;
-    
+
+    const statusCode = healthStatus.status === 'healthy' ? 200
+      : healthStatus.status === 'warning' ? 200 : 503;
+
     res.status(statusCode).json(healthStatus);
   } catch (error) {
     res.status(500).json({
@@ -77,7 +79,7 @@ router.get('/', authGuard, async (req, res) => {
 router.get('/connection-pool', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       connectionPool: healthStatus.connectionPool,
@@ -99,7 +101,7 @@ router.get('/connection-pool', authGuard, async (req, res) => {
 router.get('/indexes', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       indexStats: healthStatus.indexStats,
@@ -121,7 +123,7 @@ router.get('/indexes', authGuard, async (req, res) => {
 router.get('/storage', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       storageStats: healthStatus.storageStats,
@@ -143,7 +145,7 @@ router.get('/storage', authGuard, async (req, res) => {
 router.get('/server', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       serverStatus: healthStatus.serverStatus,
@@ -165,7 +167,7 @@ router.get('/server', authGuard, async (req, res) => {
 router.get('/replica', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       replicaSet: healthStatus.replicaSet,
@@ -188,10 +190,10 @@ router.get('/slow-queries', authGuard, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const mongoose = require('mongoose');
-    const db = mongoose.connection.db;
-    
+    const { db } = mongoose.connection;
+
     const slowQueries = await dbHealthMonitor.getSlowQueries(db, limit);
-    
+
     res.json({
       status: 'ok',
       slowQueries,
@@ -213,10 +215,10 @@ router.get('/slow-queries', authGuard, async (req, res) => {
 router.get('/collection/:name', authGuard, async (req, res) => {
   try {
     const mongoose = require('mongoose');
-    const db = mongoose.connection.db;
-    
+    const { db } = mongoose.connection;
+
     const collectionStats = await dbHealthMonitor.getCollectionStats(db, req.params.name);
-    
+
     res.json({
       status: 'ok',
       collection: collectionStats,
@@ -238,7 +240,7 @@ router.get('/collection/:name', authGuard, async (req, res) => {
 router.get('/all-collections', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       collections: healthStatus.indexStats?.collections || {},
@@ -261,7 +263,7 @@ router.get('/all-collections', authGuard, async (req, res) => {
 router.get('/summary', authGuard, async (req, res) => {
   try {
     const healthStatus = await dbHealthMonitor.getHealthStatus();
-    
+
     res.json({
       status: 'ok',
       summary: {

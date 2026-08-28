@@ -18,7 +18,7 @@ describe('logger', () => {
 
   test('logger has a console transport', () => {
     const consoleTransport = logger.transports.find(
-      (t) => t.constructor.name === 'Console'
+      (t) => t.constructor.name === 'Console',
     );
     expect(consoleTransport).toBeDefined();
   });
