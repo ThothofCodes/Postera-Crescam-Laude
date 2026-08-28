@@ -195,9 +195,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: tech-hub/package-lock.json
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - name: Build static site
         run: npm run build
         env:
@@ -348,17 +346,13 @@ jobs:
     name: CI gate — all checks passed
     runs-on: ubuntu-latest
     if: always()
-    needs: [backend-test, backend-audit, frontend-test, frontend-build, frontend-audit, tech-hub-build, e2e-test, security-scan]
+    needs: [backend-test, frontend-test, frontend-build]
     steps:
       - name: Check all required jobs passed
         run: |
           echo "Backend test:     ${{ needs.backend-test.result }}"
-          echo "Backend audit:    ${{ needs.backend-audit.result }}"
           echo "Frontend test:    ${{ needs.frontend-test.result }}"
           echo "Frontend build:   ${{ needs.frontend-build.result }}"
-          echo "Frontend audit:   ${{ needs.frontend-audit.result }}"
-          echo "E2E test:         ${{ needs.e2e-test.result }}"
-          echo "Security scan:    ${{ needs.security-scan.result }}"
 
           if [[ "${{ needs.backend-test.result }}" != "success" ]]; then
             echo "::error::Backend tests failed"
@@ -372,5 +366,4 @@ jobs:
             echo "::error::Frontend build failed"
             exit 1
           fi
-          # E2E and security are advisory for now
           echo "✅ All required checks passed"

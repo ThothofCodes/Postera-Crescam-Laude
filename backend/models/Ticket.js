@@ -14,8 +14,8 @@ const SLA_HOURS = {
 
 const TicketSchema = new mongoose.Schema({
   ticketId: { type: String, unique: true },
-  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', default: null },
-  departmentSlug: { type: String, default: 'general' },
+  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
+  departmentSlug: { type: String, required: true },
   raisedBy: { type: mongoose.Schema.Types.ObjectId, default: null },
   raisedByRole: { type: String, enum: ['CLIENT', 'STAFF'], required: true },
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
