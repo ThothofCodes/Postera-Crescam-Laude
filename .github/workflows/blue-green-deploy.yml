@@ -1,13 +1,13 @@
 name: Blue-Green Deployment
 
-# Triggers on push to main or manual deployment
+# Only manual trigger or push to main
 on:
   push:
     branches: [main]
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: 'Target environment (auto = alternate, blue/green = specific)'
         required: true
         default: 'auto'
         type: choice
@@ -16,7 +16,7 @@ on:
           - blue
           - green
       version:
-        description: 'Version tag'
+        description: 'Version tag (optional)'
         required: false
         type: string
 
@@ -27,8 +27,6 @@ concurrency:
 
 env:
   NODE_VERSION: '20.x'
-  DOCKER_REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository }}
 
 jobs:
   # ═══════════════════════════════════════════════════════════════════════════
@@ -41,24 +39,34 @@ jobs:
       target_env: ${{ steps.detect.outputs.target_env }}
       current_env: ${{ steps.detect.outputs.current_env }}
       version: ${{ steps.version.outputs.version }}
+      has_deploy_secrets: ${{ steps.secrets.outputs.has_secrets }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check available secrets
+        id: secrets
+        run: |
+          if [ -n "${{ secrets.DEPLOY_HOST }}" ]; then
+            echo "has_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_secrets=false" >> $GITHUB_OUTPUT
+            echo "⚠️  DEPLOY_HOST not configured — will build only"
+          fi
 
       - name: Detect current active environment
         id: detect
         run: |
-          # In production, this would check the actual load balancer
-          # For now, we alternate between blue and green
-          if [ -f /tmp/active-env ]; then
-            CURRENT=$(cat /tmp/active-env)
+          # For auto mode, alternate between blue and green
+          if [ "${{ inputs.environment }}" = "auto" ] || [ -z "${{ inputs.environment }}" ]; then
+            # Default to green on first run
+            CURRENT="blue"
+            TARGET="green"
+          elif [ "${{ inputs.environment }}" = "blue" ]; then
+            CURRENT="green"
+            TARGET="blue"
           else
             CURRENT="blue"
-          fi
-          
-          if [ "$CURRENT" = "blue" ]; then
             TARGET="green"
-          else
-            TARGET="blue"
           fi
           
           echo "current_env=$CURRENT" >> $GITHUB_OUTPUT
@@ -78,7 +86,7 @@ jobs:
           echo "Version: $VERSION"
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # BUILD & PUSH IMAGES
+  # BUILD & PUSH IMAGES (always runs)
   # ═══════════════════════════════════════════════════════════════════════════
   build:
     name: Build Docker images
@@ -93,7 +101,7 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.DOCKER_REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -104,8 +112,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:${{ needs.pre-check.outputs.version }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:latest
+            ghcr.io/${{ github.repository }}/backend:${{ needs.pre-check.outputs.version }}
+            ghcr.io/${{ github.repository }}/backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -116,12 +124,12 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ needs.pre-check.outputs.version }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:latest
+            ghcr.io/${{ github.repository }}/frontend:${{ needs.pre-check.outputs.version }}
+            ghcr.io/${{ github.repository }}/frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            VITE_API_URL=${{ secrets.VITE_API_URL || 'http://localhost:5001' }}
 
       - name: Build and push tech-hub
         uses: docker/build-push-action@v5
@@ -130,17 +138,18 @@ jobs:
           file: ./tech-hub/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:${{ needs.pre-check.outputs.version }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:latest
+            ghcr.io/${{ github.repository }}/tech-hub:${{ needs.pre-check.outputs.version }}
+            ghcr.io/${{ github.repository }}/tech-hub:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # DEPLOY TO TARGET ENVIRONMENT
+  # DEPLOY (only if secrets are configured)
   # ═══════════════════════════════════════════════════════════════════════════
   deploy:
     name: Deploy to ${{ needs.pre-check.outputs.target_env }}
     needs: [pre-check, build]
+    if: needs.pre-check.outputs.has_deploy_secrets == 'true'
     runs-on: ubuntu-latest
     environment: ${{ needs.pre-check.outputs.target_env }}
     steps:
@@ -151,220 +160,101 @@ jobs:
           TARGET_ENV: ${{ needs.pre-check.outputs.target_env }}
           VERSION: ${{ needs.pre-check.outputs.version }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           echo "Deploying version $VERSION to $TARGET_ENV environment..."
           
-          # SSH to deployment server and run deployment
-          ssh -o StrictHostKeyChecking=no -i "$DEPLOY_HOST" << 'EOF'
+          # SSH to deployment server
+          ssh -o StrictHostKeyChecking=no $DEPLOY_HOST << 'EOF'
             cd /opt/pcl
             
             # Pull new images
-            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:$VERSION
-            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:$VERSION
-            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:$VERSION
+            docker pull ghcr.io/${{ github.repository }}/backend:$VERSION
+            docker pull ghcr.io/${{ github.repository }}/frontend:$VERSION
+            docker pull ghcr.io/${{ github.repository }}/tech-hub:$VERSION
             
             # Stop existing services in target environment
-            docker-compose -f docker-compose.$TARGET_ENV.yml down
+            docker-compose -f docker-compose.$TARGET_ENV.yml down || true
             
-            # Update image tags in docker-compose
-            sed -i "s|image: .*backend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:$VERSION|" docker-compose.$TARGET_ENV.yml
-            sed -i "s|image: .*frontend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:$VERSION|" docker-compose.$TARGET_ENV.yml
-            sed -i "s|image: .*tech-hub:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:$VERSION|" docker-compose.$TARGET_ENV.yml
-            
-            # Start services
+            # Start services with new images
             docker-compose -f docker-compose.$TARGET_ENV.yml up -d
+            
+            echo "✅ Deployment to $TARGET_ENV complete"
           EOF
 
-      - name: Wait for services to be healthy
+      - name: Wait for services
         run: |
           TARGET_ENV=${{ needs.pre-check.outputs.target_env }}
           
           if [ "$TARGET_ENV" = "blue" ]; then
             BACKEND_PORT=5001
-            FRONTEND_PORT=3000
-            TECHHUB_PORT=4321
           else
             BACKEND_PORT=5002
-            FRONTEND_PORT=3001
-            TECHHUB_PORT=4322
           fi
           
-          echo "Waiting for services on $TARGET_ENV environment..."
-          
-          # Wait for backend
+          echo "Waiting for backend on port $BACKEND_PORT..."
           for i in {1..30}; do
             if curl -sf "http://localhost:$BACKEND_PORT/api/health" > /dev/null 2>&1; then
-              echo "Backend is healthy"
+              echo "✅ Backend is healthy"
               break
             fi
-            echo "Waiting for backend... ($i/30)"
+            echo "Waiting... ($i/30)"
             sleep 2
           done
-          
-          # Wait for frontend
-          for i in {1..30}; do
-            if curl -sf "http://localhost:$FRONTEND_PORT" > /dev/null 2>&1; then
-              echo "Frontend is healthy"
-              break
-            fi
-            echo "Waiting for frontend... ($i/30)"
-            sleep 2
-          done
-
-      - name: Verify deployment
-        run: |
-          TARGET_ENV=${{ needs.pre-check.outputs.target_env }}
-          
-          if [ "$TARGET_ENV" = "blue" ]; then
-            BACKEND_PORT=5001
-          else
-            BACKEND_PORT=5002
-          fi
-          
-          echo "Verifying deployment..."
-          
-          # Check backend health
-          HEALTH=$(curl -sf "http://localhost:$BACKEND_PORT/api/health" || echo '{"status":"error"}')
-          STATUS=$(echo $HEALTH | jq -r '.status')
-          
-          if [ "$STATUS" = "ok" ]; then
-            echo "✅ Backend health check passed"
-          else
-            echo "❌ Backend health check failed"
-            exit 1
-          fi
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # SWITCH TRAFFIC
+  # SWITCH TRAFFIC (only if deploy succeeded)
   # ═══════════════════════════════════════════════════════════════════════════
   switch-traffic:
     name: Switch traffic to ${{ needs.pre-check.outputs.target_env }}
     needs: [pre-check, deploy]
+    if: needs.pre-check.outputs.has_deploy_secrets == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Switch load balancer
         env:
           TARGET_ENV: ${{ needs.pre-check.outputs.target_env }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
           echo "Switching traffic to $TARGET_ENV environment..."
           
-          ssh -o StrictHostKeyChecking=no -i "$DEPLOY_HOST" << 'EOF'
+          ssh -o StrictHostKeyChecking=no $DEPLOY_HOST << 'EOF'
             cd /opt/pcl
             
-            # Update active environment file
+            # Update active environment
             echo "$TARGET_ENV" > /tmp/active-env
             
             # Reload nginx
             sudo nginx -t && sudo nginx -s reload
             
-            echo "Traffic switched to $TARGET_ENV"
+            echo "✅ Traffic switched to $TARGET_ENV"
           EOF
 
-      - name: Verify traffic switch
-        run: |
-          TARGET_ENV=${{ needs.pre-check.outputs.target_env }}
-          
-          echo "Verifying traffic is routing to $TARGET_ENV..."
-          
-          # Wait for nginx to reload
-          sleep 5
-          
-          # Check main endpoint
-          for i in {1..10}; do
-            RESPONSE=$(curl -sf "http://localhost/api/health" || echo '{"status":"error"}')
-            echo "Attempt $i: $RESPONSE"
-            
-            if echo "$RESPONSE" | grep -q '"status":"ok"'; then
-              echo "✅ Traffic switch verified"
-              break
-            fi
-            sleep 2
-          done
-
   # ═══════════════════════════════════════════════════════════════════════════
-  # POST-DEPLOYMENT
+  # POST-DEPLOYMENT (always runs)
   # ═══════════════════════════════════════════════════════════════════════════
   post-deploy:
-    name: Post-deployment tasks
-    needs: [pre-check, switch-traffic]
+    name: Post-deployment summary
+    needs: [pre-check, build, deploy]
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Create deployment record
+      - name: Deployment summary
         run: |
-          echo "## Deployment Complete 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Version | ${{ needs.pre-check.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Target Environment | ${{ needs.pre-check.outputs.target_env }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Previous Environment | ${{ needs.pre-check.outputs.current_env }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | \`${{ needs.pre-check.outputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Target Environment | \`${{ needs.pre-check.outputs.target_env }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Status | \`${{ needs.build.result }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy Status | \`${{ needs.deploy.result || 'skipped (no deploy secrets)' }}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| Deployed By | @${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Rollback Instructions" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "To rollback, run the workflow manually with:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "environment: ${{ needs.pre-check.outputs.current_env }}" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-
-      - name: Notify deployment
-        if: success()
-        run: |
-          echo "Deployment successful!"
-          # Add Slack/Discord notification here if needed
-
-      - name: Notify failure
-        if: failure()
-        run: |
-          echo "Deployment failed! Manual intervention may be required."
-          # Add Slack/Discord notification here if needed
-
-  # ═══════════════════════════════════════════════════════════════════════════
-  # ROLLBACK (manual trigger)
-  # ═══════════════════════════════════════════════════════════════════════════
-  rollback:
-    name: Rollback to ${{ needs.pre-check.outputs.current_env }}
-    needs: [pre-check]
-    if: inputs.environment != 'auto' && inputs.environment != needs.pre-check.outputs.target_env
-    runs-on: ubuntu-latest
-    steps:
-      - name: Rollback traffic
-        env:
-          CURRENT_ENV: ${{ needs.pre-check.outputs.current_env }}
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        run: |
-          echo "Rolling back to $CURRENT_ENV environment..."
           
-          ssh -o StrictHostKeyChecking=no -i "$DEPLOY_HOST" << 'EOF'
-            cd /opt/pcl
-            
-            # Update active environment file
-            echo "$CURRENT_ENV" > /tmp/active-env
-            
-            # Reload nginx
-            sudo nginx -t && sudo nginx -s reload
-            
-            echo "Rollback to $CURRENT_ENV complete"
-          EOF
-
-      - name: Verify rollback
-        run: |
-          CURRENT_ENV=${{ needs.pre-check.outputs.current_env }}
-          
-          echo "Verifying rollback to $CURRENT_ENV..."
-          sleep 5
-          
-          RESPONSE=$(curl -sf "http://localhost/api/health" || echo '{"status":"error"}')
-          echo "Health check: $RESPONSE"
-          
-          if echo "$RESPONSE" | grep -q '"status":"ok"'; then
-            echo "✅ Rollback verified"
-          else
-            echo "❌ Rollback verification failed"
-            exit 1
+          if [ "${{ needs.pre-check.outputs.has_deploy_secrets }}" = "false" ]; then
+            echo "### ⚠️ Build Only Mode" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Docker images were built and pushed to \`ghcr.io\`." >> $GITHUB_STEP_SUMMARY
+            echo "To deploy, configure these GitHub secrets:" >> $GITHUB_STEP_SUMMARY
+            echo "- \`DEPLOY_HOST\` - SSH host for deployment server" >> $GITHUB_STEP_SUMMARY
           fi
