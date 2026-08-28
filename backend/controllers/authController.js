@@ -184,7 +184,7 @@ exports.login = async (req, res, next) => {
       return res.status(403).json({ message: 'Account deactivated — contact your administrator' });
     }
 
-    // ── Device fingerprint check ────────────────────────────────────────
+    // ── Device fingerprint check + auto-registration ─────────────────────
     let deviceHash = null;
 
     if (deviceFingerprint) {
@@ -193,8 +193,45 @@ exports.login = async (req, res, next) => {
       // Check if this user has ANY registered devices
       const totalDevices = await RegisteredDevice.countDocuments({ admin: user._id, isActive: true });
 
-      if (totalDevices > 0) {
-        // User has registered devices — check if THIS device is one of them
+      if (totalDevices === 0) {
+        // First device — auto-register it
+        await RegisteredDevice.create({
+          admin: user._id,
+          deviceHash,
+          deviceName: deviceName || 'First Device',
+          lastSeenIp: req.ip,
+          lastSeenAt: new Date(),
+          userAgent: req.headers['user-agent'] || '',
+        });
+        console.log(`[DEVICE] Auto-registered first device for ${user.email}`);
+      } else if (totalDevices < RegisteredDevice.MAX_DEVICES) {
+        // User has fewer than MAX_DEVICES registered — check if this is already registered
+        const existingDevice = await RegisteredDevice.findOne({
+          admin: user._id,
+          deviceHash,
+          isActive: true,
+        });
+
+        if (existingDevice) {
+          // Device already registered — update last seen
+          existingDevice.lastSeenAt = new Date();
+          existingDevice.lastSeenIp = req.ip;
+          existingDevice.userAgent = req.headers['user-agent'] || '';
+          await existingDevice.save();
+        } else {
+          // New device — auto-register it (within limit)
+          await RegisteredDevice.create({
+            admin: user._id,
+            deviceHash,
+            deviceName: deviceName || `Device ${totalDevices + 1}`,
+            lastSeenIp: req.ip,
+            lastSeenAt: new Date(),
+            userAgent: req.headers['user-agent'] || '',
+          });
+          console.log(`[DEVICE] Auto-registered device ${totalDevices + 1}/${RegisteredDevice.MAX_DEVICES} for ${user.email}`);
+        }
+      } else {
+        // User has MAX_DEVICES registered — check if THIS device is one of them
         const device = await RegisteredDevice.findOne({
           admin: user._id,
           deviceHash,
@@ -203,7 +240,7 @@ exports.login = async (req, res, next) => {
 
         if (!device) {
           return res.status(403).json({
-            message: 'Device not authorized. Contact your Super Admin to register this device.',
+            message: `Device limit reached (${RegisteredDevice.MAX_DEVICES} max). Contact your Super Admin to register a new device.`,
             code: 'DEVICE_NOT_REGISTERED',
           });
         }
@@ -214,7 +251,6 @@ exports.login = async (req, res, next) => {
         device.userAgent = req.headers['user-agent'] || '';
         await device.save();
       }
-      // If totalDevices === 0, allow login without device registration (first-time setup)
     }
 
     // ── Kick existing sessions (enforce 1 concurrent session) ────────────

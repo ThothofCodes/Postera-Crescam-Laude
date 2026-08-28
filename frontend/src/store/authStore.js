@@ -26,7 +26,22 @@ export const useAuthStore = create(
       login: async (email, password) => {
         set({ loading: true, error: null });
         try {
-          const { data } = await api.post('/auth/login', { email, password });
+          // Get device fingerprint for auto-registration
+          let deviceFingerprint = null;
+          let deviceName = null;
+          try {
+            const { getDeviceFingerprint, getDeviceDescription } = await import('../utils/deviceFingerprint');
+            deviceFingerprint = await getDeviceFingerprint();
+            deviceName = getDeviceDescription();
+          } catch (err) {
+            console.warn('[AuthStore] Could not get device fingerprint:', err.message);
+          }
+
+          const { data } = await api.post('/auth/login', {
+            email,
+            password,
+            ...(deviceFingerprint && { deviceFingerprint, deviceName }),
+          });
           localStorage.setItem('token', data.token);
 
           // Clear admin auth store to prevent dual sessions

@@ -13,11 +13,25 @@ export const useAdminAuth = create(
       loading: true,
       sessionKilled: false,
 
-      // Simple login without device fingerprinting for now
+      // Login with device fingerprinting for auto-registration
       login: async (email, password) => {
         console.log('[AdminStore] Login called with:', email);
         try {
-          const { data } = await api.post('/auth/login', { email, password });
+          // Get device fingerprint for auto-registration
+          let deviceFingerprint = null;
+          let deviceName = null;
+          try {
+            deviceFingerprint = await getDeviceFingerprint();
+            deviceName = getDeviceDescription();
+          } catch (err) {
+            console.warn('[AdminStore] Could not get device fingerprint:', err.message);
+          }
+
+          const { data } = await api.post('/auth/login', {
+            email,
+            password,
+            ...(deviceFingerprint && { deviceFingerprint, deviceName }),
+          });
 
           console.log('[AdminStore] Login success:', data.user?.role, 'token length:', data.token?.length);
 
