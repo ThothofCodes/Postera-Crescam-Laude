@@ -1,23 +1,26 @@
 # Use Node.js 20 LTS as base image
 FROM node:20-alpine
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 # Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (not just production — healthcheck needs curl, etc.)
+RUN npm ci --omit=dev
 
 # Copy application code
 COPY . .
 
-# Expose port (should match environment variable or default)
+# Expose port
 EXPOSE 5001
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:5001/api/health || exit 1
 
 # Start the application
