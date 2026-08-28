@@ -1,6 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 import React, { useState } from 'react';
 import { useChat } from '../hooks/useChat';
+import { publicApi } from '../utils/api';
 import toast from 'react-hot-toast';
 
 const ChatToggle = () => {
@@ -22,27 +23,17 @@ const ChatToggle = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/chat/callback`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          clientName: customerName,
-          message: `Callback requested: ${contactType} - ${contact}`,
-          phone: contactType === 'phone' ? contact : undefined
-        })
+      await publicApi.post('/chat/callback', {
+        clientName: customerName,
+        message: `Callback requested: ${contactType} - ${contact}`,
+        phone: contactType === 'phone' ? contact : undefined
       });
 
-      if (response.ok) {
-        toast.success('Callback request submitted successfully!');
-        setCustomerName('');
-        setContact('');
-        setShowCallback(false);
-        setIsOpen(false);
-      } else {
-        toast.error('Failed to submit callback request');
-      }
+      toast.success('Callback request submitted successfully!');
+      setCustomerName('');
+      setContact('');
+      setShowCallback(false);
+      setIsOpen(false);
     } catch (error) {
       console.error('Error submitting callback request:', error);
       toast.error('Failed to submit callback request');

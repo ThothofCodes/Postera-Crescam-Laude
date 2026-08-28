@@ -1,0 +1,318 @@
+name: Staging Deployment
+
+# Triggers on push to develop or manual deployment
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - seed
+          - reset
+          - status
+
+# Only one staging deployment at a time
+concurrency:
+  group: staging-deployment
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20.x'
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+  STAGING_ENV: staging
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PRE-DEPLOYMENT CHECKS
+  # ═══════════════════════════════════════════════════════════════════════════
+  pre-check:
+    name: Pre-deployment checks
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate version tag
+        id: version
+        run: |
+          VERSION="staging-$(date +%Y%m%d)-${GITHUB_SHA::8}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Check if deployment needed
+        id: check
+        run: |
+          # Check if there are relevant changes
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
+          
+          if echo "$CHANGED_FILES" | grep -qE "^(backend/|frontend/|tech-hub/|deployment/)"; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+            echo "Deployment needed"
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+            echo "No deployment needed"
+          fi
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # BUILD & PUSH IMAGES
+  # ═══════════════════════════════════════════════════════════════════════════
+  build:
+    name: Build Docker images
+    needs: [pre-check]
+    if: needs.pre-check.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:${{ needs.pre-check.outputs.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ needs.pre-check.outputs.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            VITE_API_URL=${{ secrets.STAGING_API_URL }}
+
+      - name: Build and push tech-hub
+        uses: docker/build-push-action@v5
+        with:
+          context: ./tech-hub
+          file: ./tech-hub/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:${{ needs.pre-check.outputs.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DEPLOY TO STAGING
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy:
+    name: Deploy to staging
+    needs: [pre-check, build]
+    if: needs.pre-check.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to staging server
+        env:
+          VERSION: ${{ needs.pre-check.outputs.version }}
+          DEPLOY_HOST: ${{ secrets.STAGING_DEPLOY_HOST }}
+          DEPLOY_KEY: ${{ secrets.STAGING_DEPLOY_KEY }}
+        run: |
+          echo "Deploying version $VERSION to staging..."
+          
+          # SSH to staging server
+          ssh -o StrictHostKeyChecking=no -i "$DEPLOY_HOST" << 'EOF'
+            cd /opt/pcl-staging
+            
+            # Pull new images
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:$VERSION
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:$VERSION
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:$VERSION
+            
+            # Stop existing services
+            docker-compose -f docker-compose.staging.yml down
+            
+            # Update image tags
+            sed -i "s|image: .*backend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:$VERSION|" docker-compose.staging.yml
+            sed -i "s|image: .*frontend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:$VERSION|" docker-compose.staging.yml
+            sed -i "s|image: .*tech-hub:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:$VERSION|" docker-compose.staging.yml
+            
+            # Start services
+            docker-compose -f docker-compose.staging.yml up -d
+          EOF
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for staging services..."
+          
+          # Wait for backend
+          for i in {1..30}; do
+            if curl -sf "http://localhost:5010/api/health" > /dev/null 2>&1; then
+              echo "Backend is healthy"
+              break
+            fi
+            echo "Waiting for backend... ($i/30)"
+            sleep 2
+          done
+          
+          # Wait for frontend
+          for i in {1..30}; do
+            if curl -sf "http://localhost:3010" > /dev/null 2>&1; then
+              echo "Frontend is healthy"
+              break
+            fi
+            echo "Waiting for frontend... ($i/30)"
+            sleep 2
+          done
+
+      - name: Run database migrations
+        run: |
+          echo "Running database migrations..."
+          
+          ssh -o StrictHostKeyChecking=no -i "${{ secrets.STAGING_DEPLOY_KEY }}" << 'EOF'
+            cd /opt/pcl-staging/backend
+            node migrations/migrate.js up
+          EOF
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying staging deployment..."
+          
+          # Check backend health
+          HEALTH=$(curl -sf "http://localhost:5010/api/health" || echo '{"status":"error"}')
+          STATUS=$(echo $HEALTH | jq -r '.status')
+          
+          if [ "$STATUS" = "ok" ]; then
+            echo "✅ Backend health check passed"
+          else
+            echo "❌ Backend health check failed"
+            exit 1
+          fi
+          
+          # Check frontend
+          if curl -sf "http://localhost:3010" > /dev/null 2>&1; then
+            echo "✅ Frontend is accessible"
+          else
+            echo "❌ Frontend is not accessible"
+            exit 1
+          fi
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DATABASE OPERATIONS
+  # ═══════════════════════════════════════════════════════════════════════════
+  seed:
+    name: Seed staging database
+    needs: [pre-check]
+    if: github.event.inputs.action == 'seed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Seed database
+        run: |
+          echo "Seeding staging database..."
+          
+          ssh -o StrictHostKeyChecking=no -i "${{ secrets.STAGING_DEPLOY_KEY }}" << 'EOF'
+            cd /opt/pcl-staging/backend
+            node seeds/seed-dev.js
+          EOF
+
+  reset:
+    name: Reset staging database
+    needs: [pre-check]
+    if: github.event.inputs.action == 'reset'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reset database
+        run: |
+          echo "Resetting staging database..."
+          
+          ssh -o StrictHostKeyChecking=no -i "${{ secrets.STAGING_DEPLOY_KEY }}" << 'EOF'
+            cd /opt/pcl-staging
+            ./deploy-staging.sh reset
+          EOF
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STATUS CHECK
+  # ═══════════════════════════════════════════════════════════════════════════
+  status:
+    name: Check staging status
+    needs: [pre-check]
+    if: github.event.inputs.action == 'status'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check staging status
+        run: |
+          echo "Checking staging environment status..."
+          
+          ssh -o StrictHostKeyChecking=no -i "${{ secrets.STAGING_DEPLOY_KEY }}" << 'EOF'
+            cd /opt/pcl-staging
+            ./deploy-staging.sh status
+          EOF
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # POST-DEPLOYMENT
+  # ═══════════════════════════════════════════════════════════════════════════
+  post-deploy:
+    name: Post-deployment tasks
+    needs: [pre-check, deploy]
+    if: needs.pre-check.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create deployment record
+        run: |
+          echo "## Staging Deployment Complete 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | ${{ needs.pre-check.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | Staging |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployed By | @${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Access URLs" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Frontend: http://localhost:3010" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend API: http://localhost:5010/api/health" >> $GITHUB_STEP_SUMMARY
+          echo "- Tech Hub: http://localhost:4330" >> $GITHUB_STEP_SUMMARY
+          echo "- Grafana: http://localhost:3002" >> $GITHUB_STEP_SUMMARY
+          echo "- Prometheus: http://localhost:9090" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify deployment
+        if: success()
+        run: |
+          echo "Staging deployment successful!"
+          # Add Slack/Discord notification here if needed
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "Staging deployment failed!"
+          # Add Slack/Discord notification here if needed

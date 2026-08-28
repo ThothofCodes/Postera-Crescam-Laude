@@ -125,11 +125,52 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
 
   # ═══════════════════════════════════════════════════════════════════════════
+  # TECH HUB DEPLOYMENT
+  # ═══════════════════════════════════════════════════════════════════════════
+  deploy-tech-hub:
+    name: Deploy Tech Hub
+    needs: [verify-ci]
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: tech-hub
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: tech-hub/package-lock.json
+
+      - run: npm ci
+
+      - name: Build static site
+        run: npm run build
+        env:
+          PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          PUBLIC_SANITY_DATASET: ${{ secrets.SANITY_DATASET || 'production' }}
+
+      # ── Netlify ──
+      - name: Deploy to Netlify
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_TECH_HUB_SITE_ID != '' }}
+        uses: nwtgck/actions-netlify@v3
+        with:
+          publish-dir: ./dist
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Tech Hub deploy from ${{ github.sha }}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_TECH_HUB_SITE_ID }}
+
+  # ═══════════════════════════════════════════════════════════════════════════
   # DOCKER (optional — for self-hosted or Kubernetes deployments)
   # ═══════════════════════════════════════════════════════════════════════════
   docker-build:
     name: Build & push Docker images
-    needs: [deploy-backend, deploy-frontend]
+    needs: [deploy-backend, deploy-frontend, deploy-tech-hub]
     if: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
     runs-on: ubuntu-latest
     steps:
@@ -165,6 +206,18 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/ruaitech-frontend:${{ github.sha }}
             ${{ secrets.DOCKERHUB_USERNAME }}/ruaitech-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push tech-hub image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./tech-hub
+          file: ./tech-hub/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/pcl-tech-hub:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/pcl-tech-hub:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

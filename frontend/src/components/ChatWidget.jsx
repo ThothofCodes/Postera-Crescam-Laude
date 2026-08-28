@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '../hooks/useChat';
+import { publicApi } from '../utils/api';
 
 const ChatWidget = ({ isAdmin = false, authToken = null }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,14 +47,19 @@ const ChatWidget = ({ isAdmin = false, authToken = null }) => {
   const handleRequestCallback = async () => {
     if (!customerName.trim() || !contact.trim()) { alert('Please fill in all required fields'); return; }
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/chat/callback`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientName: customerName, message: `Callback requested: ${contactType} - ${contact}`, phone: contactType === 'phone' ? contact : undefined })
+      await publicApi.post('/chat/callback', {
+        clientName: customerName,
+        message: `Callback requested: ${contactType} - ${contact}`,
+        phone: contactType === 'phone' ? contact : undefined
       });
-      if (response.ok) { alert('Callback request submitted successfully.'); setShowCallbackForm(false); setCustomerName(''); setContact(''); }
-      else { alert('Failed to submit callback request.'); }
-    } catch (error) { console.error('Error:', error); alert('Failed to submit callback request.'); }
+      alert('Callback request submitted successfully.');
+      setShowCallbackForm(false);
+      setCustomerName('');
+      setContact('');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to submit callback request.');
+    }
   };
 
   if (isAdmin) return <div style={{ display: 'none' }}>Admin view not handled here</div>;

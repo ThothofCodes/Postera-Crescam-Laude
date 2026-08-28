@@ -259,6 +259,9 @@ app.use('/api/email', require('./routes/email'));
 app.use('/api/ussd', require('./routes/ussd'));
 app.use('/api/devices', require('./routes/devices'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/deployment', require('./routes/deployment'));
+app.use('/api/db-health', require('./routes/dbHealth'));
+app.use('/api/connection-pool', require('./routes/connectionPool'));
 
 // ── 10a. Swagger API docs ──────────────────────────────────────────────────
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

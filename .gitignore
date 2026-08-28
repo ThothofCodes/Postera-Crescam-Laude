@@ -8,3 +8,22 @@ node_modules/
 *.key
 keys/
 coverage/
+
+# Build artifacts
+frontend/dist/
+tech-hub/dist/
+
+# Deployment artifacts
+*.tar.gz
+*.zip
+
+# OS files
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Temp files
+.tmp/
+.temp/

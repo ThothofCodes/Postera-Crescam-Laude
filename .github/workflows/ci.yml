@@ -182,6 +182,35 @@ jobs:
         # Fails the job if high/critical vulns are found
 
   # ═══════════════════════════════════════════════════════════════════════════
+  # TECH HUB
+  # ═══════════════════════════════════════════════════════════════════════════
+  tech-hub-build:
+    name: Tech Hub — build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tech-hub
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: tech-hub/package-lock.json
+      - run: npm ci
+      - name: Build static site
+        run: npm run build
+        env:
+          PUBLIC_SANITY_PROJECT_ID: placeholder
+          PUBLIC_SANITY_DATASET: production
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tech-hub-dist
+          path: tech-hub/dist/
+          retention-days: 7
+
+  # ═══════════════════════════════════════════════════════════════════════════
   # E2E TESTS (Cypress)
   # ═══════════════════════════════════════════════════════════════════════════
   e2e-test:
@@ -204,14 +233,21 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      - name: Seed database
+      - name: Run database migrations
         working-directory: backend
-        run: node seed.js
+        run: node migrations/migrate.js up
         env:
           MONGO_URI: mongodb://localhost:27017/ruaitech_ci
           JWT_SECRET: ci-test-secret-not-for-production
           NODE_ENV: test
-        continue-on-error: true  # seed may fail if already seeded
+
+      - name: Seed test database
+        working-directory: backend
+        run: node seeds/seed-test.js
+        env:
+          MONGO_URI: mongodb://localhost:27017/ruaitech_ci
+          JWT_SECRET: ci-test-secret-not-for-production
+          NODE_ENV: test
 
       - name: Start backend server
         working-directory: backend
@@ -311,7 +347,7 @@ jobs:
     name: CI gate — all checks passed
     runs-on: ubuntu-latest
     if: always()
-    needs: [backend-test, backend-audit, frontend-test, frontend-build, frontend-audit, e2e-test, security-scan]
+    needs: [backend-test, backend-audit, frontend-test, frontend-build, frontend-audit, tech-hub-build, e2e-test, security-scan]
     steps:
       - name: Check all required jobs passed
         run: |

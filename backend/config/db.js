@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const mongoose = require('mongoose');
+const ConnectionPoolManager = require('../utils/connectionPool');
 
 const connectDB = async () => {
   const uri = process.env.MONGO_URI;
@@ -18,9 +19,20 @@ const connectDB = async () => {
   }
 
   try {
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     mongoose.set('bufferCommands', false); // fail fast instead of buffering
-    const conn = await mongoose.connect(uri, { serverSelectionTimeoutMS: 8000 });
-    console.log(`✅  MongoDB connected: ${conn.connection.host}`);
+    
+    // Use optimized connection pooling
+    await ConnectionPoolManager.connect({
+      mongoUri: uri,
+      isProduction,
+    });
+    
+    // Warm up connection pool
+    await ConnectionPoolManager.warmUpPool();
+    
+    console.log(`✅  MongoDB connected with optimized pooling: ${mongoose.connection.host}`);
   } catch (err) {
     console.error(`❌  MongoDB connection failed: ${err.message}`);
     console.error('    Check your MONGO_URI in backend/.env and ensure your IP is whitelisted in Atlas.\n');

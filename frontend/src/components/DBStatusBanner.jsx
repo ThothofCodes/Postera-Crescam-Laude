@@ -1,22 +1,32 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 // PCL — Circuit Canopy DBStatusBanner
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 import useSocket from '../hooks/useSocket';
 
+// Pages that don't need the DB banner (static content / no backend calls)
+const STATIC_PATHS = ['/tech-hub', '/tech-insights', '/store', '/calculator', '/consult', '/services', '/contact', '/help'];
+
 export default function DBStatusBanner() {
   const [status, setStatus] = useState(null);
+  const { pathname } = useLocation();
+
+  // Hide banner on static content pages
+  const isStaticPage = STATIC_PATHS.some(p => pathname === p || pathname.startsWith(p + '/'));
 
   useEffect(() => {
+    if (isStaticPage) return; // Don't fetch health on static pages
     api.get('/health')
       .then(({ data }) => setStatus(data.status))
       .catch(() => setStatus('degraded'));
-  }, []);
+  }, [isStaticPage]);
 
   useSocket({
     'system:status': ({ status: s }) => { setStatus(s === 'ok' ? 'ok' : 'degraded'); },
     connect: () => setStatus('ok'),
     disconnect: () => {
+      if (isStaticPage) return;
       setTimeout(() => {
         api.get('/health')
           .then(({ data }) => setStatus(data.status))
@@ -25,7 +35,8 @@ export default function DBStatusBanner() {
     },
   });
 
-  if (status === 'ok' || status === null) return null;
+  // Don't show banner on static pages or when status is ok/null
+  if (isStaticPage || status === 'ok' || status === null) return null;
 
   return (
     <div style={{
