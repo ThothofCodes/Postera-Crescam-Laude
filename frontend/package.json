@@ -40,6 +40,7 @@
     "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-istanbul": "^4.1.11",
     "@vitest/ui": "^4.1.9",
     "cypress": "^15.21.0",
     "eslint": "^9.18.0",

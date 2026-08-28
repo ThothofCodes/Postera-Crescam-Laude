@@ -25,6 +25,10 @@ concurrency:
   group: deployment-${{ github.ref }}
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   NODE_VERSION: '20.x'
 
