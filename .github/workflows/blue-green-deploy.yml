@@ -30,7 +30,7 @@ permissions:
   packages: write
 
 env:
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '22.x'
 
 jobs:
   # ═══════════════════════════════════════════════════════════════════════════
@@ -43,6 +43,7 @@ jobs:
       target_env: ${{ steps.detect.outputs.target_env }}
       current_env: ${{ steps.detect.outputs.current_env }}
       version: ${{ steps.version.outputs.version }}
+      repo_lower: ${{ steps.repo.outputs.repo_lower }}
       has_deploy_secrets: ${{ steps.secrets.outputs.has_secrets }}
     steps:
       - uses: actions/checkout@v4
@@ -89,6 +90,9 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
+      - name: Lowercase repository name
+        id: repo
+        run: echo "repo_lower=$(echo "${{ github.repository }}" | tr [:upper:] [:lower:])" >> $GITHUB_OUTPUT
   # ═══════════════════════════════════════════════════════════════════════════
   # BUILD & PUSH IMAGES (always runs)
   # ═══════════════════════════════════════════════════════════════════════════
@@ -116,8 +120,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/backend:${{ needs.pre-check.outputs.version }}
-            ghcr.io/${{ github.repository }}/backend:latest
+            ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/backend:${{ needs.pre-check.outputs.version }}
+            ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -128,8 +132,8 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/frontend:${{ needs.pre-check.outputs.version }}
-            ghcr.io/${{ github.repository }}/frontend:latest
+            ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/frontend:${{ needs.pre-check.outputs.version }}
+            ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -142,8 +146,8 @@ jobs:
           file: ./tech-hub/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/tech-hub:${{ needs.pre-check.outputs.version }}
-            ghcr.io/${{ github.repository }}/tech-hub:latest
+            ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/tech-hub:${{ needs.pre-check.outputs.version }}
+            ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/tech-hub:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -172,9 +176,9 @@ jobs:
             cd /opt/pcl
             
             # Pull new images
-            docker pull ghcr.io/${{ github.repository }}/backend:$VERSION
-            docker pull ghcr.io/${{ github.repository }}/frontend:$VERSION
-            docker pull ghcr.io/${{ github.repository }}/tech-hub:$VERSION
+            docker pull ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/backend:$VERSION
+            docker pull ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/frontend:$VERSION
+            docker pull ghcr.io/${{ needs.pre-check.outputs.repo_lower }}/tech-hub:$VERSION
             
             # Stop existing services in target environment
             docker-compose -f docker-compose.$TARGET_ENV.yml down || true

@@ -25,9 +25,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '22.x'
   DOCKER_REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository }}
+  IMAGE_PREFIX: ${{ github.repository_owner }}/${{ github.event.repository.name }}
   STAGING_ENV: staging
 
 jobs:
@@ -40,6 +40,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       should_deploy: ${{ steps.check.outputs.should_deploy }}
+      repo_lower: ${{ steps.repo.outputs.repo_lower }}
     steps:
       - uses: actions/checkout@v4
 
@@ -92,8 +93,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:${{ needs.pre-check.outputs.version }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:staging
+            ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/backend:${{ needs.pre-check.outputs.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/backend:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -104,8 +105,8 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:${{ needs.pre-check.outputs.version }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:staging
+            ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/frontend:${{ needs.pre-check.outputs.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/frontend:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -118,8 +119,8 @@ jobs:
           file: ./tech-hub/Dockerfile
           push: true
           tags: |
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:${{ needs.pre-check.outputs.version }}
-            ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:staging
+            ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/tech-hub:${{ needs.pre-check.outputs.version }}
+            ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/tech-hub:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -148,17 +149,17 @@ jobs:
             cd /opt/pcl-staging
             
             # Pull new images
-            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:$VERSION
-            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:$VERSION
-            docker pull ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:$VERSION
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/backend:$VERSION
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/frontend:$VERSION
+            docker pull ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/tech-hub:$VERSION
             
             # Stop existing services
             docker-compose -f docker-compose.staging.yml down
             
             # Update image tags
-            sed -i "s|image: .*backend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/backend:$VERSION|" docker-compose.staging.yml
-            sed -i "s|image: .*frontend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/frontend:$VERSION|" docker-compose.staging.yml
-            sed -i "s|image: .*tech-hub:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_PREFIX }}/tech-hub:$VERSION|" docker-compose.staging.yml
+            sed -i "s|image: .*backend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/backend:$VERSION|" docker-compose.staging.yml
+            sed -i "s|image: .*frontend:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/frontend:$VERSION|" docker-compose.staging.yml
+            sed -i "s|image: .*tech-hub:.*|image: ${{ env.DOCKER_REGISTRY }}/${{ needs.pre-check.outputs.repo_lower }}/tech-hub:$VERSION|" docker-compose.staging.yml
             
             # Start services
             docker-compose -f docker-compose.staging.yml up -d

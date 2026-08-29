@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: false  # don't cancel mid-deploy — let it finish
 
 env:
-  NODE_VERSION: '20.x'
+  NODE_VERSION: '22.x'
 
 jobs:
   # ═══════════════════════════════════════════════════════════════════════════
