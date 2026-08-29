@@ -11,14 +11,18 @@ const AdminPrivateRoute = ({ children }) => {
     return <div>Loading...</div>;
   }
 
-  // Allow access if user is authenticated with any admin role
-  if (user && ADMIN_ROLES.includes(user.role)) {
-    return children;
-  }
-
   // Redirect to login if not authenticated
   if (!user) {
     return <Navigate to="/admin/login" replace />;
+  }
+
+  // Allow access if user is authenticated with any admin role
+  if (ADMIN_ROLES.includes(user.role)) {
+    // Force password change on first login
+    if (user.mustChangePassword) {
+      return <Navigate to="/admin/force-password-change" replace />;
+    }
+    return children;
   }
 
   // Access denied for non-admin users

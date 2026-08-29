@@ -275,24 +275,18 @@ exports.login = async (req, res, next) => {
       });
 
       user.lastLogin = new Date();
-      await user.save({ validateBeforeSave: false });
+      await user.save({ validateBeforeSave: false });    return res.json({
+      token: signToken(user, jti),
+      user: {
+        id: user._id, name: user.name, email: user.email, role: user.role, department: user.department,
+        departmentSlug: user.departmentSlug, isOwner: user.isOwner,
+      },
+      session: { jti, expiresAt },
+      mustChangePassword: user.mustChangePassword || false,
+    });
+  }
 
-      return res.json({
-        token: signToken(user, jti),
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          department: user.department,
-          departmentSlug: user.departmentSlug,
-          isOwner: user.isOwner,
-        },
-        session: { jti, expiresAt },
-      });
-    }
-
-    // ── Fallback: no device fingerprint (backward compatible) ─────────────
+  // ── Fallback: no device fingerprint (backward compatible) ─────────────
     // Also kick old sessions and create a new one (same as device path)
     await ActiveSession.deleteMany({ admin: user._id });
 
@@ -310,20 +304,53 @@ exports.login = async (req, res, next) => {
     });
 
     user.lastLogin = new Date();
-    await user.save({ validateBeforeSave: false });
-
-    res.json({
+    await user.save({ validateBeforeSave: false });    res.json({
       token: signToken(user, jti),
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        department: user.department,
-        departmentSlug: user.departmentSlug,
-        isOwner: user.isOwner,
+        id: user._id, name: user.name, email: user.email, role: user.role, department: user.department,
+        departmentSlug: user.departmentSlug, isOwner: user.isOwner,
       },
+      mustChangePassword: user.mustChangePassword || false,
     });
+  } catch (err) { next(err); }
+};
+
+// ── Forced password change (first login) ──────────────────────────────
+exports.changeFirstPassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (!user.mustChangePassword) {
+      return res.status(400).json({ message: 'Password change not required' });
+    }
+
+    // Verify current (temporary) password
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    // Validate new password
+    if (!newPassword || newPassword.length < 8) {
+      return res.status(400).json({ message: 'New password must be at least 8 characters' });
+    }
+
+    if (newPassword === currentPassword) {
+      return res.status(400).json({ message: 'New password must be different from the temporary password' });
+    }
+
+    // Update password and clear flag
+    user.password = newPassword;
+    user.mustChangePassword = false;
+    user.temporaryPassword = undefined;
+    await user.save();
+
+    res.json({ message: 'Password changed successfully. You can now access the admin panel.' });
   } catch (err) { next(err); }
 };
 

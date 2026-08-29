@@ -24,6 +24,8 @@ const UserSchema = new mongoose.Schema({
   isEmailVerified: { type: Boolean, default: false }, // Track if email is verified
   passwordResetToken: { type: String, default: null }, // For password reset/initial setup
   tokenExpiry: { type: Date, default: null }, // Token expiry for password reset
+  mustChangePassword: { type: Boolean, default: false }, // Forces password change on first login
+  temporaryPassword: { type: String, default: null, select: false }, // Stores the initial password for display
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {

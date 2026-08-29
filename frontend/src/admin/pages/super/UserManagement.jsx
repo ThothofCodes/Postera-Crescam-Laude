@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 const ROLES = ['DEPT_HEAD_OWNER', 'STAFF'];
 const DEPTS = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
-const EMPTY = { name:'', email:'', password:'', role:'STAFF', departmentSlug:'', isOwner:false };
+const EMPTY = { name:'', email:'', password:'', role:'STAFF', departmentSlug:'', isOwner:false, mustChangePassword:false };
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -17,6 +17,7 @@ export default function UserManagement() {
   const [saving, setSaving] = useState(false);
   const [pwModal, setPwModal] = useState(null);
   const [newPw, setNewPw] = useState('');
+  const [createdUser, setCreatedUser] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -30,8 +31,14 @@ export default function UserManagement() {
   const save = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      if (modal === 'create') { await api.post('/users', form); toast.success('User created'); }
-      else { await api.put(`/users/${modal._id}`, form); toast.success('Updated'); }
+      if (modal === 'create') {
+        const { data } = await api.post('/users', form);
+        setCreatedUser({ ...data, tempPassword: form.password });
+        toast.success('User created');
+      } else {
+        await api.put(`/users/${modal._id}`, form);
+        toast.success('Updated');
+      }
       setModal(null); load();
     } catch (err) { toast.error(err.response?.data?.message || 'Error'); }
     setSaving(false);
@@ -40,8 +47,13 @@ export default function UserManagement() {
   const resetPw = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      await api.post(`/users/${pwModal._id}/reset-password`, { password: newPw });
-      toast.success('Password reset'); setPwModal(null); setNewPw('');
+      const { data } = await api.post(`/users/${pwModal._id}/reset-password`, { 
+        password: newPw,
+        mustChangePassword: pwModal.mustChangePassword 
+      });
+      toast.success(data.message || 'Password reset'); 
+      setPwModal(null); setNewPw('');
+      load(); // Reload to show updated status
     } catch (err) { toast.error(err.response?.data?.message || 'Error'); }
     setSaving(false);
   };
@@ -69,7 +81,10 @@ export default function UserManagement() {
                 <tr key={u._id} style={{ borderBottom: '1px solid rgba(26,58,92,0.4)', opacity: u.isActive ? 1 : 0.4 }}>
                   <td style={td}><span style={{ fontWeight: 700, color: '#F4F1EA' }}>{u.name}</span></td>
                   <td style={td}>{u.email}</td>
-                  <td style={td}><span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 3, background: 'rgba(238,97,0,0.08)', border: '1px solid rgba(238,97,0,0.2)', color: '#EE6100', fontWeight: 700, letterSpacing: '0.08em' }}>{u.role}</span></td>
+                  <td style={td}>
+                    <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 3, background: 'rgba(238,97,0,0.08)', border: '1px solid rgba(238,97,0,0.2)', color: '#EE6100', fontWeight: 700, letterSpacing: '0.08em' }}>{u.role}</span>
+                    {u.mustChangePassword && <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 3, background: 'rgba(255,215,0,0.15)', border: '1px solid rgba(255,215,0,0.3)', color: '#ffd700', fontWeight: 700, marginLeft: 4 }}>TEMP PW</span>}
+                  </td>
                   <td style={td}>{u.departmentSlug || '—'}</td>
                   <td style={td}>{u.isOwner ? '✅' : '—'}</td>
                   <td style={td}>{u.isActive ? '✅' : '❌'}</td>
@@ -98,7 +113,13 @@ export default function UserManagement() {
             <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div><label style={lbl}>Name</label><input value={form.name} onChange={(e) => setForm({...form,name:e.target.value})} required style={inp} /></div>
               <div><label style={lbl}>Email</label><input type="email" value={form.email} onChange={(e) => setForm({...form,email:e.target.value})} required={modal==='create'} disabled={modal!=='create'} style={{...inp,opacity:modal!=='create'?0.5:1}} /></div>
-              {modal === 'create' && <div><label style={lbl}>Password</label><input type="password" value={form.password} onChange={(e) => setForm({...form,password:e.target.value})} required minLength={6} style={inp} /></div>}
+              {modal === 'create' && <>
+                <div><label style={lbl}>Password</label><input type="password" value={form.password} onChange={(e) => setForm({...form,password:e.target.value})} required minLength={6} style={inp} /></div>
+                <label style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:12, color:'#A9C4BE' }}>
+                  <input type="checkbox" checked={form.mustChangePassword} onChange={(e) => setForm({...form,mustChangePassword:e.target.checked})} />
+                  Require password change on first login
+                </label>
+              </>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div><label style={lbl}>Role</label>
                   <select value={form.role} onChange={(e) => setForm({...form,role:e.target.value})} style={inp}>
@@ -116,6 +137,12 @@ export default function UserManagement() {
                 <input type="checkbox" checked={form.isOwner} onChange={(e) => setForm({...form,isOwner:e.target.checked})} />
                 Department Co-Owner (DEPT_HEAD_OWNER)
               </label>
+              {modal === 'create' && (
+                <label style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:12, color:'#ffd700' }}>
+                  <input type="checkbox" checked={form.mustChangePassword} onChange={(e) => setForm({...form,mustChangePassword:e.target.checked})} />
+                  Force password change on first login
+                </label>
+              )}
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setModal(null)} style={btn('#6A8A82')}>Cancel</button>
                 <button type="submit" disabled={saving} style={btn('#EE6100')}>{saving ? 'Saving...' : 'Save'}</button>
@@ -131,11 +158,51 @@ export default function UserManagement() {
             <h3 style={{ margin: '0 0 1rem', color: '#ffd700' }}>Reset Password — {pwModal.name}</h3>
             <form onSubmit={resetPw} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div><label style={lbl}>New Password</label><input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} required minLength={6} style={inp} /></div>
+              <label style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:12, color:'#ffd700' }}>
+                <input type="checkbox" checked={pwModal.mustChangePassword || false} onChange={(e) => setPwModal({...pwModal, mustChangePassword: e.target.checked})} />
+                Force password change on next login
+              </label>
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setPwModal(null)} style={btn('#6A8A82')}>Cancel</button>
                 <button type="submit" disabled={saving} style={btn('#ffd700')}>{saving ? 'Resetting...' : 'Reset'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {createdUser && (
+        <div style={overlay}>
+          <div style={{ ...box, maxWidth: 480 }}>
+            <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <span style={{ fontSize: 48 }}>✅</span>
+              <h3 style={{ margin: '0.5rem 0', color: '#00ff88' }}>User Created Successfully!</h3>
+            </div>
+            
+            <div style={{ background: 'rgba(0, 255, 136, 0.05)', border: '1px solid rgba(0, 255, 136, 0.2)', borderRadius: 6, padding: '1rem', marginBottom: '1rem' }}>
+              <p style={{ margin: '0 0 0.5rem', fontSize: 12, color: '#A9C4BE' }}><strong>Name:</strong> {createdUser.name}</p>
+              <p style={{ margin: '0 0 0.5rem', fontSize: 12, color: '#A9C4BE' }}><strong>Email:</strong> {createdUser.email}</p>
+              <p style={{ margin: '0 0 0.5rem', fontSize: 12, color: '#A9C4BE' }}><strong>Role:</strong> {createdUser.role}</p>
+              
+              {createdUser.mustChangePassword && (
+                <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', borderRadius: 4 }}>
+                  <p style={{ margin: '0 0 0.5rem', fontSize: 11, color: '#ffd700', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    🔐 Temporary Password
+                  </p>
+                  <p style={{ margin: 0, fontSize: 16, fontFamily: 'monospace', color: '#F4F1EA', background: 'rgba(0,0,0,0.3)', padding: '0.5rem', borderRadius: 4, wordBreak: 'break-all' }}>
+                    {createdUser.tempPassword}
+                  </p>
+                  <p style={{ margin: '0.5rem 0 0', fontSize: 11, color: '#A9C4BE' }}>
+                    User must change this password on first login.
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <button onClick={() => { navigator.clipboard.writeText(createdUser.tempPassword || ''); toast.success('Password copied!'); }} style={btn('#00ff88')}>📋 Copy Password</button>
+              <button onClick={() => setCreatedUser(null)} style={btn('#EE6100')}>Close</button>
+            </div>
           </div>
         </div>
       )}

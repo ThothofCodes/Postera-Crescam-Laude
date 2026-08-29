@@ -137,6 +137,25 @@ exports.authorize = (...roles) => {
   };
 };
 
+// ── Must change password guard ────────────────────────────────────────
+// Blocks access to all endpoints except password change and logout
+exports.mustChangePasswordGuard = (req, res, next) => {
+  if (req.user?.mustChangePassword) {
+    // Allow only password change and logout endpoints
+    const allowedPaths = ['/auth/change-first-password', '/auth/logout'];
+    const isAllowed = allowedPaths.some(p => req.path.includes(p));
+    
+    if (!isAllowed) {
+      return res.status(403).json({
+        message: 'You must change your password before accessing this resource.',
+        code: 'MUST_CHANGE_PASSWORD',
+        mustChangePassword: true,
+      });
+    }
+  }
+  next();
+};
+
 // ── Legacy aliases ───────────────────────────────────────────────────
 exports.admin = exports.superAdminGuard;
 exports.staff = exports.staffGuard;

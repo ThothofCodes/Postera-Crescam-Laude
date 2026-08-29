@@ -76,6 +76,7 @@ const MessagesPage = React.lazy(() => import('./admin/pages/shared/MessagesPage'
 const StaffInvitation = React.lazy(() => import('./admin/pages/shared/StaffInvitation'));
 const CRMPage = React.lazy(() => import('./admin/pages/shared/CRMPage'));
 const BillingPage = React.lazy(() => import('./admin/pages/shared/BillingPage'));
+const ForcePasswordChange = React.lazy(() => import('./admin/pages/ForcePasswordChange'));
 const InternetLanding = React.lazy(() => import('./admin/pages/internet/Landing'));
 const ISPClients = React.lazy(() => import('./admin/pages/internet/Clients'));
 const WebDevLanding = React.lazy(() => import('./admin/pages/webdev/Landing'));
@@ -185,6 +186,7 @@ export default function App() {
                 {/* ── Admin entry ── */}
                 <Route path="/admin/login" element={<Login />} />
                 <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
+                <Route path="/admin/force-password-change" element={<React.Suspense fallback={<Spinner />}><ForcePasswordChange /></React.Suspense>} />
 
                 {/* ── Legacy admin routes (AdminLayout handles auth for all admin roles) ── */}
                 <Route element={<AdminLayout />}>

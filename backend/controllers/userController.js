@@ -29,7 +29,7 @@ exports.getUsers = async (req, res, next) => {
 exports.createUser = async (req, res, next) => {
   try {
     const {
-      name, email, password, role, departmentSlug, isOwner,
+      name, email, password, role, departmentSlug, isOwner, mustChangePassword,
     } = req.body;
 
     // Block SUPER_ADMIN creation entirely
@@ -57,6 +57,8 @@ exports.createUser = async (req, res, next) => {
     }
 
     const finalRole = isDeptHead(req.user) ? 'STAFF' : (role || 'STAFF');
+    
+    // Create user with temporary password if mustChangePassword is true
     const user = await User.create({
       name,
       email,
@@ -65,6 +67,8 @@ exports.createUser = async (req, res, next) => {
       department,
       departmentSlug: targetSlug,
       isOwner: isSuperAdmin(req.user) ? (isOwner || false) : false,
+      mustChangePassword: mustChangePassword || false,
+      temporaryPassword: mustChangePassword ? password : null,
     });
 
     res.status(201).json({
@@ -73,6 +77,7 @@ exports.createUser = async (req, res, next) => {
       email,
       role: user.role,
       departmentSlug: user.departmentSlug,
+      mustChangePassword: user.mustChangePassword,
     });
   } catch (err) { next(err); }
 };
@@ -120,7 +125,7 @@ exports.updateUser = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select('+temporaryPassword');
     if (!user) return res.status(404).json({ message: 'User not found' });
     if (user.superAdminLocked) return res.status(403).json({ message: 'Cannot reset Super Admin password via API' });
 
@@ -131,9 +136,20 @@ exports.resetPassword = async (req, res, next) => {
       }
     }
 
-    user.password = req.body.password;
+    const { password, mustChangePassword } = req.body;
+    user.password = password;
+    
+    // If mustChangePassword is true, set the temporary password for display
+    if (mustChangePassword) {
+      user.mustChangePassword = true;
+      user.temporaryPassword = password;
+    } else {
+      user.mustChangePassword = false;
+      user.temporaryPassword = undefined;
+    }
+    
     await user.save();
-    res.json({ message: 'Password reset successfully' });
+    res.json({ message: 'Password reset successfully', mustChangePassword: user.mustChangePassword });
   } catch (err) { next(err); }
 };
 

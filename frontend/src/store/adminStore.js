@@ -44,7 +44,7 @@ export const useAdminAuth = create(
           if (data.token) localStorage.setItem('adminToken', data.token);
 
           set({
-            user: data.user,
+            user: { ...data.user, mustChangePassword: data.mustChangePassword || false },
             adminToken: data.token,
             sessionKilled: false,
           });
