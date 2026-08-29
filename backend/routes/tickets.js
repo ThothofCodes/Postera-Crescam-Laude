@@ -47,7 +47,7 @@ router.post('/:id/notify', async (req, res) => {
     if (!phone && ticket.thread?.length) {
       const contactEntry = ticket.thread.find((t) => t.authorRole === 'CLIENT');
       if (contactEntry?.message) {
-        const phoneMatch = contactEntry.message.match(/\+?\d{10,15}/);
+        const [phoneMatch] = contactEntry.message.match(/\+?\d{10,15}/);
         if (phoneMatch) phone = phoneMatch[0];
       }
     }

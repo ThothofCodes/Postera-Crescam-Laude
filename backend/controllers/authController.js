@@ -275,18 +275,23 @@ exports.login = async (req, res, next) => {
       });
 
       user.lastLogin = new Date();
-      await user.save({ validateBeforeSave: false });    return res.json({
-      token: signToken(user, jti),
-      user: {
-        id: user._id, name: user.name, email: user.email, role: user.role, department: user.department,
-        departmentSlug: user.departmentSlug, isOwner: user.isOwner,
-      },
-      session: { jti, expiresAt },
-      mustChangePassword: user.mustChangePassword || false,
-    });
-  }
+      await user.save({ validateBeforeSave: false }); return res.json({
+        token: signToken(user, jti),
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          department: user.department,
+          departmentSlug: user.departmentSlug,
+          isOwner: user.isOwner,
+        },
+        session: { jti, expiresAt },
+        mustChangePassword: user.mustChangePassword || false,
+      });
+    }
 
-  // ── Fallback: no device fingerprint (backward compatible) ─────────────
+    // ── Fallback: no device fingerprint (backward compatible) ─────────────
     // Also kick old sessions and create a new one (same as device path)
     await ActiveSession.deleteMany({ admin: user._id });
 
@@ -304,11 +309,16 @@ exports.login = async (req, res, next) => {
     });
 
     user.lastLogin = new Date();
-    await user.save({ validateBeforeSave: false });    res.json({
+    await user.save({ validateBeforeSave: false }); res.json({
       token: signToken(user, jti),
       user: {
-        id: user._id, name: user.name, email: user.email, role: user.role, department: user.department,
-        departmentSlug: user.departmentSlug, isOwner: user.isOwner,
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        departmentSlug: user.departmentSlug,
+        isOwner: user.isOwner,
       },
       mustChangePassword: user.mustChangePassword || false,
     });

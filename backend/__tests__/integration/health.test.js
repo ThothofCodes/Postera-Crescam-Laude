@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 // Integration tests for /api/health and /api/ready endpoints.
 
-const http = require('http');
 const express = require('express');
 
 // We create a minimal Express app to test the health endpoints without

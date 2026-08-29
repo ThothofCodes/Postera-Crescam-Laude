@@ -4,7 +4,7 @@ const Department = require('../models/Department');
 
 exports.getIncome = async (req, res, next) => {
   try {
-    const { departmentId, range = 'monthly', year = new Date().getFullYear() } = req.query;
+    const { departmentId, range: _range = 'monthly', year = new Date().getFullYear() } = req.query;
     const isSuperAdmin = req.user.role === 'SUPER_ADMIN';
 
     // Scope: dept head can only see their own dept
@@ -59,14 +59,14 @@ exports.getIncome = async (req, res, next) => {
     // Attach targets to chart data
     chartData.forEach((d) => {
       const monthStr = `${year}-${String(d.month).padStart(2, '0')}`;
-      const t = targets.find((t) => t.month === monthStr);
-      d.target = t?.target || 0;
+      const found = targets.find((t) => t.month === monthStr);
+      d.target = found?.target || 0;
     });
 
     const totalIncome = chartData.reduce((s, d) => s + d.income, 0);
     const totalExpense = chartData.reduce((s, d) => s + d.expense, 0);
     const growthRate = chartData.length > 1
-      ? ((chartData[chartData.length - 1].income - chartData[0].income) / (chartData[0].income || 1) * 100).toFixed(1)
+      ? (((chartData[chartData.length - 1].income - chartData[0].income) / (chartData[0].income || 1)) * 100).toFixed(1)
       : 0;
 
     res.json({

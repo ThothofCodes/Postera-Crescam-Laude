@@ -175,7 +175,7 @@ exports.redeemPoints = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { pointsToRedeem, invoiceId } = req.body;
-    const mongoose = require('mongoose');
+    const _mongoose = require('mongoose');
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid client ID' });
     const pts = Number(pointsToRedeem);
     if (!pts || pts < 100 || pts % 100 !== 0) return res.status(400).json({ message: 'Points must be a multiple of 100 (minimum 100)' });
@@ -206,7 +206,7 @@ exports.redeemPoints = async (req, res, next) => {
 exports.generateReferralCode = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const mongoose = require('mongoose');
+    const _mongoose = require('mongoose');
     if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ message: 'Invalid ID' });
     const client = await CRMClient.findById(id);
     if (!client) return res.status(404).json({ message: 'Client not found' });

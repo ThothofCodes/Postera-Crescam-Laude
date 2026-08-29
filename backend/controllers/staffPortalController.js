@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const mongoose = require('mongoose');
 const { Memo, Assessment } = require('../models/StaffPortal');
-const { sendSMS } = require('../config/africastalking');
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 const today = () => new Date().toISOString().slice(0, 10);
@@ -99,7 +98,10 @@ exports.submitWorkLog = async (req, res, next) => {
           departmentSlug: req.user.departmentSlug,
           adminId: req.user._id,
           workLog: {
-            tasks: tasks.slice(0, 2000), blockers: blockers?.slice(0, 1000), hoursWorked: Number(hoursWorked) || 0, notes: notes?.slice(0, 1000),
+            tasks: tasks.slice(0, 2000),
+            blockers: blockers?.slice(0, 1000),
+            hoursWorked: Number(hoursWorked) || 0,
+            notes: notes?.slice(0, 1000),
           },
           logSubmittedAt: new Date(),
           status: 'LOG_SUBMITTED',

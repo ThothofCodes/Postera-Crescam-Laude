@@ -20,7 +20,7 @@ exports.getRevenue = async (req, res, next) => {
       query.date = {};
       if (req.query.startDate) query.date.$gte = new Date(req.query.startDate);
       if (req.query.endDate) query.date.$lte = new Date(req.query.endDate);
-      if (isNaN(query.date.$gte) || isNaN(query.date.$lte)) return res.status(400).json({ message: 'Invalid date format' });
+      if (Number.isNaN(query.date.$gte?.getTime()) || Number.isNaN(query.date.$lte?.getTime())) return res.status(400).json({ message: 'Invalid date format' });
     }
     const [entries, total] = await Promise.all([
       Revenue.find(query).populate('createdBy', 'name').sort('-date').skip((page - 1) * limit)

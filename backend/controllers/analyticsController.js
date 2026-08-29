@@ -1,5 +1,4 @@
 // Copyright (c) 2026 Thoth of Codes. Business Intelligence Analytics Controller
-const mongoose = require('mongoose');
 const Analytics = require('../models/Analytics');
 
 const isValidSlug = (s) => /^[a-z]+$/.test(s || '');

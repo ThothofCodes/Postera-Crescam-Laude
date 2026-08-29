@@ -3,7 +3,7 @@ const router = require('express').Router();
 const {
   getUsers, createUser, updateUser, resetPassword, deactivateUser,
 } = require('../controllers/userController');
-const { protect, superAdminGuard, staffManagerGuard } = require('../middleware/auth');
+const { protect, staffManagerGuard } = require('../middleware/auth');
 
 // All routes require authentication + staff manager permission
 router.use(protect, staffManagerGuard);

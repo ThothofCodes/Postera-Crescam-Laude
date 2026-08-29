@@ -36,7 +36,7 @@ class ConnectionPoolManager {
   static getOptimizedConfig(options = {}) {
     const {
       isProduction = process.env.NODE_ENV === 'production',
-      expectedConnections = 100,
+      expectedConnections: _expectedConnections = 100,
       maxPoolSize = isProduction ? 50 : 20,
       minPoolSize = isProduction ? 10 : 5,
       maxIdleTimeMS = 30000, // 30 seconds
@@ -208,7 +208,7 @@ class ConnectionPoolManager {
    */
   static getPoolStats() {
     try {
-      const { db } = mongoose.connection;
+      const { db: _db } = mongoose.connection;
       const state = mongoose.connection.readyState;
 
       // Get server status for connection info

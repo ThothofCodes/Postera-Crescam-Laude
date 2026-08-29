@@ -143,8 +143,8 @@ exports.mustChangePasswordGuard = (req, res, next) => {
   if (req.user?.mustChangePassword) {
     // Allow only password change and logout endpoints
     const allowedPaths = ['/auth/change-first-password', '/auth/logout'];
-    const isAllowed = allowedPaths.some(p => req.path.includes(p));
-    
+    const isAllowed = allowedPaths.some((p) => req.path.includes(p));
+
     if (!isAllowed) {
       return res.status(403).json({
         message: 'You must change your password before accessing this resource.',

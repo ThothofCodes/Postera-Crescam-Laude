@@ -24,7 +24,7 @@ const args = process.argv.slice(2).reduce((acc, arg) => {
   return acc;
 }, {});
 
-const ORDER_COUNT = parseInt(args.count) || 1000;
+const ORDER_COUNT = parseInt(args.count, 10) || 1000;
 const WITH_USERS = args['with-users'] === true;
 const WITH_PRODUCTS = args['with-products'] === true;
 
@@ -89,7 +89,7 @@ function randomItem(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function randomItems(arr, min, max) {
+function _randomItems(arr, min, max) {
   const count = randomInt(min, max);
   const shuffled = [...arr].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
@@ -133,8 +133,8 @@ function generateTransactionId(method) {
 
 function generateAddress() {
   const building = randomInt(1, 500);
-  const floor = randomInt(1, 20);
-  const room = randomInt(1, 50);
+  const _floor = randomInt(1, 20);
+  const _room = randomInt(1, 50);
   const street = randomItem(STREETS);
   const city = randomItem(CITIES);
 
@@ -147,7 +147,7 @@ function generateAddress() {
   };
 }
 
-function generateCustomer(index) {
+function generateCustomer(_index) {
   const firstName = randomItem(FIRST_NAMES);
   const lastName = randomItem(LAST_NAMES);
 
@@ -209,7 +209,7 @@ function generatePayment(method) {
   };
 }
 
-function generateTimestamp(index, total) {
+function generateTimestamp(_index, _total) {
   // Distribute orders over the past 90 days
   const now = new Date();
   const daysAgo = randomInt(0, 90);

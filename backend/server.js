@@ -19,7 +19,6 @@ const { swaggerSpec } = require('./swagger');
 mongoose.set('bufferCommands', false);
 
 process.on('unhandledRejection', (err) => {
-  const logger = require('./utils/logger');
   logger.error('Unhandled rejection', { message: err.message });
 });
 
@@ -28,7 +27,6 @@ connectDB().then(() => {
     require('./cron/jobs')();
     setupIndexes().catch((e) => console.error('Index setup warning:', e.message));
   } catch (e) {
-    const logger = require('./utils/logger');
     logger.error('Startup error', { message: e.message });
   }
 });

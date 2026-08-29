@@ -110,7 +110,7 @@ const handleError = (res, error, message = 'An error occurred') => {
 };
 
 // Helper function for finding items in an array
-const findItemById = (array, id) => array.find((item) => item.id === parseInt(id));
+const findItemById = (array, id) => array.find((item) => item.id === parseInt(id, 10));
 
 // FAQ Routes
 router.get('/faq', (req, res) => {
@@ -302,7 +302,7 @@ router.get('/tickets/all', protect, async (req, res) => { // Changed from authen
 
 router.get('/tickets/:id', protect, async (req, res) => { // Changed from authenticateToken to protect
   try {
-    const ticketId = parseInt(req.params.id);
+    const ticketId = parseInt(req.params.id, 10);
     const ticket = helpTickets.find((t) => t.id === ticketId);
 
     if (!ticket) {
@@ -342,7 +342,7 @@ router.patch('/tickets/:id', protect, async (req, res) => { // Changed from auth
       });
     }
 
-    const ticketIndex = helpTickets.findIndex((ticket) => ticket.id === parseInt(id));
+    const ticketIndex = helpTickets.findIndex((ticket) => ticket.id === parseInt(id, 10));
     if (ticketIndex === -1) {
       return res.status(404).json({
         success: false,

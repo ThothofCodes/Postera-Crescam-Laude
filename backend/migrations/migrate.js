@@ -68,6 +68,7 @@ async function runMigrations() {
 
     try {
       console.log(`⏳  Running: ${migration.name}`);
+      // eslint-disable-next-line import/no-dynamic-require
 
       const migrationModule = require(migration.path);
       await migrationModule.up(mongoose.connection.db);
@@ -240,7 +241,7 @@ async function main() {
       case 'status':
         await showStatus();
         break;
-      case 'create':
+      case 'create': {
         const name = process.argv[3];
         if (!name) {
           console.error('\n❌  Usage: node migrate.js create <migration_name>\n');
@@ -248,6 +249,7 @@ async function main() {
         }
         createMigration(name);
         break;
+      }
       default:
         console.log(`
 ╔══════════════════════════════════════════════════════════════════╗

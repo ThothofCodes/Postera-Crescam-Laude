@@ -1,4 +1,4 @@
-const { emitDeptNotification, emitBroadcast, emitNotification } = require('../socket');
+const { emitBroadcast } = require('../socket');
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const Notification = require('../models/Notification');
 

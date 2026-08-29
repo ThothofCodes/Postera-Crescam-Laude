@@ -140,7 +140,7 @@ const stkPush = async (phone, amount, accountRef, description) => {
   // The actual CheckoutRequestID will come from Safaricom's response
   if (data.CheckoutRequestID) {
     // Update the signature with the real checkout request ID
-    const realSignedUrl = await generateSignedCallbackUrl(MPESA_CALLBACK_URL, data.CheckoutRequestID);
+    const _realSignedUrl = await generateSignedCallbackUrl(MPESA_CALLBACK_URL, data.CheckoutRequestID);
     console.log(`[MPESA] STK Push initiated: ${data.CheckoutRequestID}, signed callback URL generated`);
   }
 
@@ -231,7 +231,7 @@ const validateCallback = (body) => {
     // Validate amount if present
     if (meta.Amount) {
       const amount = Number(meta.Amount);
-      if (isNaN(amount) || amount <= 0) {
+      if (Number.isNaN(amount) || amount <= 0) {
         throw new Error('Invalid amount in callback');
       }
     }

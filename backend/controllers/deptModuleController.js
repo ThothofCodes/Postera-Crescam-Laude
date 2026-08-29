@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { emitSessionUpdate } = require('../socket');
+const { emitSessionUpdate: _emitSessionUpdate } = require('../socket');
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const JobCard = require('../models/JobCard');
 const PSSession = require('../models/PSSession');

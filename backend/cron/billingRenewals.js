@@ -2,7 +2,6 @@
 const mongoose = require('mongoose');
 const Invoice = require('../models/Invoice');
 const ISPClient = require('../models/ISPClient');
-const CRMClient = require('../models/CRMClient');
 const { sendSMS } = require('../config/africastalking');
 
 exports.runBillingRenewals = async function () {

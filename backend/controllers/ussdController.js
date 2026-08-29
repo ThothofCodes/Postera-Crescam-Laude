@@ -12,10 +12,6 @@ const SESSION_TTL = 180000; // 180 seconds
 const getSession = (id) => sessions[id] || {};
 const setSession = (id, data) => { sessions[id] = data; setTimeout(() => delete sessions[id], SESSION_TTL); };
 
-function menu(text, end = false) {
-  return { text, endSession: end };
-}
-
 // POST /api/ussd/callback — Africa's Talking USSD handler
 exports.handle = async (req, res) => {
   const { sessionId, phoneNumber, text } = req.body;

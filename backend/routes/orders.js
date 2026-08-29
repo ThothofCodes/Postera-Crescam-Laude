@@ -75,9 +75,9 @@ async function generateReceiptPDF(order) {
       // ── Colors ───────────────────────────────────────────────────
       const emberRgb = rgb(COLORS.ember);
       const inkRgb = rgb(COLORS.ink);
-      const inkBrightRgb = rgb(COLORS.inkBright);
+      const _inkBrightRgb = rgb(COLORS.inkBright);
       const mistRgb = rgb(COLORS.mist);
-      const paperRgb = rgb(COLORS.paper);
+      const _paperRgb = rgb(COLORS.paper);
 
       // ── Header ───────────────────────────────────────────────────
       // Ember top bar
@@ -166,7 +166,7 @@ async function generateReceiptPDF(order) {
       y += 16;
 
       // Table header
-      const tableTop = y;
+      const _tableTop = y;
       const colItem = leftX;
       const colQty = 350;
       const colPrice = 410;

@@ -11,7 +11,7 @@ const Department = require('../models/Department');
 
 async function getSlugs() {
   const depts = await Department.find({ isActive: true }).select('slug').lean();
-  return depts.length > 0 ? depts.map(d => d.slug) : ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
+  return depts.length > 0 ? depts.map((d) => d.slug) : ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
 }
 
 async function saveSnapshot(deptSlug, group, data, period = 'DAILY') {

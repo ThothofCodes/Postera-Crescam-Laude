@@ -105,7 +105,7 @@ const presenceManager = {
     try {
       // NEW LOGIC: For global chat availability, we only check if any admin is physically connected
       // regardless of their individual availability settings
-      for (const [adminId, sockets] of adminSockets) {
+      for (const [_adminId, sockets] of adminSockets) {
         if (sockets.size > 0) {
           // As long as any admin is physically connected, return true
           return true;
@@ -121,7 +121,7 @@ const presenceManager = {
   onlineAdminCount() {
     try {
       let count = 0;
-      for (const [adminId, sockets] of adminSockets) {
+      for (const [_adminId, sockets] of adminSockets) {
         if (sockets.size > 0) {
           count++;
         }

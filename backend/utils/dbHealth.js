@@ -197,7 +197,7 @@ class DatabaseHealthMonitor {
         const stats = await coll.stats();
 
         // Calculate index usage
-        const totalOps = indexAccessStats.reduce((sum, stat) => {
+        const _totalOps = indexAccessStats.reduce((sum, stat) => {
           return sum + (stat.accesses?.ops || 0);
         }, 0);
 
@@ -349,7 +349,7 @@ class DatabaseHealthMonitor {
     let collectionsWithWarnings = 0;
     let totalUnusedIndexes = 0;
 
-    for (const [collName, stats] of Object.entries(indexStats)) {
+    for (const [_collName, stats] of Object.entries(indexStats)) {
       if (stats.error) continue;
 
       totalCollections++;

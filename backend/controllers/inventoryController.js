@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
+// eslint-disable-next-line import/no-unresolved
+const cloudinary = require('cloudinary').v2;
 const { v4: uuidv4 } = require('uuid');
 const Inventory = require('../models/Inventory');
-const upload = require('../middleware/upload');
-const cloudinary = require('cloudinary').v2;
 
 // Configure Cloudinary
 cloudinary.config({
@@ -44,7 +44,7 @@ const inventoryController = {
         success: true,
         data: items,
         total,
-        page: parseInt(page),
+        page: parseInt(page, 10),
         totalPages: Math.ceil(total / limit),
       });
     } catch (error) {
@@ -219,7 +219,9 @@ const inventoryController = {
       const cutoff = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
 
       const filter = {
-        expiryDate: { $exists: true, $ne: null, $lte: cutoff, $gte: now },
+        expiryDate: {
+          $exists: true, $ne: null, $lte: cutoff, $gte: now,
+        },
         isActive: true,
       };
       if (req.query.departmentSlug) filter.departmentSlug = req.query.departmentSlug;
@@ -239,7 +241,9 @@ const inventoryController = {
         daysUntilExpiry: Math.ceil((item.expiryDate - now) / (24 * 60 * 60 * 1000)),
       }));
 
-      res.json({ success: true, data, total: data.length, days });
+      res.json({
+        success: true, data, total: data.length, days,
+      });
     } catch (error) {
       console.error('Error getting expiring items:', error);
       res.status(500).json({ success: false, message: 'Failed to get expiring items' });
@@ -250,7 +254,7 @@ const inventoryController = {
   recordMovement: async (req, res) => {
     try {
       const {
-        itemId, type, quantity, notes,
+        itemId, type, quantity,
       } = req.body;
 
       const item = await Inventory.findById(itemId);
@@ -267,13 +271,13 @@ const inventoryController = {
         case 'RESTOCK':
         case 'RETURN':
         case 'TRANSFER':
-          newQuantity += parseInt(quantity);
+          newQuantity += parseInt(quantity, 10);
           break;
         case 'SALE':
         case 'JOB_USAGE':
         case 'DAMAGE_LOSS':
         case 'ADJUSTMENT':
-          newQuantity -= parseInt(quantity);
+          newQuantity -= parseInt(quantity, 10);
           break;
         default:
           return res.status(400).json({

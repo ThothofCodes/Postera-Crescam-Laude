@@ -3,7 +3,7 @@ const router = require('express').Router();
 const {
   getRevenue, getSummary, createRevenue, updateRevenue, deleteRevenue,
 } = require('../controllers/revenueController');
-const { protect, staff, admin } = require('../middleware/auth');
+const { protect, staff } = require('../middleware/auth');
 
 router.use(protect, staff);
 router.get('/summary', getSummary);

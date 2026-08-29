@@ -24,7 +24,9 @@ router.get('/:id/qr', async (req, res) => {
     if (!item) return res.status(404).json({ message: 'Item not found' });
     const qrData = JSON.stringify({ id: item._id, sku: item.sku, name: item.name });
     const dataUri = await QRCode.toDataURL(qrData, { width: 200, margin: 1 });
-    res.json({ success: true, dataUri, sku: item.sku, name: item.name });
+    res.json({
+      success: true, dataUri, sku: item.sku, name: item.name,
+    });
   } catch (err) {
     res.status(500).json({ message: 'Failed to generate QR code' });
   }

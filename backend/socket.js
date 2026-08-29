@@ -152,7 +152,7 @@ function initSocket(httpServer) {
 
       // Notify pending callback clients
       const pending = presenceManager.getPendingCallbacks();
-      pending.forEach(([clientSocketId, clientData]) => {
+      pending.forEach(([clientSocketId, _clientData]) => {
         const clientSocket = _io.sockets.sockets.get(clientSocketId);
         if (clientSocket?.connected) {
           clientSocket.emit('admin:now-available', {
@@ -169,8 +169,8 @@ function initSocket(httpServer) {
           presenceManager.adminDisconnected(userId, socket.id);
           // Update admin status for all clients when admin disconnects
           // FIXED: Ensure the status is broadcast immediately when an admin disconnects
-          const currentAdminStatus = presenceManager.isAnyAdminOnline();
-          _io.to('public-chat').emit('admin:status', { online: currentAdminStatus });
+          const _latestAdminStatus = presenceManager.isAnyAdminOnline();
+          _io.to('public-chat').emit('admin:status', { online: _latestAdminStatus });
 
           if (departmentSlug) {
             _io.to(`public-chat:${departmentSlug}`).emit('admin:status:dept', {
@@ -189,8 +189,8 @@ function initSocket(httpServer) {
 
         // Check if any admins are still connected and available
         // FIXED: Ensure the status is broadcast immediately when an admin disconnects
-        const currentAdminStatus = presenceManager.isAnyAdminOnline();
-        _io.to('public-chat').emit('admin:status', { online: currentAdminStatus });
+        const _latestAdminStatus2 = presenceManager.isAnyAdminOnline();
+        _io.to('public-chat').emit('admin:status', { online: _latestAdminStatus2 });
 
         if (departmentSlug) {
           _io.to(`public-chat:${departmentSlug}`).emit('admin:status:dept', {
@@ -366,7 +366,7 @@ function initSocket(httpServer) {
           return;
         }
 
-        const { message, guestId } = data;
+        const { message, guestId: visitorGuestId } = data;
 
         // Check if admin is available before allowing chat
         if (!presenceManager.isAnyAdminOnline()) {
@@ -376,10 +376,10 @@ function initSocket(httpServer) {
 
         try {
           // Save message to database with consistent conversation ID format
-          const conversationId = `conversation-guest-${guestId}`;
+          const msgConversationId = `conversation-guest-${visitorGuestId}`;
           const chatMessage = new ChatMessage({
-            conversationId,
-            senderId: guestId,
+            conversationId: msgConversationId,
+            senderId: visitorGuestId,
             senderType: 'customer',
             message,
           });
@@ -388,29 +388,29 @@ function initSocket(httpServer) {
 
           // Broadcast to all admins
           _io.to('admin-room').emit('new-chat-message', {
-            conversationId,
+            conversationId: msgConversationId,
             message: {
               ...chatMessage.toObject(),
               direction: 'incoming', // From admin perspective, customer messages are incoming
             },
-            guestId,
+            guestId: visitorGuestId,
           });
 
           // Echo back to sender (but mark as outgoing from customer perspective)
           socket.emit('new-chat-message', {
-            conversationId,
+            conversationId: msgConversationId,
             message: {
               ...chatMessage.toObject(),
               senderType: 'customer',
               direction: 'outgoing', // From customer perspective, their own messages are outgoing
             },
-            guestId,
+            guestId: visitorGuestId,
           });
 
           // Echo back to sender as confirmation
           socket.emit('message-sent', {
             messageId: chatMessage._id,
-            conversationId,
+            conversationId: msgConversationId,
             message: {
               ...chatMessage.toObject(),
               senderType: 'customer',

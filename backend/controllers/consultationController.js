@@ -32,7 +32,8 @@ exports.getAvailability = async (req, res, next) => {
     const end = new Date(date);
     end.setDate(end.getDate() + 7);
     const slots = await AvailabilitySlot.find({ date: { $gte: start, $lte: end }, isBooked: false, isBlocked: false })
-      .populate('consultant', 'name').sort('date startTime');
+      .populate('consultant', 'name')
+      .sort('date startTime');
     res.json(slots);
   } catch (err) { next(err); }
 };
@@ -153,7 +154,9 @@ exports.cancelConsultation = async (req, res, next) => {
   try {
     const c = await Consultation.findByIdAndUpdate(req.params.id, { status: 'cancelled' }, { new: true }).populate('client');
     if (!c) return res.status(404).json({ message: 'Consultation not found' });
-    if (mongoose.connection.readyState === 1) { await AvailabilitySlot.findOneAndUpdate({ consultation: c._id }, { isBooked: false, consultation: null }); }
+    if (mongoose.connection.readyState === 1) {
+      await AvailabilitySlot.findOneAndUpdate({ consultation: c._id }, { isBooked: false, consultation: null });
+    }
     if (c.client?.phone) {
       sendSMS(c.client.phone, `Your consultation on ${new Date(c.preferredDate).toDateString()} has been cancelled. Contact us to reschedule.`);
     }

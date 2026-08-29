@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const router = require('express').Router();
 const ctrl = require('../controllers/staffInvitationController');
-const { protect, superAdminGuard, deptHeadGuard } = require('../middleware/auth');
+const { protect, deptHeadGuard } = require('../middleware/auth');
 
 // Protect all routes
 router.use(protect);

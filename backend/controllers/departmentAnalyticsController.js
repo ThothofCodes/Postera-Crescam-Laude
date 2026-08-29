@@ -30,14 +30,16 @@ exports.getDepartmentAnalytics = async (req, res, next) => {
 
       // Tickets per department (all time + by status)
       Ticket.aggregate([
-        { $group: {
-          _id: '$departmentSlug',
-          total: { $sum: 1 },
-          open: { $sum: { $cond: [{ $in: ['$status', ['OPEN', 'IN_PROGRESS']] }, 1, 0] } },
-          resolved: { $sum: { $cond: [{ $eq: ['$status', 'RESOLVED'] }, 1, 0] } },
-          closed: { $sum: { $cond: [{ $eq: ['$status', 'CLOSED'] }, 1, 0] } },
-          slaBreach: { $sum: { $cond: ['$slaBreach', 1, 0] } },
-        } },
+        {
+          $group: {
+            _id: '$departmentSlug',
+            total: { $sum: 1 },
+            open: { $sum: { $cond: [{ $in: ['$status', ['OPEN', 'IN_PROGRESS']] }, 1, 0] } },
+            resolved: { $sum: { $cond: [{ $eq: ['$status', 'RESOLVED'] }, 1, 0] } },
+            closed: { $sum: { $cond: [{ $eq: ['$status', 'CLOSED'] }, 1, 0] } },
+            slaBreach: { $sum: { $cond: ['$slaBreach', 1, 0] } },
+          },
+        },
       ]),
 
       // Staff count per department
@@ -49,23 +51,29 @@ exports.getDepartmentAnalytics = async (req, res, next) => {
       // Invoice stats per department
       Invoice.aggregate([
         { $match: { createdAt: { $gte: dateFrom, $lte: dateTo } } },
-        { $group: {
-          _id: '$departmentSlug',
-          total: { $sum: 1 },
-          paid: { $sum: { $cond: [{ $eq: ['$status', 'PAID'] }, 1, 0] } },
-          unpaid: { $sum: { $cond: [{ $ne: ['$status', 'PAID'] }, 1, 0] } },
-          revenue: { $sum: { $cond: [{ $eq: ['$status', 'PAID'] }, '$total', 0] } },
-        } },
+        {
+          $group: {
+            _id: '$departmentSlug',
+            total: { $sum: 1 },
+            paid: { $sum: { $cond: [{ $eq: ['$status', 'PAID'] }, 1, 0] } },
+            unpaid: { $sum: { $cond: [{ $ne: ['$status', 'PAID'] }, 1, 0] } },
+            revenue: { $sum: { $cond: [{ $eq: ['$status', 'PAID'] }, '$total', 0] } },
+          },
+        },
       ]),
     ]);
 
     // Merge all data by department slug
     const analytics = departments.map((dept) => {
-      const slug = dept.slug;
-      const rev = revenueByDept.find(r => r._id === slug) || { total: 0, count: 0 };
-      const tkt = ticketStats.find(t => t._id === slug) || { total: 0, open: 0, resolved: 0, closed: 0, slaBreach: 0 };
-      const staff = staffByDept.find(s => s._id === slug) || { total: 0 };
-      const inv = invoiceStats.find(i => i._id === slug) || { total: 0, paid: 0, unpaid: 0, revenue: 0 };
+      const { slug } = dept;
+      const rev = revenueByDept.find((r) => r._id === slug) || { total: 0, count: 0 };
+      const tkt = ticketStats.find((t) => t._id === slug) || {
+        total: 0, open: 0, resolved: 0, closed: 0, slaBreach: 0,
+      };
+      const staff = staffByDept.find((s) => s._id === slug) || { total: 0 };
+      const inv = invoiceStats.find((i) => i._id === slug) || {
+        total: 0, paid: 0, unpaid: 0, revenue: 0,
+      };
 
       return {
         slug,
@@ -113,19 +121,21 @@ exports.getDepartmentTimeline = async (req, res, next) => {
       ]),
       Ticket.aggregate([
         { $match: { departmentSlug: slug, createdAt: { $gte: dateFrom, $lte: dateTo } } },
-        { $group: {
-          _id: { month: { $month: '$createdAt' } },
-          total: { $sum: 1 },
-          resolved: { $sum: { $cond: [{ $in: ['$status', ['RESOLVED', 'CLOSED']] }, 1, 0] } },
-        } },
+        {
+          $group: {
+            _id: { month: { $month: '$createdAt' } },
+            total: { $sum: 1 },
+            resolved: { $sum: { $cond: [{ $in: ['$status', ['RESOLVED', 'CLOSED']] }, 1, 0] } },
+          },
+        },
         { $sort: { '_id.month': 1 } },
       ]),
     ]);
 
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const timeline = months.map((name, i) => {
-      const rev = monthlyRevenue.find(r => r._id.month === i + 1);
-      const tkt = monthlyTickets.find(t => t._id.month === i + 1);
+      const rev = monthlyRevenue.find((r) => r._id.month === i + 1);
+      const tkt = monthlyTickets.find((t) => t._id.month === i + 1);
       return {
         month: name,
         monthNum: i + 1,

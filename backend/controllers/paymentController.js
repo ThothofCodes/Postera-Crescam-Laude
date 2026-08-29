@@ -3,7 +3,6 @@ const { validateCallback, isCallbackProcessed, markCallbackProcessed } = require
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Consultation = require('../models/Consultation');
-const Client = require('../models/Client');
 const Revenue = require('../models/Revenue');
 const { sendSMS } = require('../config/africastalking');
 const { sendEmail } = require('../config/mailer');
@@ -149,7 +148,6 @@ exports.mpesaCallback = async (req, res) => {
         paymentStatus: 'failed',
       });
       // Notify customer of failed payment
-      const failedRecord = order || consultation;
       const failedPhone = order?.customer?.phone || consultation?.client?.phone;
       const failedEmail = order?.customer?.email;
       const failedName = order?.customer?.name || 'Customer';

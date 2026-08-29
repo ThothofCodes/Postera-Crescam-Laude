@@ -82,7 +82,10 @@ exports.createOrder = async (req, res, next) => {
 
     const order = await Order.create({
       customer: {
-        name: customer.name.trim().slice(0, 100), phone, email: customer.email?.toLowerCase().trim().slice(0, 200), deliveryAddress: customer.deliveryAddress?.trim().slice(0, 500),
+        name: customer.name.trim().slice(0, 100),
+        phone,
+        email: customer.email?.toLowerCase().trim().slice(0, 200),
+        deliveryAddress: customer.deliveryAddress?.trim().slice(0, 500),
       },
       items: enriched,
       subtotal,

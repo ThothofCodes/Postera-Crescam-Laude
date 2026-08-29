@@ -57,7 +57,7 @@ exports.createUser = async (req, res, next) => {
     }
 
     const finalRole = isDeptHead(req.user) ? 'STAFF' : (role || 'STAFF');
-    
+
     // Create user with temporary password if mustChangePassword is true
     const user = await User.create({
       name,
@@ -138,7 +138,7 @@ exports.resetPassword = async (req, res, next) => {
 
     const { password, mustChangePassword } = req.body;
     user.password = password;
-    
+
     // If mustChangePassword is true, set the temporary password for display
     if (mustChangePassword) {
       user.mustChangePassword = true;
@@ -147,7 +147,7 @@ exports.resetPassword = async (req, res, next) => {
       user.mustChangePassword = false;
       user.temporaryPassword = undefined;
     }
-    
+
     await user.save();
     res.json({ message: 'Password reset successfully', mustChangePassword: user.mustChangePassword });
   } catch (err) { next(err); }

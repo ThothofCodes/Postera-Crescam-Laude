@@ -3,7 +3,7 @@
 
 const errorHandler = require('../../middleware/errorHandler');
 const {
-  AppError, ValidationError, NotFoundError, ConflictError,
+  AppError, ValidationError, NotFoundError,
 } = require('../../utils/errors');
 
 function mockReqRes(overrides = {}) {

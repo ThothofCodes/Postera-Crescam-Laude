@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
 const generateReceipt = require('../utils/generateReceipt');
-const { emitPaymentResult } = require('../socket');
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const Invoice = require('../models/Invoice');
-const CRMClient = require('../models/CRMClient');
 const { stkPush, isCallbackProcessed, markCallbackProcessed } = require('../middleware/mpesa');
 const { sendSMS } = require('../config/africastalking');
-const DeptTransaction = require('../models/DeptTransaction');
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 const safePage = (p) => Math.max(1, Math.min(Number(p) || 1, 1000));

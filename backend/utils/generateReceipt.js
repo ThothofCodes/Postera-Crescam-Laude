@@ -64,6 +64,7 @@ function receiptHTML(invoice) {
 module.exports = async function generateReceipt(invoice) {
   try {
     let puppeteer;
+    // eslint-disable-next-line import/no-unresolved
     try { puppeteer = require('puppeteer'); } catch (_) { puppeteer = require('puppeteer-core'); }
 
     const browser = await puppeteer.launch({

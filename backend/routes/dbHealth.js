@@ -188,7 +188,7 @@ router.get('/replica', authGuard, async (req, res) => {
  */
 router.get('/slow-queries', authGuard, async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit, 10) || 10;
     const mongoose = require('mongoose');
     const { db } = mongoose.connection;
 

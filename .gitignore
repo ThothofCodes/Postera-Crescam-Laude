@@ -27,3 +27,6 @@ Thumbs.db
 # Temp files
 .tmp/
 .temp/
+
+# Freebuff local workspace
+.freebuff/

@@ -9,7 +9,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
   console.log('All users deleted');
 
   // Re-run seed
-  const seedScript = require('./seed.js');
+  const _seedScript = require('./seed');
   // Since seed.js runs automatically, we'll execute it in a different way
   console.log('Please run: node seed.js');
 

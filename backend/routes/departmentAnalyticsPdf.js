@@ -7,7 +7,6 @@ const DeptTransaction = require('../models/DeptTransaction');
 const Ticket = require('../models/Ticket');
 const User = require('../models/User');
 const Department = require('../models/Department');
-const Invoice = require('../models/Invoice');
 
 const COLORS = {
   ember: '#EE6100',
@@ -46,13 +45,15 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
         { $group: { _id: '$departmentSlug', total: { $sum: '$amount' }, count: { $sum: 1 } } },
       ]),
       Ticket.aggregate([
-        { $group: {
-          _id: '$departmentSlug',
-          total: { $sum: 1 },
-          open: { $sum: { $cond: [{ $in: ['$status', ['OPEN', 'IN_PROGRESS']] }, 1, 0] } },
-          resolved: { $sum: { $cond: [{ $eq: ['$status', 'RESOLVED'] }, 1, 0] } },
-          slaBreach: { $sum: { $cond: ['$slaBreach', 1, 0] } },
-        } },
+        {
+          $group: {
+            _id: '$departmentSlug',
+            total: { $sum: 1 },
+            open: { $sum: { $cond: [{ $in: ['$status', ['OPEN', 'IN_PROGRESS']] }, 1, 0] } },
+            resolved: { $sum: { $cond: [{ $eq: ['$status', 'RESOLVED'] }, 1, 0] } },
+            slaBreach: { $sum: { $cond: ['$slaBreach', 1, 0] } },
+          },
+        },
       ]),
       User.aggregate([
         { $match: { departmentSlug: { $exists: true, $ne: null } } },
@@ -62,14 +63,22 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
 
     // Merge data
     const analytics = departments.map((dept) => {
-      const slug = dept.slug;
-      const rev = revenueByDept.find(r => r._id === slug) || { total: 0, count: 0 };
-      const tkt = ticketStats.find(t => t._id === slug) || { total: 0, open: 0, resolved: 0, slaBreach: 0 };
-      const staff = staffByDept.find(s => s._id === slug) || { total: 0 };
+      const { slug } = dept;
+      const rev = revenueByDept.find((r) => r._id === slug) || { total: 0, count: 0 };
+      const tkt = ticketStats.find((t) => t._id === slug) || {
+        total: 0, open: 0, resolved: 0, slaBreach: 0,
+      };
+      const staff = staffByDept.find((s) => s._id === slug) || { total: 0 };
       return {
-        name: dept.name, slug, color: dept.color || '#2BB6A3',
-        revenue: rev.total, transactions: rev.count,
-        tickets: tkt.total, open: tkt.open, resolved: tkt.resolved, slaBreach: tkt.slaBreach,
+        name: dept.name,
+        slug,
+        color: dept.color || '#2BB6A3',
+        revenue: rev.total,
+        transactions: rev.count,
+        tickets: tkt.total,
+        open: tkt.open,
+        resolved: tkt.resolved,
+        slaBreach: tkt.slaBreach,
         staff: staff.total,
       };
     }).sort((a, b) => b.revenue - a.revenue);
@@ -109,7 +118,8 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
     doc.moveDown(0.5);
 
     // Divider
-    doc.moveTo(40, doc.y).lineTo(doc.page.width - 40, doc.y).strokeColor(hexToRgb(COLORS.teal)).lineWidth(0.5).stroke();
+    doc.moveTo(40, doc.y).lineTo(doc.page.width - 40, doc.y).strokeColor(hexToRgb(COLORS.teal)).lineWidth(0.5)
+      .stroke();
     doc.moveDown(0.8);
 
     // ── KPI Summary ────────────────────────────────────────────
@@ -136,7 +146,8 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
     doc.y = kpiY + 40;
 
     // Divider
-    doc.moveTo(40, doc.y).lineTo(doc.page.width - 40, doc.y).strokeColor(hexToRgb('#E0E0E0')).lineWidth(0.3).stroke();
+    doc.moveTo(40, doc.y).lineTo(doc.page.width - 40, doc.y).strokeColor(hexToRgb('#E0E0E0')).lineWidth(0.3)
+      .stroke();
     doc.moveDown(0.6);
 
     // ── Revenue Bar Chart ──────────────────────────────────────
@@ -144,13 +155,13 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
       .text('Revenue by Department', 40);
     doc.moveDown(0.3);
 
-    const maxRevenue = Math.max(...analytics.map(d => d.revenue), 1);
+    const maxRevenue = Math.max(...analytics.map((d) => d.revenue), 1);
     const barStartX = 130;
     const barMaxWidth = doc.page.width - 180;
     const barHeight = 14;
 
     analytics.forEach((dept) => {
-      const y = doc.y;
+      const { y } = doc;
       // Label
       doc.fontSize(8).font('Helvetica').fillColor(hexToRgb(COLORS.ink))
         .text(dept.name.length > 16 ? dept.name.substring(0, 15) + '…' : dept.name, 40, y + 2, { width: 85 });
@@ -218,9 +229,9 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
       rowData.forEach((val, i) => {
         const color = i === 0 ? COLORS.ink
           : i === 1 ? COLORS.teal
-          : i === 4 && dept.open > 0 ? COLORS.red
-          : i === 6 && dept.slaBreach > 0 ? '#FF6600'
-          : COLORS.ink;
+            : i === 4 && dept.open > 0 ? COLORS.red
+              : i === 6 && dept.slaBreach > 0 ? '#FF6600'
+                : COLORS.ink;
         doc.fontSize(8).font(i === 0 ? 'Helvetica' : 'Helvetica').fillColor(hexToRgb(color))
           .text(val, colX, rowY, { width: colWidths[i] });
         colX += colWidths[i];

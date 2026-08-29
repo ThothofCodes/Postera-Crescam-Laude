@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 // Standardized error classes for consistent API error responses.
 
