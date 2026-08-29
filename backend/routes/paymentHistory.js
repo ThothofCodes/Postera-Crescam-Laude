@@ -10,10 +10,10 @@ const { protect, staffGuard } = require('../middleware/auth');
 router.get('/', protect, staffGuard, async (req, res) => {
   try {
     const {
-      status,       // paid, unpaid, refunded, partial
-      method,       // mpesa, cash, bank
-      source,       // order, consultation, invoice
-      search,       // search by orderNumber, mpesaRef, customer name
+      status, // paid, unpaid, refunded, partial
+      method, // mpesa, cash, bank
+      source, // order, consultation, invoice
+      search, // search by orderNumber, mpesaRef, customer name
       page = 1,
       limit = 30,
       sort = '-createdAt',
@@ -41,7 +41,7 @@ router.get('/', protect, staffGuard, async (req, res) => {
         .select('orderNumber paymentStatus paymentMethod mpesaRef total customer.name customer.phone createdAt checkoutRequestId retryCount')
         .sort(sort)
         .lean();
-      queries.push(...orders.map(o => ({
+      queries.push(...orders.map((o) => ({
         id: o._id,
         reference: o.orderNumber,
         type: 'order',
@@ -72,7 +72,7 @@ router.get('/', protect, staffGuard, async (req, res) => {
         .populate('client', 'fullName phone')
         .sort(sort)
         .lean();
-      queries.push(...consults.map(c => ({
+      queries.push(...consults.map((c) => ({
         id: c._id,
         reference: `CONSULT-${String(c._id).slice(-6).toUpperCase()}`,
         type: 'consultation',
@@ -109,7 +109,7 @@ router.get('/', protect, staffGuard, async (req, res) => {
         .populate('clientId', 'fullName phone')
         .sort(sort)
         .lean();
-      queries.push(...invoices.map(inv => ({
+      queries.push(...invoices.map((inv) => ({
         id: inv._id,
         reference: inv.invoiceId,
         type: 'invoice',
@@ -136,8 +136,8 @@ router.get('/', protect, staffGuard, async (req, res) => {
     });
 
     // Calculate summary stats
-    const totalPaid = queries.filter(q => q.status === 'paid').reduce((s, q) => s + (q.amount || 0), 0);
-    const totalUnpaid = queries.filter(q => q.status === 'unpaid').reduce((s, q) => s + ((q.balance || q.amount) || 0), 0);
+    const totalPaid = queries.filter((q) => q.status === 'paid').reduce((s, q) => s + (q.amount || 0), 0);
+    const totalUnpaid = queries.filter((q) => q.status === 'unpaid').reduce((s, q) => s + ((q.balance || q.amount) || 0), 0);
     const totalCount = queries.length;
 
     // Paginate
@@ -153,8 +153,8 @@ router.get('/', protect, staffGuard, async (req, res) => {
         totalPaid,
         totalUnpaid,
         totalCount,
-        paidCount: queries.filter(q => q.status === 'paid').length,
-        unpaidCount: queries.filter(q => q.status === 'unpaid' || q.status === 'partial').length,
+        paidCount: queries.filter((q) => q.status === 'paid').length,
+        unpaidCount: queries.filter((q) => q.status === 'unpaid' || q.status === 'partial').length,
       },
     });
   } catch (err) {

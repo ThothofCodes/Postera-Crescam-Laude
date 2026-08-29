@@ -2,19 +2,16 @@
 // PCL — Webhook Configuration Endpoints (admin only)
 const router = require('express').Router();
 const { protect, superAdminGuard } = require('../middleware/auth');
-const { 
-  getWebhookSecret, 
-  rotateWebhookSecret, 
+const {
+  rotateWebhookSecret,
   clearSecretsCache,
   SIGNATURE_MAX_AGE_MS,
-  ROTATION_GRACE_PERIOD_MS 
+  ROTATION_GRACE_PERIOD_MS,
 } = require('../middleware/webhookSignature');
 
 // GET /api/webhook-config — Get webhook configuration (admin only)
 router.get('/', protect, superAdminGuard, async (req, res) => {
   try {
-    const primarySecret = await getWebhookSecret();
-    
     // Get all secrets from database
     let secrets = [];
     try {
@@ -28,11 +25,11 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
     }
 
     const isDefault = !process.env.MPESA_WEBHOOK_SECRET && secrets.length === 0;
-    
+
     res.json({
       primarySecret: isDefault ? '[AUTO-GENERATED]' : '••••••••••••••••••••',
       secretsCount: secrets.length,
-      secrets: secrets.map(s => ({
+      secrets: secrets.map((s) => ({
         id: s._id,
         label: s.label,
         status: s.status,
@@ -51,7 +48,7 @@ router.get('/', protect, superAdminGuard, async (req, res) => {
         payments: process.env.MPESA_CALLBACK_URL || 'Not configured',
         billing: process.env.MPESA_CALLBACK_URL ? process.env.MPESA_CALLBACK_URL.replace('/payments/', '/billing/') : 'Not configured',
       },
-      instructions: isDefault 
+      instructions: isDefault
         ? '⚠️ Using auto-generated secret. Set MPESA_WEBHOOK_SECRET in .env or rotate via API for production.'
         : '✅ Using custom webhook secret(s) from database/environment.',
     });
@@ -67,7 +64,7 @@ router.post('/rotate', protect, superAdminGuard, async (req, res) => {
   try {
     const { label } = req.body;
     const result = await rotateWebhookSecret(req.user._id, label);
-    
+
     if (result.success) {
       res.json({
         message: 'Webhook secret rotated successfully',
@@ -95,28 +92,28 @@ router.post('/deprecate/:id', protect, superAdminGuard, async (req, res) => {
   try {
     const WebhookSecret = require('../models/WebhookSecret');
     const secret = await WebhookSecret.findById(req.params.id);
-    
+
     if (!secret) {
       return res.status(404).json({ message: 'Secret not found' });
     }
-    
+
     if (secret.status === 'deprecated') {
       return res.status(400).json({ message: 'Secret is already deprecated' });
     }
-    
+
     // Cannot deprecate the only active secret
     const activeCount = await WebhookSecret.countDocuments({ status: 'active' });
     if (secret.status === 'active' && activeCount <= 1) {
       return res.status(400).json({ message: 'Cannot deprecate the only active secret. Rotate first.' });
     }
-    
+
     secret.status = 'deprecated';
     secret.deprecatedAt = new Date();
     secret.expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour grace period
     await secret.save();
-    
+
     clearSecretsCache();
-    
+
     res.json({
       message: 'Secret deprecated successfully',
       secretId: secret._id,
@@ -133,15 +130,15 @@ router.post('/deprecate/:id', protect, superAdminGuard, async (req, res) => {
 router.post('/cleanup', protect, superAdminGuard, async (req, res) => {
   try {
     const WebhookSecret = require('../models/WebhookSecret');
-    
+
     // Delete deprecated secrets that have expired
     const result = await WebhookSecret.deleteMany({
       status: 'deprecated',
-      expiresAt: { $lt: new Date() }
+      expiresAt: { $lt: new Date() },
     });
-    
+
     clearSecretsCache();
-    
+
     res.json({
       message: 'Cleanup completed',
       deletedCount: result.deletedCount,
@@ -156,15 +153,15 @@ router.post('/cleanup', protect, superAdminGuard, async (req, res) => {
 router.post('/test', protect, superAdminGuard, async (req, res) => {
   try {
     const { generateSignature, generateSignedCallbackUrl } = require('../middleware/webhookSignature');
-    
+
     const testCheckoutId = 'TEST-' + Date.now();
     const timestamp = Date.now();
     const signature = await generateSignature(testCheckoutId, timestamp);
     const signedUrl = await generateSignedCallbackUrl(
       process.env.MPESA_CALLBACK_URL || 'https://example.com/api/payments/mpesa/callback',
-      testCheckoutId
+      testCheckoutId,
     );
-    
+
     res.json({
       testCheckoutId,
       timestamp,

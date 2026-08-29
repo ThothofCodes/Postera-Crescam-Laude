@@ -491,7 +491,7 @@ function initSocket(httpServer) {
       try {
         const Department = require('./models/Department');
         const depts = await Department.find({ isActive: true }).select('slug').lean();
-        cachedSlugs = depts.map(d => d.slug);
+        cachedSlugs = depts.map((d) => d.slug);
         lastSlugFetch = now;
       } catch { /* DB not ready — use fallback */
         cachedSlugs = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];

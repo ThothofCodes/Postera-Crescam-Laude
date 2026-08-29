@@ -47,24 +47,24 @@ if (require.main === module || process.env.NODE_ENV) {
  */
 async function getActiveSecrets() {
   const now = Date.now();
-  
+
   // Return cached secrets if still valid
   if (cachedSecrets.length > 0 && now - lastSecretFetch < SECRET_CACHE_TTL_MS) {
     return cachedSecrets;
   }
-  
+
   try {
     const WebhookSecret = require('../models/WebhookSecret');
     const secrets = await WebhookSecret.find({
       status: { $in: ['active', 'rotate'] },
       $or: [
         { expiresAt: { $gt: new Date() } },
-        { expiresAt: { $exists: false } }
-      ]
+        { expiresAt: { $exists: false } },
+      ],
     }).sort({ createdAt: -1 });
-    
+
     if (secrets.length > 0) {
-      cachedSecrets = secrets.map(s => ({
+      cachedSecrets = secrets.map((s) => ({
         secret: s.secret,
         status: s.status,
         _id: s._id,
@@ -76,7 +76,7 @@ async function getActiveSecrets() {
     // Database not available, fall back to env variable
     console.warn('[WEBHOOK] Failed to fetch secrets from database:', err.message);
   }
-  
+
   // Fallback to environment variable
   const envSecret = process.env.MPESA_WEBHOOK_SECRET || crypto.randomBytes(32).toString('hex');
   cachedSecrets = [{ secret: envSecret, status: 'active', _id: 'env' }];
@@ -90,7 +90,7 @@ async function getActiveSecrets() {
 async function getPrimarySecret() {
   const secrets = await getActiveSecrets();
   // Return the first active secret
-  const active = secrets.find(s => s.status === 'active');
+  const active = secrets.find((s) => s.status === 'active');
   return active ? active.secret : (process.env.MPESA_WEBHOOK_SECRET || crypto.randomBytes(32).toString('hex'));
 }
 
@@ -119,13 +119,28 @@ async function generateSignature(checkoutRequestId, timestamp, secret) {
 async function generateSignedCallbackUrl(baseUrl, checkoutRequestId) {
   const timestamp = Date.now();
   const signature = await generateSignature(checkoutRequestId, timestamp);
-  
+
   // Append signature and timestamp as query parameters
   const url = new URL(baseUrl);
   url.searchParams.set('sig', signature);
   url.searchParams.set('ts', timestamp.toString());
-  
+
   return url.toString();
+}
+
+/**
+ * Update secret usage statistics (non-blocking)
+ */
+async function updateSecretUsage(secretId) {
+  try {
+    const WebhookSecret = require('../models/WebhookSecret');
+    await WebhookSecret.findByIdAndUpdate(secretId, {
+      $inc: { usageCount: 1 },
+      lastUsedAt: new Date(),
+    });
+  } catch {
+    // Non-critical, ignore errors
+  }
 }
 
 /**
@@ -144,7 +159,7 @@ async function verifySignature(checkoutRequestId, signature, timestamp) {
 
   // Parse timestamp
   const ts = parseInt(timestamp, 10);
-  if (isNaN(ts)) {
+  if (Number.isNaN(ts)) {
     return { valid: false, reason: 'Invalid timestamp format' };
   }
 
@@ -164,7 +179,7 @@ async function verifySignature(checkoutRequestId, signature, timestamp) {
 
   // Get all secrets to try (supports rotation)
   const secrets = await getActiveSecrets();
-  
+
   for (const secretObj of secrets) {
     // Recompute expected signature with this secret
     const expectedSignature = crypto
@@ -177,18 +192,18 @@ async function verifySignature(checkoutRequestId, signature, timestamp) {
       if (Buffer.from(signature, 'hex').length === Buffer.from(expectedSignature, 'hex').length) {
         const isValid = crypto.timingSafeEqual(
           Buffer.from(signature, 'hex'),
-          Buffer.from(expectedSignature, 'hex')
+          Buffer.from(expectedSignature, 'hex'),
         );
 
         if (isValid) {
           // Mark signature as used (prevent replay)
           usedSignatures.set(signature, Date.now());
-          
+
           // Update usage stats in database (non-blocking)
           if (secretObj._id && secretObj._id !== 'env') {
             updateSecretUsage(secretObj._id).catch(() => {});
           }
-          
+
           return { valid: true, secretId: secretObj._id, secretStatus: secretObj.status };
         }
       }
@@ -198,21 +213,6 @@ async function verifySignature(checkoutRequestId, signature, timestamp) {
   }
 
   return { valid: false, reason: 'Signature mismatch (no matching secret)' };
-}
-
-/**
- * Update secret usage statistics (non-blocking)
- */
-async function updateSecretUsage(secretId) {
-  try {
-    const WebhookSecret = require('../models/WebhookSecret');
-    await WebhookSecret.findByIdAndUpdate(secretId, {
-      $inc: { usageCount: 1 },
-      lastUsedAt: new Date(),
-    });
-  } catch {
-    // Non-critical, ignore errors
-  }
 }
 
 /**
@@ -230,7 +230,7 @@ async function webhookSignatureMiddleware(req, res, next) {
   try {
     const signature = req.query.sig;
     const timestamp = req.query.ts;
-    
+
     // Get checkoutRequestId from body
     const checkoutRequestId = req.body?.Body?.stkCallback?.CheckoutRequestID;
 
@@ -245,15 +245,15 @@ async function webhookSignatureMiddleware(req, res, next) {
 
     if (!result.valid) {
       console.warn(`[WEBHOOK] Signature verification failed: ${result.reason}`);
-      
+
       // In production, reject the request
       if (process.env.NODE_ENV === 'production') {
-        return res.status(403).json({ 
+        return res.status(403).json({
           message: 'Webhook signature verification failed',
-          code: 'WEBHOOK_SIGNATURE_INVALID'
+          code: 'WEBHOOK_SIGNATURE_INVALID',
         });
       }
-      
+
       // In development, log warning but continue (for testing)
       console.warn('[WEBHOOK] Allowing request in development mode despite invalid signature');
     } else {
@@ -282,16 +282,15 @@ async function getWebhookSecret() {
  * Rotate webhook secret with zero downtime
  */
 async function rotateWebhookSecret(createdBy, label) {
-  const crypto = require('crypto');
   const newSecret = crypto.randomBytes(32).toString('hex');
-  
+
   try {
     const WebhookSecret = require('../models/WebhookSecret');
     const rotated = await WebhookSecret.rotate(newSecret, createdBy, label);
-    
+
     // Clear cache to force refresh
     clearSecretsCache();
-    
+
     return {
       success: true,
       secretId: rotated._id,

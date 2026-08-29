@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAdminAuth } from '../../context/AdminAuthContext';
-import api from '../../utils/api';
+import { useAdminAuth } from '../../../admin/context/AdminAuthContext';
+import { api } from '../../../utils/api';
 
 const STATUS_COLORS = {
   paid: { bg: '#0d94881a', text: '#0d9488', border: '#0d948844' },
