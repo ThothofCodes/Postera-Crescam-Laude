@@ -2,7 +2,9 @@
 // Tech Hub — Public content API routes (no auth required)
 
 const express = require('express');
+
 const router = express.Router();
+
 const { createClient } = require('@sanity/client');
 
 const sanityClient = createClient({

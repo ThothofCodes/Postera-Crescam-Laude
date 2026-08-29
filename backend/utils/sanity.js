@@ -98,7 +98,9 @@ const techFacts = createCrud('fact', ['fact', 'source', 'category']);
 const authors = createCrud('author', ['name', 'avatar', 'bio']);
 
 // ── Article-specific extras ──────────────────────────────────────────────────
-async function getArticles({ page = 1, limit = 20, category = null, status = null } = {}) {
+async function getArticles({
+  page = 1, limit = 20, category = null, status = null,
+} = {}) {
   if (!isConfigured) return { articles: [], total: 0 };
   const start = (page - 1) * limit;
   let filters = '_type == "article"';
@@ -128,12 +130,21 @@ async function getArticle(identifier) {
   }`, { id: identifier });
 }
 
+function makeSlug(text) {
+  return text.toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim()
+    .slice(0, 96);
+}
+
 async function createArticle(data) {
   if (!isConfigured) throw new Error('Sanity CMS not configured');
   const doc = {
     _type: 'article',
     title: data.title,
-    slug: { current: data.slug || slugify(data.title), _type: 'slug' },
+    slug: { current: data.slug || makeSlug(data.title), _type: 'slug' },
     excerpt: data.excerpt || '',
     body: data.body || [],
     category: data.category || 'general',
@@ -172,9 +183,9 @@ async function updateArticle(id, data) {
 
 async function getCategoryStats() {
   if (!isConfigured) return [];
-  const articles = await sanityClient.fetch('array(*[_type == "article"] { category }) | order(category asc)');
+  const data = await sanityClient.fetch('array(*[_type == "article"] { category }) | order(category asc)');
   const counts = {};
-  articles.forEach((a) => { counts[a.category] = (counts[a.category] || 0) + 1; });
+  data.forEach((a) => { counts[a.category] = (counts[a.category] || 0) + 1; });
   return Object.entries(counts).map(([category, count]) => ({ category, count }));
 }
 
@@ -183,9 +194,7 @@ async function getStudioUrl() {
   return `https://${process.env.SANITY_PROJECT_ID}.sanity.studio`;
 }
 
-function slugify(text) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim().slice(0, 96);
-}
+// slugify replaced by makeSlug above
 
 async function uploadArticleImage(buffer, filename) {
   // Upload to ImgBB (free image hosting)
@@ -198,7 +207,10 @@ async function uploadArticleImage(buffer, filename) {
       const asset = await sanityClient.assets.upload('image', buffer, {
         filename: filename || `article_${Date.now()}.jpg`,
       });
-      sanityAsset = { _type: 'image', asset: { _type: 'reference', _ref: asset._id } };
+      sanityAsset = {
+        _type: 'image',
+        asset: { _type: 'reference', _ref: asset._id },
+      };
     } catch {
       // Non-critical — image is still on ImgBB
     }
@@ -212,7 +224,9 @@ async function uploadArticleImage(buffer, filename) {
 
 module.exports = {
   isConfigured,
-  articles: { ...articles, list: getArticles, get: getArticle, create: createArticle, update: updateArticle },
+  articles: {
+    ...articles, list: getArticles, get: getArticle, create: createArticle, update: updateArticle,
+  },
   techTips,
   techNews,
   techFacts,

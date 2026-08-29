@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const axios = require('axios');
-const crypto = require('crypto');
+const _crypto = require('crypto');
 // Webhook signature is only for verifying incoming callbacks — NOT for the STK request URL
 // Safaricom rejects callback URLs with query parameters
 

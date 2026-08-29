@@ -2,10 +2,12 @@
 // Tech Hub — Full content management API routes (Sanity CMS + ImgBB images)
 
 const express = require('express');
+
 const router = express.Router();
 const multer = require('multer');
 const { protect, superAdminGuard } = require('../middleware/auth');
 const { uploadToImgBB, isConfigured: imgbbConfigured } = require('../utils/imgbb');
+
 const {
   isConfigured,
   articles,
@@ -37,18 +39,26 @@ router.get('/status', async (req, res) => {
     res.json({
       configured: isConfigured,
       studioUrl,
-      imgbbConfigured: imgbbConfigured,
+      imgbbConfigured,
     });
   } catch {
-    res.json({ configured: isConfigured, studioUrl: null, imgbbConfigured: false });
+    res.json({
+      configured: isConfigured,
+      studioUrl: null,
+      imgbbConfigured: false,
+    });
   }
 });
 
 // ── Articles ─────────────────────────────────────────────────────────────────
 router.get('/articles', async (req, res) => {
   try {
-    const { page = 1, limit = 20, category, status } = req.query;
-    const result = await articles.list({ page: parseInt(page, 10), limit: parseInt(limit, 10), category, status });
+    const {
+      page = 1, limit = 20, category, status,
+    } = req.query;
+    const result = await articles.list({
+      page: parseInt(page, 10), limit: parseInt(limit, 10), category, status,
+    });
     res.json(result);
   } catch (err) {
     res.status(500).json({ message: err.message });

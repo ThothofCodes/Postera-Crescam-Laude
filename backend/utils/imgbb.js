@@ -6,7 +6,7 @@
 const axios = require('axios');
 const FormData = require('form-data');
 
-const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
+const { IMGBB_API_KEY } = process.env;
 const IMGBB_API_URL = 'https://api.imgbb.com/1/upload';
 
 /**
@@ -41,14 +41,14 @@ async function uploadToImgBB(buffer, filename, expiration = 0) {
     throw new Error(data.error?.message || 'ImgBB upload failed');
   }
 
-  const img = data.data;
+  const { data: img } = data;
   return {
-    url: img.url,            // Direct URL (http)
-    displayUrl: img.display_url, // Alternative display URL
-    deleteUrl: img.delete_url,   // URL to delete the image
+    url: img.url,
+    displayUrl: img.display_url,
+    deleteUrl: img.delete_url,
     width: img.width,
     height: img.height,
-    size: img.size,          // File size in bytes
+    size: img.size,
     mime: img.mime,
     extension: img.extension,
   };
