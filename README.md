@@ -597,4 +597,4 @@ ruaitech_solutions/
 ---
 
 © 2026 Ruai Tech Solutions · Ruai Town Centre, Nairobi County, Kenya  
-Super Administrator: **Thoth of Codes** · `codeofthoth@outlook.com` · [github.com/3mutua](https://github.com/ThothofCodes)
+Super Administrator: **Thoth of Codes** · `codeofthoth@outlook.com` · [github.com/ThothofCodes](https://github.com/ThothofCodes)

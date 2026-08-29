@@ -1,8 +1,24 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getArticleBySlug } from '../../lib/sanity';
+import { getArticleBySlug, getArticles } from '../../lib/sanity';
 
-const { slug } = Astro.params;
+export async function getStaticPaths() {
+  // If Sanity is not configured, return empty paths (build succeeds but no detail pages)
+  try {
+    const { articles } = await getArticles({ limit: 100 });
+    if (!articles || articles.length === 0) {
+      return [{ params: { slug: '__placeholder__' }, props: { placeholder: true } }];
+    }
+    return articles.map((article) => ({
+      params: { slug: article.slug.current },
+      props: { slug: article.slug.current },
+    }));
+  } catch {
+    return [{ params: { slug: '__placeholder__' }, props: { placeholder: true } }];
+  }
+}
+
+const slug = Astro.params.slug ?? Astro.props.slug;
 const article = await getArticleBySlug(slug);
 
 if (!article) {

@@ -2,14 +2,19 @@ import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 
 // Sanity configuration — values injected via environment variables
+const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID;
+const dataset = import.meta.env.PUBLIC_SANITY_DATASET || 'production';
+const isConfigured = !!projectId && projectId !== 'your-project-id';
+
 const config = {
-  projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID || 'your-project-id',
-  dataset: import.meta.env.PUBLIC_SANITY_DATASET || 'production',
+  projectId: projectId || 'placeholder',
+  dataset,
   apiVersion: '2024-01-01',
-  useCdn: true, // Enable CDN for fast reads
+  useCdn: true,
 };
 
 export const sanityClient = createClient(config);
+export const sanityReady = isConfigured;
 
 // Image URL builder
 const builder = imageUrlBuilder(sanityClient);
@@ -21,6 +26,7 @@ export function urlFor(source) {
 
 // Fetch all published articles (paginated)
 export async function getArticles({ page = 1, limit = 12, category = null } = {}) {
+  if (!isConfigured) return { articles: [], total: 0 };
   const start = (page - 1) * limit;
   const categoryFilter = category ? `&& category == "${category}"` : '';
   
@@ -44,6 +50,7 @@ export async function getArticles({ page = 1, limit = 12, category = null } = {}
 
 // Fetch single article by slug
 export async function getArticleBySlug(slug) {
+  if (!isConfigured) return null;
   const query = `*[_type == "article" && slug.current == $slug][0] {
     _id,
     title,
@@ -68,6 +75,7 @@ export async function getArticleBySlug(slug) {
 
 // Fetch tech tips
 export async function getTechTips({ limit = 10 } = {}) {
+  if (!isConfigured) return [];
   const query = `*[_type == "techTip"] | order(publishedAt desc) [0...${limit}] {
     _id,
     title,
@@ -83,6 +91,7 @@ export async function getTechTips({ limit = 10 } = {}) {
 
 // Fetch tech news
 export async function getTechNews({ limit = 10 } = {}) {
+  if (!isConfigured) return [];
   const query = `*[_type == "news"] | order(publishedAt desc) [0...${limit}] {
     _id,
     title,
@@ -99,6 +108,7 @@ export async function getTechNews({ limit = 10 } = {}) {
 
 // Fetch daily tech facts
 export async function getTechFacts({ limit = 5 } = {}) {
+  if (!isConfigured) return [];
   const query = `*[_type == "fact"] | order(publishedAt desc) [0...${limit}] {
     _id,
     title,
@@ -113,12 +123,14 @@ export async function getTechFacts({ limit = 5 } = {}) {
 
 // Fetch all categories with counts
 export async function getCategories() {
+  if (!isConfigured) return [];
   const query = `array(*[_type == "article"] | order(category asc).category)`;
   return sanityClient.fetch(query);
 }
 
 // Fetch site settings
 export async function getSiteSettings() {
+  if (!isConfigured) return null;
   const query = `*[_type == "siteSettings"][0] {
     title,
     description,
