@@ -1,9 +1,5 @@
-#!/usr/bin/env bash
-# ═══════════════════════════════════════════════════════════════
-# PCL Deployment Secrets Validator
-# Run this locally to verify your secrets are ready for GitHub
-# Usage: bash deployment/validate-secrets.sh
-# ═══════════════════════════════════════════════════════════════
+#!/bin/bash
+set -uo pipefail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -27,71 +23,74 @@ check() {
         echo -e "  ${RED}✗${NC} $name: ${RED}MISSING (required)${NC}"
         FAIL=$((FAIL + 1))
     else
-        echo -e "  ${YELLOW}○${NC} $name: ${YELLOW}not set (optional)${NC}"
+        echo -e "  ${YELLOW}○${NC} $name: ${YELLOW}optional, not set${NC}"
         SKIP=$((SKIP + 1))
     fi
 }
 
-echo -e "\n${CYAN}═══════════════════════════════════════════════════════${NC}"
-echo -e "${CYAN}  PCL Deployment Secrets Validator${NC}"
-echo -e "${CYAN}═══════════════════════════════════════════════════════${NC}\n"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${CYAN}  Deployment Secrets Validator${NC}"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+echo ""
 
-# Check if .env exists
-if [[ -f ".env" ]]; then
-    echo -e "${CYAN}Loading .env file...${NC}\n"
-    set -a
-    source .env
-    set +a
-else
-    echo -e "${YELLOW}No .env file found. Checking environment variables...${NC}\n"
-fi
+echo -e "${CYAN}Core Secrets:${NC}"
+check "MONGO_URI" "${MONGO_URI:-}"
+check "JWT_SECRET" "${JWT_SECRET:-}"
+check "SUPER_ADMIN_EMAIL" "${SUPER_ADMIN_EMAIL:-}"
+check "CLIENT_URL" "${CLIENT_URL:-}"
+check "VITE_API_URL" "${VITE_API_URL:-}"
 
-echo -e "${CYAN}── Core Secrets ──${NC}"
-check "MONGO_URI" "${MONGO_URI:-}" "true"
-check "JWT_SECRET" "${JWT_SECRET:-}" "true"
-check "SUPER_ADMIN_EMAIL" "${SUPER_ADMIN_EMAIL:-}" "true"
-check "CLIENT_URL" "${CLIENT_URL:-}" "true"
-check "VITE_API_URL" "${VITE_API_URL:-}" "true"
+echo ""
+echo -e "${CYAN}M-Pesa:${NC}"
+check "MPESA_CONSUMER_KEY" "${MPESA_CONSUMER_KEY:-}"
+check "MPESA_CONSUMER_SECRET" "${MPESA_CONSUMER_SECRET:-}"
+check "MPESA_SHORTCODE" "${MPESA_SHORTCODE:-}"
+check "MPESA_PASSKEY" "${MPESA_PASSKEY:-}"
 
-echo -e "\n${CYAN}── Heroku (Backend) ──${NC}"
-check "HEROKU_API_KEY" "${HEROKU_API_KEY:-}" "false"
-check "HEROKU_APP_NAME" "${HEROKU_APP_NAME:-}" "false"
-check "HEROKU_EMAIL" "${HEROKU_EMAIL:-}" "false"
+echo ""
+echo -e "${CYAN}Africa's Talking:${NC}"
+check "AT_USERNAME" "${AT_USERNAME:-}"
+check "AT_API_KEY" "${AT_API_KEY:-}"
 
-echo -e "\n${CYAN}── Vercel (Frontend) ──${NC}"
+echo ""
+echo -e "${CYAN}Render (Backend):${NC}"
+check "RENDER_API_KEY" "${RENDER_API_KEY:-}" "false"
+check "RENDER_SERVICE_ID" "${RENDER_SERVICE_ID:-}" "false"
+
+echo ""
+echo -e "${CYAN}Vercel (Frontend):${NC}"
 check "VERCEL_TOKEN" "${VERCEL_TOKEN:-}" "false"
 check "VERCEL_PROJECT_ID" "${VERCEL_PROJECT_ID:-}" "false"
 check "VERCEL_ORG_ID" "${VERCEL_ORG_ID:-}" "false"
 
-echo -e "\n${CYAN}── Netlify (Tech Hub) ──${NC}"
+echo ""
+echo -e "${CYAN}Netlify (Tech Hub):${NC}"
 check "NETLIFY_AUTH_TOKEN" "${NETLIFY_AUTH_TOKEN:-}" "false"
 check "NETLIFY_TECH_HUB_SITE_ID" "${NETLIFY_TECH_HUB_SITE_ID:-}" "false"
 check "SANITY_PROJECT_ID" "${SANITY_PROJECT_ID:-}" "false"
+check "SANITY_DATASET" "${SANITY_DATASET:-}" "false"
 
-echo -e "\n${CYAN}── M-Pesa ──${NC}"
-check "MPESA_CONSUMER_KEY" "${MPESA_CONSUMER_KEY:-}" "false"
-check "MPESA_CONSUMER_SECRET" "${MPESA_CONSUMER_SECRET:-}" "false"
-check "MPESA_SHORTCODE" "${MPESA_SHORTCODE:-}" "false"
-check "MPESA_PASSKEY" "${MPESA_PASSKEY:-}" "false"
+echo ""
+echo -e "${CYAN}Cyclic (Alternative Backend):${NC}"
+check "CYCLIC_API_KEY" "${CYCLIC_API_KEY:-}" "false"
+check "CYCLIC_APP_NAME" "${CYCLIC_APP_NAME:-}" "false"
 
-echo -e "\n${CYAN}── Africa's Talking ──${NC}"
-check "AT_USERNAME" "${AT_USERNAME:-}" "false"
-check "AT_API_KEY" "${AT_API_KEY:-}" "false"
-
-echo -e "\n${CYAN}── Docker (Optional) ──${NC}"
+echo ""
+echo -e "${CYAN}Docker:${NC}"
 check "DOCKERHUB_USERNAME" "${DOCKERHUB_USERNAME:-}" "false"
 check "DOCKERHUB_TOKEN" "${DOCKERHUB_TOKEN:-}" "false"
 
-echo -e "\n${CYAN}═══════════════════════════════════════════════════════${NC}"
-echo -e "  ${GREEN}Passed: $PASS${NC}  ${RED}Failed: $FAIL${NC}  ${YELLOW}Optional: $SKIP${NC}"
-echo -e "${CYAN}═══════════════════════════════════════════════════════${NC}\n"
+echo ""
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "  ${GREEN}Pass: ${PASS}${NC} | ${RED}Fail: ${FAIL}${NC} | ${YELLOW}Skip: ${SKIP}${NC}"
+echo -e "${CYAN}═══════════════════════════════════════════════════════════════${NC}"
 
 if [[ $FAIL -gt 0 ]]; then
-    echo -e "${RED}⚠  $FAIL required secrets are missing!${NC}"
-    echo -e "   See deployment/SETUP_SECRETS.md for setup instructions.\n"
+    echo ""
+    echo -e "${RED}✗ Some required secrets are missing!${NC}"
     exit 1
 else
-    echo -e "${GREEN}✓  All required secrets are configured!${NC}"
-    echo -e "   Run ${CYAN}git push origin main${NC} to trigger deployment.\n"
+    echo ""
+    echo -e "${GREEN}✓ All required secrets are set!${NC}"
     exit 0
 fi

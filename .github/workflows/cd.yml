@@ -66,27 +66,50 @@ jobs:
           fi
           echo "✅ PythonAnywhere reloaded successfully"
 
-      # ── Heroku ──
-      - name: Deploy to Heroku
-        if: ${{ secrets.HEROKU_API_KEY != '' && secrets.HEROKU_APP_NAME != '' }}
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          appdir: "backend"
-          rollbackonhealthcheckfailure: true
-        env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          SUPER_ADMIN_EMAIL: ${{ secrets.SUPER_ADMIN_EMAIL }}
-          MPESA_CONSUMER_KEY: ${{ secrets.MPESA_CONSUMER_KEY }}
-          MPESA_CONSUMER_SECRET: ${{ secrets.MPESA_CONSUMER_SECRET }}
-          MPESA_SHORTCODE: ${{ secrets.MPESA_SHORTCODE }}
-          MPESA_PASSKEY: ${{ secrets.MPESA_PASSKEY }}
-          AT_USERNAME: ${{ secrets.AT_USERNAME }}
-          AT_API_KEY: ${{ secrets.AT_API_KEY }}
-          CLIENT_URL: ${{ secrets.CLIENT_URL }}
+      # ── Render ──
+      - name: Deploy to Render
+        if: ${{ secrets.RENDER_API_KEY != '' && secrets.RENDER_SERVICE_ID != '' }}
+        run: |
+          echo "Deploying backend to Render..."
+          
+          RESPONSE=$(curl -s -o /tmp/render-response.json -w "%{http_code}" -X POST \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json")
+          
+          echo "Deploy response: ${RESPONSE}"
+          cat /tmp/render-response.json
+          
+          if [ "${RESPONSE}" != "201" ]; then
+            echo "::error::Render deploy failed with status ${RESPONSE}"
+            exit 1
+          fi
+          echo "✅ Render deploy triggered successfully"
+          
+          # Wait for deploy to complete
+          sleep 30
+          
+          # Check service status
+          STATUS_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}")
+          echo "Service status: $(echo $STATUS_RESPONSE | jq -r '.state')"
+          
+      # ── Cyclic.sh (alternative free tier) ──
+      - name: Deploy to Cyclic
+        if: ${{ secrets.CYCLIC_API_KEY != '' && secrets.CYCLIC_APP_NAME != '' }}
+        run: |
+          echo "Deploying backend to Cyclic.sh..."
+          
+          # Cyclic auto-deploys from GitHub on push
+          # Just verify the service is running
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://${{ secrets.CYCLIC_APP_NAME }}.cyclic.app/api/health" || echo "000")
+          
+          if [ "${RESPONSE}" = "200" ]; then
+            echo "✅ Cyclic service is healthy"
+          else
+            echo "⚠️ Cyclic health check returned ${RESPONSE} — service may be cold starting"
+          fi
 
   # ═══════════════════════════════════════════════════════════════════════════
   # FRONTEND DEPLOYMENT

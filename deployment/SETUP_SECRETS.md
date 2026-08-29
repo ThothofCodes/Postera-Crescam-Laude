@@ -34,13 +34,12 @@ The CI/CD pipeline requires secrets configured in GitHub. This guide walks you t
 | `AT_USERNAME` | [Africa's Talking](https://africastalking.com) → Settings → Username |
 | `AT_API_KEY` | Africa's Talking → Settings → API Key |
 
-### 4. Heroku (Backend)
+### 4. Render (Backend)
 
 | Secret | How to Get |
 |--------|-----------|
-| `HEROKU_API_KEY` | [Heroku Account](https://dashboard.heroku.com/account) → API Key → Reveal |
-| `HEROKU_APP_NAME` | Your Heroku app name (create at heroku.com → New → Create new app) |
-| `HEROKU_EMAIL` | Your Heroku account email |
+| `RENDER_API_KEY` | [Render Dashboard](https://dashboard.render.com) → Settings → API Keys → Create API Key |
+| `RENDER_SERVICE_ID` | Create a Web Service → copy Service ID from URL or Settings |
 
 ### 5. Vercel (Frontend)
 
@@ -59,7 +58,14 @@ The CI/CD pipeline requires secrets configured in GitHub. This guide walks you t
 | `SANITY_PROJECT_ID` | [Sanity Manage](https://www.sanity.io/manage) → Project → ID |
 | `SANITY_DATASET` | Default: `production` |
 
-### 7. Docker (Optional)
+### 7. Cyclic.sh (Alternative Backend)
+
+| Secret | How to Get |
+|--------|-----------|
+| `CYCLIC_API_KEY` | [Cyclic.sh Dashboard](https://console.cyclic.sh) → Settings → API Key |
+| `CYCLIC_APP_NAME` | Your Cyclic app name (created during setup) |
+
+### 8. Docker (Optional)
 
 | Secret | How to Get |
 |--------|-----------|
@@ -108,8 +114,9 @@ Everything else will be skipped gracefully (each deployment step has `if: ${{ se
 
 ## Troubleshooting
 
-### "Deploy to Heroku" is skipped
-→ Check that `HEROKU_API_KEY`, `HEROKU_APP_NAME`, and `HEROKU_EMAIL` are all set
+### "Deploy to Render" is skipped
+→ Check that `RENDER_API_KEY` and `RENDER_SERVICE_ID` are set
+→ Ensure Render service is connected to your GitHub repo
 
 ### "Deploy to Vercel" is skipped  
 → Check that `VERCEL_TOKEN` is set and valid
@@ -118,8 +125,8 @@ Everything else will be skipped gracefully (each deployment step has `if: ${{ se
 → Check that both `NETLIFY_AUTH_TOKEN` and `NETLIFY_TECH_HUB_SITE_ID` are set
 
 ### Backend crashes after deploy
-→ Check Heroku logs: `heroku logs --tail -a your-app-name`
-→ Verify `MONGO_URI` is correct and IP whitelist includes Heroku IPs
+→ Check Render logs: Go to Render Dashboard → Your Service → Logs
+→ Verify `MONGO_URI` is correct and IP whitelist includes Render IPs
 
 ### Frontend shows API errors
 → Check `VITE_API_URL` matches your actual backend URL
