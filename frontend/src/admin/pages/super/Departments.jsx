@@ -7,30 +7,48 @@ import { formatKES } from '../../../utils/helpers';
 import IncomeProjectionChart from '../../components/IncomeProjectionChart';
 import { Spinner } from '../../../components/UI';
 
-const DEPARTMENTS = [
-  { slug: 'internet', label: 'Internet Distribution', branch: 'Signal', icon: '📡', color: '#2BB6A3', desc: 'Always-on connectivity — ISP services, bandwidth allocation, and network management.', features: ['Client Management', 'Bandwidth Monitoring', 'Network Health', 'ISP Billing'] },
-  { slug: 'webdev', label: 'Web Development', branch: 'Forge', icon: '🔨', color: '#a78bfa', desc: 'Building and crafting digital experiences — web apps, e-commerce, and custom solutions.', features: ['Project Pipeline', 'Sprint Tracking', 'Client Portals', 'Deployment'] },
-  { slug: 'playstation', label: 'PlayStation Arena', branch: 'Pulse', icon: '🎮', color: '#FFB020', desc: 'Community heartbeat — gaming stations, session management, and tournament hosting.', features: ['Station Management', 'Session Tracking', 'Tournament Ops', 'Community'] },
-  { slug: 'repair', label: 'Hardware Repair', branch: 'Restore', icon: '🔧', color: '#FF8800', desc: 'Renewal and restoration — device diagnostics, repair job cards, and parts inventory.', features: ['Job Cards', 'Parts Inventory', 'Repair Tracking', 'Diagnostics'] },
-  { slug: 'cybersecurity', label: 'Cybersecurity', branch: 'Sentinel', icon: '🛡️', color: '#FF3B3B', desc: 'Guard and protection — threat monitoring, security contracts, and compliance management.', features: ['Threat Monitoring', 'Security Contracts', 'Compliance', 'Incident Response'] },
-  { slug: 'govadmin', label: 'Gov Admin Assistance', branch: 'Civic', icon: '🏛️', color: '#39FF88', desc: 'Public service — government document processing, compliance filings, and permit management.', features: ['Document Processing', 'Compliance Filings', 'Permit Management', 'Client Tracking'] },
-];
+// Rich metadata for known departments (branch names, features, descriptions)
+const DEPT_META = {
+  internet: { branch: 'Signal', features: ['Client Management', 'Bandwidth Monitoring', 'Network Health', 'ISP Billing'] },
+  webdev: { branch: 'Forge', features: ['Project Pipeline', 'Sprint Tracking', 'Client Portals', 'Deployment'] },
+  playstation: { branch: 'Pulse', features: ['Station Management', 'Session Tracking', 'Tournament Ops', 'Community'] },
+  repair: { branch: 'Restore', features: ['Job Cards', 'Parts Inventory', 'Repair Tracking', 'Diagnostics'] },
+  cybersecurity: { branch: 'Sentinel', features: ['Threat Monitoring', 'Security Contracts', 'Compliance', 'Incident Response'] },
+  govadmin: { branch: 'Civic', features: ['Document Processing', 'Compliance Filings', 'Permit Management', 'Client Tracking'] },
+};
+const DEFAULT_META = { branch: 'Dept', features: ['Dashboard', 'Reports', 'Settings'] };
 
 export default function DepartmentsPage() {
   const [breakdown, setBreakdown] = useState([]);
   const [users, setUsers] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [bd, us] = await Promise.all([
+      const [bd, us, deptRes] = await Promise.all([
         api.get('/finance/breakdown'),
         api.get('/users'),
+        api.get('/departments'),
       ]);
       setBreakdown(bd.data);
       setUsers(us.data);
+      // Merge API data with local metadata
+      const depts = (deptRes.data || []).filter(d => d.isActive !== false).map(d => {
+        const meta = DEPT_META[d.slug] || DEFAULT_META;
+        return {
+          slug: d.slug,
+          label: d.name,
+          branch: meta.branch,
+          icon: d.icon || '◈',
+          color: d.color || '#2BB6A3',
+          desc: d.description || `${d.name} department`,
+          features: meta.features,
+        };
+      });
+      setDepartments(depts);
     } catch { }
     setLoading(false);
   }, []);
@@ -42,7 +60,7 @@ export default function DepartmentsPage() {
   const totalRevenue = breakdown.reduce((sum, b) => sum + (b.total || 0), 0);
   const totalStaff = users.length;
 
-  const activeDepts = DEPARTMENTS.filter((d) => filter === 'all' || d.slug === filter);
+  const activeDepts = departments.filter((d) => filter === 'all' || d.slug === filter);
 
   if (loading) return <Spinner />;
 
@@ -61,10 +79,10 @@ export default function DepartmentsPage() {
       {/* ── Summary KPIs ───────────────────────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
         {[
-          { label: 'Total Departments', value: DEPARTMENTS.length, color: '#EE6100' },
+          { label: 'Total Departments', value: departments.length, color: '#EE6100' },
           { label: 'Total Revenue', value: formatKES(totalRevenue), color: '#2BB6A3' },
           { label: 'Total Staff', value: totalStaff, color: '#a78bfa' },
-          { label: 'Active Branches', value: `${DEPARTMENTS.length}/6`, color: '#39FF88' },
+          { label: 'Active Branches', value: departments.length, color: '#39FF88' },
         ].map((kpi) => (
           <div key={kpi.label} style={{
             background: 'linear-gradient(160deg,#0F2620,#0F2620)', border: `1px solid ${kpi.color}22`, borderRadius: 8, padding: '1rem 1.25rem',
@@ -83,7 +101,7 @@ export default function DepartmentsPage() {
           style={{ padding: '0.4rem 0.85rem', borderRadius: 4, border: `1px solid ${filter === 'all' ? '#EE6100' : 'rgba(36,74,68,0.4)'}`, background: filter === 'all' ? 'rgba(238,97,0,0.12)' : 'transparent', color: filter === 'all' ? '#EE6100' : '#6A8A82', cursor: 'pointer', fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'Share Tech Mono',monospace", transition: 'all 0.15s' }}>
           All
         </button>
-        {DEPARTMENTS.map((d) => (
+        {departments.map((d) => (
           <button key={d.slug} onClick={() => setFilter(d.slug)}
             style={{ padding: '0.4rem 0.85rem', borderRadius: 4, border: `1px solid ${filter === d.slug ? d.color : 'rgba(36,74,68,0.4)'}`, background: filter === d.slug ? `${d.color}18` : 'transparent', color: filter === d.slug ? d.color : '#6A8A82', cursor: 'pointer', fontWeight: 600, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: "'Share Tech Mono',monospace", transition: 'all 0.15s' }}>
             {d.icon} {d.branch}
@@ -161,7 +179,7 @@ export default function DepartmentsPage() {
         <h3 style={{ margin: '0 0 1rem', fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#A9C4BE', fontFamily: "'Rajdhani',sans-serif" }}>◆ Revenue Comparison</h3>
         {breakdown.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {DEPARTMENTS.map((dept) => {
+            {departments.map((dept) => {
               const rev = deptRevenue(dept.slug);
               const maxRev = Math.max(...breakdown.map((b) => b.total || 0), 1);
               const width = (rev / maxRev) * 100;

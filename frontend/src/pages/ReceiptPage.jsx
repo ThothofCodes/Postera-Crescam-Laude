@@ -44,7 +44,7 @@ export default function ReceiptPage() {
       } catch {
         // Fallback: try direct fetch (public endpoint might work differently)
         try {
-          const res = await fetch(`${api.defaults?.baseURL || 'http://localhost:5001/api'}/orders?search=${orderNumber}`);
+          const res = await fetch(`${api.defaults?.baseURL || '/api'}/orders?search=${orderNumber}`);
           const data = await res.json();
           const found = data?.find?.((o) => o.orderNumber === orderNumber) || data?.orders?.find?.((o) => o.orderNumber === orderNumber);
           if (found) {
@@ -68,7 +68,7 @@ export default function ReceiptPage() {
   const handleDownloadPDF = async () => {
     setDownloading(true);
     try {
-      const baseUrl = api.defaults?.baseURL || 'http://localhost:5001/api';
+      const baseUrl = api.defaults?.baseURL || '/api';
       const url = `${baseUrl}/orders/receipt/${orderNumber}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to download');

@@ -7,6 +7,8 @@ const DepartmentSchema = new mongoose.Schema({
     type: String, required: true, unique: true, lowercase: true,
   },
   description: String,
+  color: { type: String, default: '#2BB6A3' }, // UI accent color (hex)
+  icon: { type: String, default: '◈' },          // Emoji or symbol for UI
   contactEmail: String,
   contactPhone: String,
   operatingHours: String,

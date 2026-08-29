@@ -18,6 +18,8 @@ const DEPT_COLORS = { internet:'#2BB6A3', webdev:'#a78bfa', playstation:'#ffd700
 const SUPER_LINKS = [
   ['Dashboard','◈','/admin/super'],
   ['All Departments','◉','/admin/super/departments'],
+  ['Manage Departments','⚙','/admin/super/manage-departments'],
+  ['Dept Analytics','📊','/admin/super/dept-analytics'],
   ['Admin Allocation','◆','/admin/super/admin-allocation'],
   ['Devices','🖥','/admin/super/devices'],
   ['User Management','◫','/admin/super/users'],
@@ -160,7 +162,7 @@ export function SuperAdminLayout() {
 
           <SidebarSection title="DEPARTMENTS" defaultOpen={true}>
             <div style={{ padding: '0 6px' }}>
-              {Object.entries(DEPT_COLORS).map(([slug, color]) => (
+              {Object.entries(deptColors).map(([slug, color]) => (
                 <NavLink key={slug} to={`/admin/${slug}`} style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '5px 10px', marginBottom: 1, borderRadius: 4,
@@ -257,6 +259,15 @@ export default function SuperDashboard() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showChatModule, setShowChatModule] = useState(false);
+  const [deptColors, setDeptColors] = useState(DEPT_COLORS);
+
+  useEffect(() => {
+    api.get('/departments').then(({ data }) => {
+      const colors = {};
+      data.forEach(d => { if (d.color) colors[d.slug] = d.color; });
+      setDeptColors(prev => ({ ...prev, ...colors }));
+    }).catch(() => {});
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -298,7 +309,7 @@ export default function SuperDashboard() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(160px,1fr))', gap: '1rem' }}>
-        {Object.entries(DEPT_COLORS).map(([slug, color]) => {
+        {Object.entries(deptColors).map(([slug, color]) => {
           const deptData = breakdown.find((b) => b._id === slug);
           return (
             <NavLink key={slug} to={`/admin/${slug}`} style={{ textDecoration: 'none' }}>
@@ -323,7 +334,7 @@ export default function SuperDashboard() {
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie data={breakdown.map((b) => ({ name: b._id, value: b.total }))} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent*100).toFixed(0)}%`} labelLine={false}>
-                {breakdown.map((b) => <Cell key={b._id} fill={DEPT_COLORS[b._id] || '#EE6100'} />)}
+                {breakdown.map((b) => <Cell key={b._id} fill={deptColors[b._id] || '#EE6100'} />)}
               </Pie>
               <Tooltip formatter={(v) => formatKES(v)} />
               <Legend />

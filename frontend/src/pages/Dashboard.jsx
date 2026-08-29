@@ -17,7 +17,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showChatModule, setShowChatModule] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
   useEffect(() => {
     const load = async () => {

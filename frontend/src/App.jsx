@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom';
 import React, { Suspense } from 'react';
 import { useEffect, useState, useCallback } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -78,6 +78,8 @@ const CRMPage = React.lazy(() => import('./admin/pages/shared/CRMPage'));
 const BillingPage = React.lazy(() => import('./admin/pages/shared/BillingPage'));
 const ForcePasswordChange = React.lazy(() => import('./admin/pages/ForcePasswordChange'));
 const DepartmentAdminAllocation = React.lazy(() => import('./admin/pages/super/DepartmentAdminAllocation'));
+const DepartmentManagement = React.lazy(() => import('./admin/pages/super/DepartmentManagement'));
+const DepartmentAnalytics = React.lazy(() => import('./admin/pages/super/DepartmentAnalytics'));
 const InternetLanding = React.lazy(() => import('./admin/pages/internet/Landing'));
 const ISPClients = React.lazy(() => import('./admin/pages/internet/Clients'));
 const WebDevLanding = React.lazy(() => import('./admin/pages/webdev/Landing'));
@@ -87,6 +89,7 @@ const RepairLanding = React.lazy(() => import('./admin/pages/repair/Landing'));
 const CybersecurityLanding = React.lazy(() => import('./admin/pages/cybersecurity/Landing'));
 const SecurityContracts = React.lazy(() => import('./admin/pages/cybersecurity/Contracts'));
 const GovAdminLanding = React.lazy(() => import('./admin/pages/govadmin/Landing'));
+const DynamicDepartmentLanding = React.lazy(() => import('./admin/pages/DynamicDepartmentLanding'));
 const GovDocs = React.lazy(() => import('./admin/pages/govadmin/GovDocs'));
 
 import DBStatusBanner from './components/DBStatusBanner';
@@ -101,6 +104,11 @@ function ScrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [pathname]);
   return null;
+}
+
+function DynamicDeptRoute() {
+  const { slug } = useParams();
+  return <DeptLayout slug={slug} title="Department" />;
 }
 
 function RedirectToAppropriatePage() {
@@ -212,6 +220,8 @@ export default function App() {
                   <Route path="devices" element={<DeviceManagement />} />
                   <Route path="users" element={<UserManagement />} />
                   <Route path="admin-allocation" element={<DepartmentAdminAllocation />} />
+                  <Route path="manage-departments" element={<DepartmentManagement />} />
+                  <Route path="dept-analytics" element={<DepartmentAnalytics />} />
                   <Route path="email" element={<EmailAllocationPage />} />
                   <Route path="finance" element={<FinancePage />} />
                   <Route path="tickets" element={<TicketsPage color="#ff3366" />} />
@@ -326,6 +336,22 @@ export default function App() {
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="chat" element={<MessagesPage />} />
                   <Route path="staff-invitation" element={<StaffInvitation color="#00ff88" />} />
+                </Route>
+
+                {/* ── Dynamic Department Catch-All ── */}
+                <Route path="/admin/:slug" element={<DynamicDeptRoute />}>
+                  <Route index element={<DynamicDepartmentLanding />} />
+                  <Route path="transactions" element={<TransactionsPage />} />
+                  <Route path="crm" element={<CRMPage color="#A9C4BE" />} />
+                  <Route path="billing" element={<BillingPage color="#A9C4BE" />} />
+                  <Route path="inventory" element={<InventoryPage color="#A9C4BE" />} />
+                  <Route path="tickets" element={<TicketsPage color="#A9C4BE" />} />
+                  <Route path="staff-portal" element={<StaffPortalAdmin color="#A9C4BE" />} />
+                  <Route path="expenses" element={<ExpensesPage />} />
+                  <Route path="audit" element={<AuditLogPage />} />
+                  <Route path="settings" element={<SettingsPage />} />
+                  <Route path="chat" element={<MessagesPage />} />
+                  <Route path="staff-invitation" element={<StaffInvitation color="#A9C4BE" />} />
                 </Route>
 
                 {/* ── Staff Portal ── */}

@@ -17,7 +17,11 @@ export const useSocket = (eventHandlers = {}) => {
   useEffect(() => {
     try {
       // Connect to socket with authentication
-      const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      // When tunneled, derive backend URL from current page origin
+      // (both frontend and backend are served from the same tunnel)
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const BACKEND_URL = import.meta.env.VITE_API_URL
+        || (isLocalhost ? 'http://localhost:5001' : window.location.origin);
 
       // FIX (Continuity Audit, Part One, Exhibit A): the auth payload used to
       // be sent as `Bearer ${token}`. Socket.IO's `auth` field is not an HTTP

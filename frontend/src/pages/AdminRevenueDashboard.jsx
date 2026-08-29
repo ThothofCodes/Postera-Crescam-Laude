@@ -21,7 +21,6 @@ export default function AdminRevenueDashboard() {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('monthly');
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
   useEffect(() => {
     const load = async () => {

@@ -7,7 +7,12 @@ const Ticket = require('../models/Ticket');
 const PSSession = require('../models/PSSession');
 const DeptTransaction = require('../models/DeptTransaction');
 
-const SLUGS = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
+const Department = require('../models/Department');
+
+async function getSlugs() {
+  const depts = await Department.find({ isActive: true }).select('slug').lean();
+  return depts.length > 0 ? depts.map(d => d.slug) : ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
+}
 
 async function saveSnapshot(deptSlug, group, data, period = 'DAILY') {
   const date = new Date().toISOString().slice(0, 10);
@@ -26,6 +31,7 @@ exports.runBISnapshot = async function () {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const SLUGS = await getSlugs();
 
     for (const slug of SLUGS) {
       const filter = { departmentSlug: slug };

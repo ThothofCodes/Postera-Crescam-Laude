@@ -21,10 +21,18 @@ export default function EmailAllocationPage({ color = '#EE6100' }) {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  const [departments, setDepartments] = useState([]);
+  const [deptColors, setDeptColors] = useState({});
 
-  const departments = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
-  const deptColors = { internet: '#2BB6A3', webdev: '#A78BFA', playstation: '#39FF88', repair: '#FFB020', cybersecurity: '#FF3B3B', govadmin: '#60A5FA' };
+  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    api.get('/departments').then(({ data }) => {
+      setDepartments(data.map(d => d.slug));
+      const colors = {};
+      data.forEach(d => { colors[d.slug] = d.color || '#2BB6A3'; });
+      setDeptColors(colors);
+    }).catch(() => {});
+  }, []);
 
   const filtered = filter === 'all' ? staff : staff.filter(s => s.department === filter);
 

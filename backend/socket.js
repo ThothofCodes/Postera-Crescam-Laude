@@ -56,6 +56,8 @@ function initSocket(httpServer) {
         const isDev = process.env.NODE_ENV !== 'production';
         if (isDev && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
         if (isDev && /^https?:\/\/\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)) return cb(null, true);
+        // Allow tunnel origins (Cloudflare, ngrok, etc.) and any HTTPS origin in dev
+        if (isDev && /^https?:\/\/[\w.-]+(:\d+)?$/.test(origin)) return cb(null, true);
         const allowed = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map((o) => o.trim());
         if (allowed.includes(origin)) return cb(null, true);
         console.warn(`[SOCKET] CORS blocked: ${origin}`);
@@ -477,22 +479,39 @@ function initSocket(httpServer) {
     });
   });
 
-  // ── Broadcast admin status every 3 seconds to ensure consistency across networks ────────────────────────────────
-  setInterval(() => {
+  // ── Broadcast admin status every 3 seconds to ensure consistency across networks ──
+  // Department slugs are fetched dynamically from the DB (cached for 60s)
+  let cachedSlugs = [];
+  let lastSlugFetch = 0;
+
+  async function getDepartmentSlugs() {
+    const now = Date.now();
+    if (cachedSlugs.length === 0 || now - lastSlugFetch > 60000) {
+      try {
+        const Department = require('./models/Department');
+        const depts = await Department.find({ isActive: true }).select('slug').lean();
+        cachedSlugs = depts.map(d => d.slug);
+        lastSlugFetch = now;
+      } catch { /* DB not ready — use fallback */
+        cachedSlugs = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
+      }
+    }
+    return cachedSlugs;
+  }
+
+  setInterval(async () => {
     const online = presenceManager.isAnyAdminOnline();
     _io.to('public-chat').emit('admin:status', { online });
 
-    // Additionally broadcast to all department-specific rooms to ensure consistency
-    // This ensures that clients connected to specific department rooms also get updates
-    // This is particularly important for multi-device scenarios
-    const allDepartmentSlugs = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
-    allDepartmentSlugs.forEach((deptSlug) => {
+    // Broadcast to all department-specific rooms dynamically
+    const slugs = await getDepartmentSlugs();
+    slugs.forEach((deptSlug) => {
       _io.to(`public-chat:${deptSlug}`).emit('admin:status:dept', {
         departmentSlug: deptSlug,
         online: presenceManager.isAnyAdminOnlineForDept(deptSlug),
       });
     });
-  }, 3000); // Reduced from 5 seconds to 3 seconds for better responsiveness
+  }, 3000);
 
   return _io;
 }

@@ -52,14 +52,15 @@ app.use(helmet({
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com'],
-      connectSrc: ["'self'", MPESA_CSP_HOST],
+      imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com', 'blob:'],
+      connectSrc: ["'self'", 'ws:', 'wss:', 'http:', 'https:', MPESA_CSP_HOST],
+      frameSrc: ["'none'"],
     },
   },
   crossOriginEmbedderPolicy: false, // allow Cloudinary images
 }));
 
-// ── 2. CORS — origin whitelist with mobile/LAN support ─────────────────────
+// ── 2. CORS — origin whitelist with mobile/LAN/tunnel support ───────────────
 const isDev = process.env.NODE_ENV !== 'production';
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
   .split(',')
@@ -69,9 +70,11 @@ app.use(cors({
   origin: (origin, cb) => {
     // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
     if (!origin) return cb(null, true);
-    // In development, allow any localhost/LAN origin
+    // In development, allow any localhost/LAN/tunnel origin
     if (isDev && /^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
     if (isDev && /^https?:\/\/\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)) return cb(null, true);
+    // Allow tunnel origins (Cloudflare, ngrok, etc.) and any HTTPS origin in dev
+    if (isDev && /^https?:\/\/[\w.-]+(:\d+)?$/.test(origin)) return cb(null, true);
     if (allowedOrigins.includes(origin)) return cb(null, true);
     console.warn(`CORS blocked: origin ${origin} not in whitelist`);
     cb(new Error(`CORS: origin ${origin} not allowed`));
@@ -264,6 +267,7 @@ app.use('/api/email', require('./routes/email'));
 app.use('/api/ussd', require('./routes/ussd'));
 app.use('/api/devices', require('./routes/devices'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/analytics/departments', require('./routes/departmentAnalytics'));
 app.use('/api/deployment', require('./routes/deployment'));
 app.use('/api/db-health', require('./routes/dbHealth'));
 app.use('/api/connection-pool', require('./routes/connectionPool'));

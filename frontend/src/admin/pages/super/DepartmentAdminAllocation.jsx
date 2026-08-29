@@ -5,12 +5,13 @@ import { api } from '../../../utils/api';
 import { Spinner, EmptyState } from '../../../components/UI';
 import toast from 'react-hot-toast';
 
-const DEPTS = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
+const FALLBACK_DEPTS = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
 const ROLES = ['DEPT_HEAD_OWNER', 'STAFF'];
 
 export default function DepartmentAdminAllocation() {
   const [allocations, setAllocations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [depts, setDepts] = useState(FALLBACK_DEPTS);
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({
     departmentSlug: '',
@@ -29,6 +30,13 @@ export default function DepartmentAdminAllocation() {
   const [saving, setSaving] = useState(false);
   const [createdAllocation, setCreatedAllocation] = useState(null);
   const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    api.get('/departments').then(({ data }) => {
+      const slugs = data.filter(d => d.isActive !== false).map(d => d.slug);
+      if (slugs.length > 0) setDepts(slugs);
+    }).catch(() => {});
+  }, []);
 
   const load = async () => {
     setLoading(true);
@@ -98,7 +106,7 @@ export default function DepartmentAdminAllocation() {
             style={selectStyle}
           >
             <option value="">All Departments</option>
-            {DEPTS.map(d => <option key={d} value={d}>{d}</option>)}
+            {depts.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
           <button onClick={() => { setForm({ departmentSlug: '', adminEmail: '', adminName: '', role: 'STAFF', permissions: { canManageUsers: false, canManageInventory: false, canManageBilling: false, canViewReports: true, canManageTickets: false }, notes: '' }); setModal('create'); }} style={btn('#EE6100')}>
             + Allocate Admin
@@ -179,7 +187,7 @@ export default function DepartmentAdminAllocation() {
                 <label style={lbl}>Department</label>
                 <select value={form.departmentSlug} onChange={(e) => setForm({ ...form, departmentSlug: e.target.value })} required style={inp}>
                   <option value="">Select Department</option>
-                  {DEPTS.map(d => <option key={d} value={d}>{d}</option>)}
+                  {depts.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
               <div>

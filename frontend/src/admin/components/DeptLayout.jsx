@@ -5,6 +5,7 @@ import { useAdminAuth } from '../context/AdminAuthContext';
 import { Spinner } from '../../components/UI';
 import AdminNavbar from './AdminNavbar';
 import { useState, useEffect } from 'react';
+import { api } from '../../utils/api';
 
 /* ── Department-specific navigation items ──────────────────────────── */
 const DEPT_NAV = {
@@ -124,6 +125,20 @@ const DEPT_NAV = {
   },
 };
 
+const DEFAULT_NAV_ITEMS = [
+  { label: '📊 Overview', path: '' },
+  { label: '💳 Transactions', path: 'transactions' },
+  { label: '👥 CRM', path: 'crm' },
+  { label: '💰 Billing', path: 'billing' },
+  { label: '📦 Inventory', path: 'inventory' },
+  { label: '🎫 Tickets', path: 'tickets' },
+  { label: '💸 Expenses', path: 'expenses' },
+  { label: '👤 Staff Portal', path: 'staff-portal' },
+  { label: '📋 Audit Log', path: 'audit' },
+  { label: '⚙️ Settings', path: 'settings' },
+  { label: '💬 Chat', path: 'chat' },
+];
+
 const DeptLayout = ({ slug, title }) => {
   const { user, loading } = useAdminAuth();
   const navigate = useNavigate();
@@ -131,8 +146,23 @@ const DeptLayout = ({ slug, title }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [subSidebarOpen, setSubSidebarOpen] = useState(false);
+  const [dynamicDept, setDynamicDept] = useState(null);
 
-  const dept = DEPT_NAV[slug] || { label: title, branch: '', color: '#A9C4BE', items: [] };
+  // If slug is not in the hardcoded DEPT_NAV, fetch from API
+  useEffect(() => {
+    if (!DEPT_NAV[slug] && slug) {
+      api.get(`/departments/${slug}`).then(({ data }) => {
+        setDynamicDept(data);
+      }).catch(() => {});
+    }
+  }, [slug]);
+
+  const dept = DEPT_NAV[slug] || (dynamicDept ? {
+    label: dynamicDept.name,
+    branch: dynamicDept.name.split(' ').map(w => w[0]).join('').slice(0, 6),
+    color: dynamicDept.color || '#A9C4BE',
+    items: DEFAULT_NAV_ITEMS,
+  } : { label: title || slug, branch: '', color: '#A9C4BE', items: DEFAULT_NAV_ITEMS });
   const basePath = `/admin/${slug}`;
 
   // Close sidebars on route change

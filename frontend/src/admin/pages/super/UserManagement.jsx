@@ -6,8 +6,8 @@ import { Spinner, EmptyState } from '../../../components/UI';
 import toast from 'react-hot-toast';
 
 const ROLES = ['DEPT_HEAD_OWNER', 'STAFF'];
-const DEPTS = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
 const EMPTY = { name:'', email:'', password:'', role:'STAFF', departmentSlug:'', isOwner:false, mustChangePassword:false };
+const FALLBACK_DEPTS = ['internet', 'webdev', 'playstation', 'repair', 'cybersecurity', 'govadmin'];
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -18,6 +18,14 @@ export default function UserManagement() {
   const [pwModal, setPwModal] = useState(null);
   const [newPw, setNewPw] = useState('');
   const [createdUser, setCreatedUser] = useState(null);
+  const [depts, setDepts] = useState(FALLBACK_DEPTS);
+
+  useEffect(() => {
+    api.get('/departments').then(({ data }) => {
+      const slugs = data.filter(d => d.isActive !== false).map(d => d.slug);
+      if (slugs.length > 0) setDepts(slugs);
+    }).catch(() => {});
+  }, []);
 
   const load = async () => {
     setLoading(true);
@@ -129,7 +137,7 @@ export default function UserManagement() {
                 <div><label style={lbl}>Department</label>
                   <select value={form.departmentSlug} onChange={(e) => setForm({...form,departmentSlug:e.target.value})} style={inp}>
                     <option value="">— None —</option>
-                    {DEPTS.map((d) => <option key={d}>{d}</option>)}
+                    {depts.map((d) => <option key={d}>{d}</option>)}
                   </select>
                 </div>
               </div>
