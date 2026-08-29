@@ -18,6 +18,7 @@ const DEPT_COLORS = { internet:'#2BB6A3', webdev:'#a78bfa', playstation:'#ffd700
 const SUPER_LINKS = [
   ['Dashboard','◈','/admin/super'],
   ['All Departments','◉','/admin/super/departments'],
+  ['Admin Allocation','◆','/admin/super/admin-allocation'],
   ['Devices','🖥','/admin/super/devices'],
   ['User Management','◫','/admin/super/users'],
   ['Chat','💬','/admin/super/chat'],

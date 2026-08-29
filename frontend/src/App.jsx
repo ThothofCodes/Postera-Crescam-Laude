@@ -77,6 +77,7 @@ const StaffInvitation = React.lazy(() => import('./admin/pages/shared/StaffInvit
 const CRMPage = React.lazy(() => import('./admin/pages/shared/CRMPage'));
 const BillingPage = React.lazy(() => import('./admin/pages/shared/BillingPage'));
 const ForcePasswordChange = React.lazy(() => import('./admin/pages/ForcePasswordChange'));
+const DepartmentAdminAllocation = React.lazy(() => import('./admin/pages/super/DepartmentAdminAllocation'));
 const InternetLanding = React.lazy(() => import('./admin/pages/internet/Landing'));
 const ISPClients = React.lazy(() => import('./admin/pages/internet/Clients'));
 const WebDevLanding = React.lazy(() => import('./admin/pages/webdev/Landing'));
@@ -210,6 +211,7 @@ export default function App() {
                   <Route path="departments" element={<DepartmentsPage />} />
                   <Route path="devices" element={<DeviceManagement />} />
                   <Route path="users" element={<UserManagement />} />
+                  <Route path="admin-allocation" element={<DepartmentAdminAllocation />} />
                   <Route path="email" element={<EmailAllocationPage />} />
                   <Route path="finance" element={<FinancePage />} />
                   <Route path="tickets" element={<TicketsPage color="#ff3366" />} />
