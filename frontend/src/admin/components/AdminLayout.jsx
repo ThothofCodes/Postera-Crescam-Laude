@@ -4,6 +4,7 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { Spinner } from '../../components/UI';
 import AdminNavbar from './AdminNavbar';
+import PaymentNotifications from './PaymentNotifications';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -41,6 +42,7 @@ const AdminLayout = () => {
         <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
           <Outlet />
         </div>
+        <PaymentNotifications maxVisible={3} />
       </main>
 
       <style>{`

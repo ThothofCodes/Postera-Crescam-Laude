@@ -130,6 +130,7 @@ function initSocket(httpServer) {
       // their highest-clearance status already covers every department via
       // presenceManager.isAnyAdminOnlineForDept().
       socket.join('admin-room');
+      socket.join('admin:global'); // For real-time payment notifications
       socket.join('public-chat'); // Also join public-chat so admin:status events reach the admin's own client
       if (departmentSlug) socket.join(`admin-room:${departmentSlug}`);
 
@@ -557,7 +558,16 @@ function emitBroadcast(payload) {
  * @param {object} payload  { success, invoiceId, amount, mpesaRef }
  */
 function emitPaymentResult(checkoutRequestId, payload) {
-  try { getIO().to(`payment:${checkoutRequestId}`).emit('payment:result', payload); } catch (e) {}
+  try {
+    const io = getIO();
+    // Emit to specific payment room (customer's browser)
+    io.to(`payment:${checkoutRequestId}`).emit('payment:result', payload);
+    // Emit to all admin rooms for real-time dashboard updates
+    io.to('admin:global').emit('payment:new', { checkoutRequestId, ...payload, timestamp: Date.now() });
+    io.to('admin-room').emit('payment:new', { checkoutRequestId, ...payload, timestamp: Date.now() });
+    // Also emit to super admin room
+    io.to('super:global').emit('payment:new', { checkoutRequestId, ...payload, timestamp: Date.now() });
+  } catch (e) {}
 }
 
 /**

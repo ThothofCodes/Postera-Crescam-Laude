@@ -9,6 +9,8 @@ const {
 const {
   protect, staffGuard, deptHeadGuard, staffReadScope,
 } = require('../middleware/auth');
+const { sendSMS } = require('../config/africastalking');
+const { sendEmail } = require('../config/mailer');
 
 // ── PCL Brand Config ─────────────────────────────────────────────────
 const STORE = {
@@ -317,6 +319,154 @@ router.get('/status/:identifier', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: 'Failed to check order status' });
+  }
+});
+
+// ── Retry STK Push (public — when initial prompt fails/times out) ──────
+router.post('/retry-payment/:identifier', async (req, res) => {
+  try {
+    const { identifier } = req.params;
+    const isObjectId = /^[0-9a-f]{24}$/i.test(identifier);
+    const query = isObjectId ? { _id: identifier } : { orderNumber: identifier };
+    const order = await Order.findOne(query);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (order.paymentStatus === 'paid') return res.status(400).json({ message: 'Order is already paid' });
+    if (order.paymentMethod !== 'mpesa') return res.status(400).json({ message: 'Only M-Pesa orders can be retried' });
+
+    // Rate limit: max 3 retries per order
+    const retryCount = (order.retryCount || 0) + 1;
+    if (retryCount > 3) {
+      // Notify customer that retries are exhausted
+      if (order.customer?.phone) {
+        sendSMS(order.customer.phone, `M-Pesa retries exhausted for Order ${order.orderNumber}. Please pay Cash on Pickup or contact support.`);
+      }
+      if (order.customer?.email) {
+        sendEmail({
+          to: order.customer.email,
+          subject: `⚠️ M-Pesa Retries Exhausted — Order ${order.orderNumber}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #f59e0b; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1 style="margin: 0; font-size: 24px;">⚠️ M-Pesa Retries Exhausted</h1>
+              </div>
+              <div style="padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                <p>Hello ${order.customer.name},</p>
+                <p>All M-Pesa payment attempts for <strong>Order ${order.orderNumber}</strong> have been exhausted.</p>
+                <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                  <p><strong>Amount:</strong> KES ${order.total.toLocaleString()}</p>
+                  <p><strong>Order Number:</strong> ${order.orderNumber}</p>
+                </div>
+                <p><strong>Your options:</strong></p>
+                <ul>
+                  <li>💵 Pay Cash on Pickup when collecting your order</li>
+                  <li>📞 Contact us for alternative payment arrangements</li>
+                </ul>
+                <p style="color: #64748b; font-size: 12px;">Postera Crescam Laude Support — +254 140 918 502</p>
+              </div>
+            </div>
+          `,
+        }).catch(() => {});
+      }
+      return res.status(429).json({ message: 'Maximum retries reached. Please pay at the counter or contact support.' });
+    }
+
+    // Re-trigger STK push
+    const { stkPush } = require('../middleware/mpesa');
+    const stkPushResult = await stkPush(order.customer.phone, order.total, order.orderNumber, 'Ruai Tech Order');
+    order.checkoutRequestId = stkPushResult.CheckoutRequestID;
+    order.retryCount = retryCount;
+    order.lastRetryAt = new Date();
+    await order.save();
+
+    res.json({
+      success: true,
+      message: `STK push sent (attempt ${retryCount}/3)`,
+      checkoutRequestId: stkPushResult.CheckoutRequestID,
+      retryCount,
+      maxRetries: 3,
+    });
+  } catch (err) {
+    console.error('Retry STK Push failed:', err.message);
+    res.status(500).json({ message: err.message || 'Failed to retry payment' });
+  }
+});
+
+// ── Switch to Cash Payment (public — when M-Pesa retries exhausted) ──
+router.post('/switch-to-cash/:identifier', async (req, res) => {
+  try {
+    const { identifier } = req.params;
+    const isObjectId = /^[0-9a-f]{24}$/i.test(identifier);
+    const query = isObjectId ? { _id: identifier } : { orderNumber: identifier };
+    const order = await Order.findOne(query);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (order.paymentStatus === 'paid') return res.status(400).json({ message: 'Order is already paid' });
+
+    // Switch payment method to cash
+    order.paymentMethod = 'cash';
+    order.paymentStatus = 'pending_cash';
+    order.notes = (order.notes || '') + '\n[Payment switched to Cash on Pickup]';
+    await order.save();
+
+    // Emit real-time notification to admins
+    try {
+      const { emitPaymentResult } = require('../socket');
+      emitPaymentResult(order.checkoutRequestId || order.orderNumber, {
+        success: false,
+        type: 'cash_switch',
+        orderNumber: order.orderNumber,
+        amount: order.total,
+        message: 'Customer switched to Cash on Pickup',
+        paymentStatus: 'pending_cash',
+        paymentMethod: 'cash',
+        timestamp: Date.now(),
+      });
+    } catch { /* Socket emission is non-critical */ }
+
+    // Notify customer of switch to cash payment
+    if (order.customer?.phone) {
+      sendSMS(order.customer.phone, `Order ${order.orderNumber} switched to Cash on Pickup. Pay KES ${order.total} when you collect. Bring your order number!`);
+    }
+    if (order.customer?.email) {
+      sendEmail({
+        to: order.customer.email,
+        subject: `💵 Cash on Pickup Selected — Order ${order.orderNumber}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #16a34a; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; font-size: 24px;">💵 Cash on Pickup</h1>
+            </div>
+            <div style="padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0;">
+              <p>Hello ${order.customer.name},</p>
+              <p>You've selected <strong>Cash on Pickup</strong> for Order ${order.orderNumber}.</p>
+              <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                <p><strong>Amount to Pay:</strong> KES ${order.total.toLocaleString()}</p>
+                <p><strong>Order Number:</strong> ${order.orderNumber}</p>
+                <p><strong>Payment Method:</strong> Cash</p>
+              </div>
+              <p><strong>What to do:</strong></p>
+              <ul>
+                <li>📍 Visit us at Ruai Town Centre, Nairobi County</li>
+                <li>🔢 Bring your order number for verification</li>
+                <li>💰 Pay when you collect your order</li>
+              </ul>
+              <p style="color: #64748b; font-size: 12px;">Thank you for shopping with Postera Crescam Laude!</p>
+            </div>
+          </div>
+        `,
+      }).catch(() => {});
+    }
+
+    res.json({
+      success: true,
+      message: 'Order switched to Cash on Pickup. Pay when you collect your order.',
+      orderNumber: order.orderNumber,
+      paymentMethod: 'cash',
+      paymentStatus: order.paymentStatus,
+      amount: order.total,
+    });
+  } catch (err) {
+    console.error('Switch to cash failed:', err.message);
+    res.status(500).json({ message: 'Failed to switch payment method' });
   }
 });
 

@@ -121,7 +121,28 @@ const globalLimiter = rateLimit({
   legacyHeaders: false,
   message: { message: 'Too many requests from this IP, please try again after 15 minutes' },
 });
-app.use('/api/', globalLimiter);
+app.use('/api/', (req, res, next) => {
+  // Exempt M-Pesa callbacks (Safaricom servers, not browsers)
+  if (req.path.startsWith('/payments/mpesa/callback') || req.path.startsWith('/billing/mpesa-callback')) {
+    return next();
+  }
+  // Exempt authenticated admin requests (they have their own auth guards)
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    return next();
+  }
+  return globalLimiter(req, res, next);
+});
+
+// ── 6b. M-Pesa callback rate limiter — 50 / 15 min (Safaricom may retry) ──
+const mpesaCallbackLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Too many M-Pesa callbacks' },
+  keyGenerator: (req) => req.ip || 'unknown',
+});
 
 // ── 7. Strict auth rate limiter — 10 attempts / 15 min ─────────────────────
 const authLimiter = rateLimit({
@@ -243,7 +264,7 @@ app.use('/api/orders', require('./routes/orders'));
 app.use('/api/consultations', require('./routes/consultations'));
 app.use('/api/revenue', require('./routes/revenue'));
 app.use('/api/calculator', require('./routes/calculator'));
-app.use('/api/payments', require('./routes/payments'));
+app.use('/api/payments', mpesaCallbackLimiter, require('./routes/payments'));
 app.use('/api/departments', require('./routes/departments'));
 app.use('/api/finance', require('./routes/finance'));
 app.use('/api/users', require('./routes/users'));
@@ -268,9 +289,12 @@ app.use('/api/ussd', require('./routes/ussd'));
 app.use('/api/devices', require('./routes/devices'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/analytics/departments', require('./routes/departmentAnalytics'));
+app.use('/api/analytics/departments/pdf', require('./routes/departmentAnalyticsPdf'));
+app.use('/api/payment-history', require('./routes/paymentHistory'));
 app.use('/api/deployment', require('./routes/deployment'));
 app.use('/api/db-health', require('./routes/dbHealth'));
 app.use('/api/connection-pool', require('./routes/connectionPool'));
+app.use('/api/webhook-config', require('./routes/webhookConfig'));
 
 // ── 10a. Swagger API docs ──────────────────────────────────────────────────
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

@@ -4,8 +4,9 @@ const { emitPaymentResult } = require('../socket');
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const Invoice = require('../models/Invoice');
 const CRMClient = require('../models/CRMClient');
-const { stkPush } = require('../middleware/mpesa');
+const { stkPush, isCallbackProcessed, markCallbackProcessed } = require('../middleware/mpesa');
 const { sendSMS } = require('../config/africastalking');
+const DeptTransaction = require('../models/DeptTransaction');
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 const safePage = (p) => Math.max(1, Math.min(Number(p) || 1, 1000));
@@ -107,6 +108,15 @@ exports.mpesaCallback = async (req, res) => {
     const result = req.body?.Body?.stkCallback;
     if (!result || result.ResultCode !== 0) return;
     const { CheckoutRequestID, CallbackMetadata } = result;
+
+    // Replay protection
+    if (isCallbackProcessed(CheckoutRequestID)) {
+      console.warn(`[MPESA-BILLING] Callback replay blocked: ${CheckoutRequestID}`);
+      return;
+    }
+    markCallbackProcessed(CheckoutRequestID);
+    console.log(`[MPESA-BILLING] Callback received: ${CheckoutRequestID} code=${result.ResultCode}`);
+
     const meta = {};
     CallbackMetadata?.Item?.forEach(({ Name, Value }) => { meta[Name] = Value; });
     const invoice = await Invoice.findOne({ checkoutRequestId: CheckoutRequestID });

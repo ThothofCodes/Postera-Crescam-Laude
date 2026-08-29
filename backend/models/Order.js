@@ -31,6 +31,8 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['mpesa', 'cash', 'bank'] },
   mpesaRef: String,
   checkoutRequestId: String,
+  retryCount: { type: Number, default: 0 },
+  lastRetryAt: Date,
   deliveryType: { type: String, enum: ['pickup', 'delivery'], default: 'pickup' },
   notes: String,
   confirmedAt: Date,

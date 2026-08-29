@@ -12,6 +12,7 @@ import RuaiTechLogo from '../../../components/Logo';
 import NotificationBell from '../../components/NotificationBell';
 import ChatMonitor from '../../components/ChatMonitor';
 import RuaiPulseBoard from '../../../components/RuaiPulseBoard';
+import PaymentNotifications from '../../components/PaymentNotifications';
 
 const DEPT_COLORS = { internet:'#2BB6A3', webdev:'#a78bfa', playstation:'#ffd700', repair:'#ff8800', cybersecurity:'#ff3366', govadmin:'#00ff88' };
 
@@ -26,6 +27,7 @@ const SUPER_LINKS = [
   ['Chat','💬','/admin/super/chat'],
   ['Email Allocation','◆','/admin/super/email'],
   ['Finance','◆','/admin/super/finance'],
+  ['Payment History','💰','/admin/super/payments'],
   ['All Tickets','◧','/admin/super/tickets'],
   ['Inventory Master','◈','/admin/super/inventory'],
   ['Blog Management','📝','/admin/super/blog'],
@@ -162,7 +164,7 @@ export function SuperAdminLayout() {
 
           <SidebarSection title="DEPARTMENTS" defaultOpen={true}>
             <div style={{ padding: '0 6px' }}>
-              {Object.entries(deptColors).map(([slug, color]) => (
+              {Object.entries(DEPT_COLORS).map(([slug, color]) => (
                 <NavLink key={slug} to={`/admin/${slug}`} style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '5px 10px', marginBottom: 1, borderRadius: 4,
@@ -233,6 +235,7 @@ export function SuperAdminLayout() {
           </div>
           <Outlet />
         </main>
+        <PaymentNotifications maxVisible={5} />
       </div>
 
       <style>{`

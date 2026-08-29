@@ -80,6 +80,7 @@ const ForcePasswordChange = React.lazy(() => import('./admin/pages/ForcePassword
 const DepartmentAdminAllocation = React.lazy(() => import('./admin/pages/super/DepartmentAdminAllocation'));
 const DepartmentManagement = React.lazy(() => import('./admin/pages/super/DepartmentManagement'));
 const DepartmentAnalytics = React.lazy(() => import('./admin/pages/super/DepartmentAnalytics'));
+const PaymentHistory = React.lazy(() => import('./admin/pages/super/PaymentHistory'));
 const InternetLanding = React.lazy(() => import('./admin/pages/internet/Landing'));
 const ISPClients = React.lazy(() => import('./admin/pages/internet/Clients'));
 const WebDevLanding = React.lazy(() => import('./admin/pages/webdev/Landing'));
@@ -224,6 +225,7 @@ export default function App() {
                   <Route path="dept-analytics" element={<DepartmentAnalytics />} />
                   <Route path="email" element={<EmailAllocationPage />} />
                   <Route path="finance" element={<FinancePage />} />
+                  <Route path="payments" element={<PaymentHistory />} />
                   <Route path="tickets" element={<TicketsPage color="#ff3366" />} />
                   <Route path="inventory" element={<InventoryPage color="#EE6100" />} />
                   <Route path="audit" element={<AuditLogPage />} />

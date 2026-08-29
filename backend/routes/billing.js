@@ -4,9 +4,10 @@ const ctrl = require('../controllers/billingController');
 const {
   protect, staffGuard, deptHeadGuard, superAdminGuard,
 } = require('../middleware/auth');
+const { webhookSignatureMiddleware } = require('../middleware/webhookSignature');
 
-// M-Pesa callback — no auth (Safaricom calls this directly)
-router.post('/mpesa-callback', ctrl.mpesaCallback);
+// M-Pesa callback — no auth, but with webhook signature verification
+router.post('/mpesa-callback', webhookSignatureMiddleware, ctrl.mpesaCallback);
 
 router.use(protect);
 

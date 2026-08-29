@@ -89,15 +89,11 @@ export default function InventoryPage({ color = '#EE6100' }) {
 
   const generateQRCode = async (itemId) => {
     try {
-      // This would typically connect to a QR code generation service
-      // For now, we'll simulate it with a placeholder
-      const qrCodeUrl = `/api/qrcode/${itemId}`;
-      setQrCode(qrCodeUrl);
-      setForm(prev => ({
-        ...prev,
-        qrCodeUrl: qrCodeUrl
-      }));
-      toast.success('QR code generated');
+      const { data } = await api.get(`/inventory/${itemId}/qr`);
+      if (data.success && data.dataUri) {
+        setQrCode(data.dataUri);
+        toast.success(`QR code generated for ${data.sku || 'item'}`);
+      }
     } catch (err) {
       toast.error('Failed to generate QR code');
     }

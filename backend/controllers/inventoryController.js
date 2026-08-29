@@ -211,22 +211,38 @@ const inventoryController = {
     }
   },
 
-  // Get expiring items (this is a placeholder - adjust based on your needs)
+  // Get items expiring within N days (default 30)
   getExpiring: async (req, res) => {
     try {
-      // This would typically check for items with expiration dates
-      // For now, return empty array as placeholder
-      res.json({
-        success: true,
-        data: [],
-        total: 0,
-      });
+      const days = Math.max(1, Math.min(Number(req.query.days) || 30, 365));
+      const now = new Date();
+      const cutoff = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+
+      const filter = {
+        expiryDate: { $exists: true, $ne: null, $lte: cutoff, $gte: now },
+        isActive: true,
+      };
+      if (req.query.departmentSlug) filter.departmentSlug = req.query.departmentSlug;
+
+      const items = await require('../models/Inventory')
+        .find(filter)
+        .sort('expiryDate')
+        .limit(100);
+
+      const data = items.map((item) => ({
+        _id: item._id,
+        name: item.name,
+        sku: item.sku,
+        quantity: item.quantity,
+        departmentSlug: item.departmentSlug,
+        expiryDate: item.expiryDate,
+        daysUntilExpiry: Math.ceil((item.expiryDate - now) / (24 * 60 * 60 * 1000)),
+      }));
+
+      res.json({ success: true, data, total: data.length, days });
     } catch (error) {
       console.error('Error getting expiring items:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get expiring items',
-      });
+      res.status(500).json({ success: false, message: 'Failed to get expiring items' });
     }
   },
 

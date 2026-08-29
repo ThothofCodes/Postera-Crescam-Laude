@@ -20,6 +20,7 @@ export default function DepartmentAnalytics() {
   const [timeline, setTimeline] = useState(null);
   const [year, setYear] = useState(new Date().getFullYear());
   const [chartView, setChartView] = useState('overview'); // overview, revenue, tickets, staffing
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   useEffect(() => { fetchAnalytics(); }, [year]);
   useEffect(() => {
@@ -40,6 +41,26 @@ export default function DepartmentAnalytics() {
       const { data } = await api.get(`/analytics/departments/${slug}/timeline`, { params: { year } });
       setTimeline(data);
     } catch { setTimeline(null); }
+  };
+
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      const response = await fetch(`/api/analytics/departments/pdf?year=${year}`);
+      if (!response.ok) throw new Error('Failed to download');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `dept-analytics-${year}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Silent — user can try again
+    }
+    setDownloadingPdf(false);
   };
 
   if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}><Spinner /></div>;
@@ -103,6 +124,16 @@ export default function DepartmentAnalytics() {
               style={{ padding: '0.4rem 0.75rem', background: '#0B1F1B', color: '#E8F0EE', border: '1px solid rgba(36,74,68,0.4)', borderRadius: 4, fontSize: 12, fontFamily: "'Poppins', sans-serif" }}>
               {[0, 1, 2].map(y => <option key={y} value={new Date().getFullYear() - y}>{new Date().getFullYear() - y}</option>)}
             </select>
+            <button onClick={handleDownloadPdf} disabled={downloadingPdf}
+              style={{
+                padding: '0.4rem 1rem', borderRadius: 4, fontSize: 12, fontWeight: 700,
+                background: downloadingPdf ? '#6A8A82' : '#EE6100',
+                color: '#fff', border: 'none', cursor: downloadingPdf ? 'not-allowed' : 'pointer',
+                fontFamily: "'Poppins', sans-serif", display: 'flex', alignItems: 'center', gap: 6,
+                transition: 'all 0.2s',
+              }}>
+              {downloadingPdf ? '⏳ Generating...' : '📥 Download PDF'}
+            </button>
           </div>
         </div>
 

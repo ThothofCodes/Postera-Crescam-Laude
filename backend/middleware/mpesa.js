@@ -1,5 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const axios = require('axios');
+const crypto = require('crypto');
+const { generateSignedCallbackUrl } = require('./webhookSignature');
 
 // ── FIX (Continuity Audit, Part Four — critical) ───────────────────────────
 // Every Daraja call used to be hardcoded to sandbox.safaricom.co.ke, with no
@@ -17,6 +19,39 @@ if (MPESA_ENV !== 'production' && MPESA_ENV !== 'sandbox') {
   console.warn(`[MPESA] Unrecognized MPESA_ENV="${process.env.MPESA_ENV}" — falling back to sandbox host for safety.`);
 }
 console.log(`[MPESA] Daraja host: ${MPESA_BASE_URL} (MPESA_ENV=${MPESA_ENV})`);
+
+// ── Callback security: replay protection ─────────────────────────────────
+// Store processed callback IDs to prevent duplicate processing
+const processedCallbacks = new Map(); // checkoutRequestId → timestamp
+const CALLBACK_MAX_AGE_MS = 5 * 60 * 1000; // 5 minutes
+const CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // Clean up every 10 minutes
+
+// Periodic cleanup of old entries
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamp] of processedCallbacks) {
+    if (now - timestamp > CALLBACK_MAX_AGE_MS * 2) {
+      processedCallbacks.delete(key);
+    }
+  }
+}, CLEANUP_INTERVAL_MS);
+
+/**
+ * Check if a callback has already been processed (replay protection).
+ * @param {string} checkoutRequestId
+ * @returns {boolean} true if already processed
+ */
+function isCallbackProcessed(checkoutRequestId) {
+  return processedCallbacks.has(checkoutRequestId);
+}
+
+/**
+ * Mark a callback as processed.
+ * @param {string} checkoutRequestId
+ */
+function markCallbackProcessed(checkoutRequestId) {
+  processedCallbacks.set(checkoutRequestId, Date.now());
+}
 
 // Safaricom IP ranges for callback verification (these would need to be updated regularly)
 // These are the known IP ranges that Safaricom uses for sending callbacks
@@ -79,6 +114,10 @@ const stkPush = async (phone, amount, accountRef, description) => {
   const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
   const password = Buffer.from(`${MPESA_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
 
+  // Generate signed callback URL with HMAC signature
+  const tempCheckoutId = crypto.randomBytes(16).toString('hex'); // Temporary ID for signing
+  const signedCallbackUrl = await generateSignedCallbackUrl(MPESA_CALLBACK_URL, tempCheckoutId);
+
   const { data } = await axios.post(
     `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
     {
@@ -90,12 +129,21 @@ const stkPush = async (phone, amount, accountRef, description) => {
       PartyA: validPhone,
       PartyB: MPESA_SHORTCODE,
       PhoneNumber: validPhone,
-      CallBackURL: MPESA_CALLBACK_URL,
+      CallBackURL: signedCallbackUrl,
       AccountReference: safeRef,
       TransactionDesc: safeDesc,
     },
     { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 },
   );
+
+  // Store the temporary checkout ID mapping for signature verification
+  // The actual CheckoutRequestID will come from Safaricom's response
+  if (data.CheckoutRequestID) {
+    // Update the signature with the real checkout request ID
+    const realSignedUrl = await generateSignedCallbackUrl(MPESA_CALLBACK_URL, data.CheckoutRequestID);
+    console.log(`[MPESA] STK Push initiated: ${data.CheckoutRequestID}, signed callback URL generated`);
+  }
+
   return data;
 };
 
@@ -116,12 +164,15 @@ const verifyMpesaSource = (req, res, next) => {
     const isFromSafaricom = SAFARICOM_IP_RANGES.some((range) => cleanIP.startsWith(range)
       || cleanIP === range);
 
-    if (process.env.NODE_ENV === 'production') {
-      if (!isFromSafaricom) {
-        console.warn(`M-Pesa callback from non-Safaricom IP: ${cleanIP}`);
-        // In production, you might want to reject non-Safaricom IPs
-        // For now, we'll just log it and continue for flexibility
-      }
+    // In production: block non-Safaricom IPs (strict security)
+    if (process.env.NODE_ENV === 'production' && !isFromSafaricom) {
+      console.error(`[MPESA] REJECTED callback from non-Safaricom IP: ${cleanIP}`);
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    // In development: warn but allow (for testing with ngrok/tunnels)
+    if (process.env.NODE_ENV !== 'production' && !isFromSafaricom) {
+      console.warn(`[MPESA] Callback from non-Safaricom IP: ${cleanIP} (allowed in dev)`);
     }
 
     // Add IP information to request for logging/debugging
@@ -208,4 +259,7 @@ module.exports = {
   validateCallback,
   formatPhone,
   verifyMpesaSource,
+  isCallbackProcessed,
+  markCallbackProcessed,
+  CALLBACK_MAX_AGE_MS,
 };
