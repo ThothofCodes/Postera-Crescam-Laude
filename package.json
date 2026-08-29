@@ -1,7 +1,7 @@
 {
-  "name": "ruaitech-solutions",
+  "name": "pcl-solutions",
   "version": "1.0.0",
-  "description": "Ruai Tech Solutions — Integrated Platform (Monorepo Root)",
+  "description": "Postera Crescam Laude — Integrated Platform (Monorepo Root)",
   "private": true,
   "scripts": {
     "install:all": "npm install --prefix backend && npm install --prefix frontend",

@@ -101,7 +101,7 @@ function ClientLogin({ slug, onLogin }) {
       justifyContent:'center', fontFamily:"'Inter',sans-serif" }}>
       <div style={{ width:380, background:'#0B1F1B', border:`1px solid ${color}33`, borderRadius:14, padding:'2rem' }}>
         <div style={{ textAlign:'center', marginBottom:'1.5rem' }}>
-          <div style={{ fontSize:28, fontWeight:800, color, letterSpacing:'0.05em' }}>RUAI TECH</div>
+          <div style={{ fontSize:28, fontWeight:800, color, letterSpacing:'0.05em' }}>PCL</div>
           <div style={{ fontSize:11, color:'#4a6a8a', letterSpacing:'0.15em', textTransform:'uppercase', marginTop:4 }}>
             Client Portal — {slug.toUpperCase()}
           </div>

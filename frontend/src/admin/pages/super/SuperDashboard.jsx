@@ -8,10 +8,10 @@ import { formatKES } from '../../../utils/helpers';
 import IncomeProjectionChart from '../../components/IncomeProjectionChart';
 import { Spinner } from '../../../components/UI';
 import { useAdminAuth } from '../../context/AdminAuthContext';
-import RuaiTechLogo from '../../../components/Logo';
+import PCLLogo from '../../../components/Logo';
 import NotificationBell from '../../components/NotificationBell';
 import ChatMonitor from '../../components/ChatMonitor';
-import RuaiPulseBoard from '../../../components/RuaiPulseBoard';
+import PulseBoard from '../../../components/PulseBoard';
 import PaymentNotifications from '../../components/PaymentNotifications';
 
 const DEPT_COLORS = { internet:'#2BB6A3', webdev:'#a78bfa', playstation:'#ffd700', repair:'#ff8800', cybersecurity:'#ff3366', govadmin:'#00ff88' };
@@ -31,6 +31,7 @@ const SUPER_LINKS = [
   ['All Tickets','◧','/admin/super/tickets'],
   ['Inventory Master','◈','/admin/super/inventory'],
   ['Blog Management','📝','/admin/super/blog'],
+  ['Tech Studio','🎛','/admin/super/studio'],
   ['Audit Log','☰','/admin/super/audit'],
   ['Broadcast','◈','/admin/super/broadcast'],
   ['Settings','◉','/admin/super/settings'],
@@ -164,7 +165,7 @@ export function SuperAdminLayout() {
           display: 'flex', alignItems: 'center', gap: 6, minHeight: 52,
         }}>
           <NavLink to="/admin/super" end style={{ textDecoration: 'none', flex: 1, overflow: 'hidden' }}>
-            <RuaiTechLogo size={24} showText={true} textSize="10px" />
+            <PCLLogo size={24} showText={true} textSize="10px" />
             <div style={{
               fontSize: 7, color: '#EE6100', letterSpacing: '0.2em',
               textTransform: 'uppercase', marginTop: 3, fontWeight: 700,
@@ -323,7 +324,7 @@ export function SuperAdminLayout() {
 
         <main style={{ flex: 1, overflowY: 'auto', padding: '1.25rem' }}>
           <div style={{ marginBottom: '1rem' }}>
-            <RuaiPulseBoard authToken={localStorage.getItem('adminToken') || localStorage.getItem('token')} />
+            <PulseBoard authToken={localStorage.getItem('adminToken') || localStorage.getItem('token')} />
           </div>
           <Outlet />
         </main>

@@ -2,7 +2,7 @@
 // PCL — Circuit Canopy Navbar
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import RuaiTechLogo from './Logo';
+import PCLLogo from './Logo';
 import { useState, useEffect } from 'react';
 
 export default function Navbar() {
@@ -30,7 +30,7 @@ export default function Navbar() {
     }}>
       {/* Logo */}
       <Link to="/store" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }} title="Home">
-        <RuaiTechLogo size={30} showText={true} textSize="13px" />
+        <PCLLogo size={30} showText={true} textSize="13px" />
       </Link>
 
       {/* Desktop Navigation */}

@@ -31,7 +31,7 @@ exports.handle = async (req, res) => {
     // Level 0 — Main menu
     if (!text || text === '') {
       return respond(
-        'Welcome to Ruai Tech Solutions\n1. Internet Services\n2. Repair Status\n3. Pay Invoice\n4. PlayStation Booking\n5. Gov Services\n6. Support\n7. My Account\n0. Exit',
+        'Welcome to Postera Crescam Laude\n1. Internet Services\n2. Repair Status\n3. Pay Invoice\n4. PlayStation Booking\n5. Gov Services\n6. Support\n7. My Account\n0. Exit',
       );
     }
 
@@ -39,8 +39,8 @@ exports.handle = async (req, res) => {
 
     // ── 0 Exit ──
     if (L1 === '0') {
-      try { await sendSMS(phone, 'Thank you for contacting Ruai Tech Solutions. Visit us at Ruai Town Centre!'); } catch (_) {}
-      return respond('Thank you for using Ruai Tech Solutions. Goodbye!', true);
+      try { await sendSMS(phone, 'Thank you for contacting Postera Crescam Laude. Visit us at PCL Centre!'); } catch (_) {}
+      return respond('Thank you for using Postera Crescam Laude. Goodbye!', true);
     }
 
     // ── 1 Internet Services ──
@@ -48,12 +48,12 @@ exports.handle = async (req, res) => {
       if (level === 1) return respond('Internet Services\n1. Check data balance\n2. Buy top-up\n3. Report outage\n4. Contact support');
       if (last === '1') {
         const client = await CRMClient.findOne({ phone, departmentSlug: 'internet' });
-        if (!client) return respond('Phone not found on our internet network.\nPlease visit Ruai Tech Solutions office.', true);
+        if (!client) return respond('Phone not found on our internet network.\nPlease visit Postera Crescam Laude office.', true);
         return respond(`Your Balance:\nPackage: ${client.packageName || 'Standard'}\nStatus: Active\nBalance: ${client.loyaltyPoints} pts\n\nFor full details, visit our office.`, true);
       }
-      if (last === '2') return respond('To buy a top-up, please M-Pesa Paybill 522522, Acc: RUAITECH, then text TOPUP to 0700000001.', true);
+      if (last === '2') return respond('To buy a top-up, please M-Pesa Paybill 522522, Acc: PCL, then text TOPUP to 0700000001.', true);
       if (last === '3') return respond('Outage reported. Our team will contact you within 1 hour.\nRef: OUT-' + Date.now().toString().slice(-6), true);
-      if (last === '4') return respond('Internet Support: Call 0700000001 or visit Ruai Town Centre.', true);
+      if (last === '4') return respond('Internet Support: Call 0700000001 or visit PCL Centre.', true);
     }
 
     // ── 2 Repair Status ──
@@ -85,7 +85,7 @@ exports.handle = async (req, res) => {
       if (level === 2) return respond(`Invoice: ${invId}\nAmount: KES ${invoice.balance}\nSend M-Pesa STK to ${phone}?\n1. Yes, send STK push\n2. No, cancel`);
       if (last === '1') {
         try {
-          await stkPush(phone, invoice.balance, invId, 'Ruai Tech Invoice');
+          await stkPush(phone, invoice.balance, invId, 'PCL Invoice');
           invoice.status = 'PAYMENT_SENT'; await invoice.save();
           return respond(`M-Pesa prompt sent to ${phone}.\nEnter your PIN to complete payment.\nRef: ${invId}`, true);
         } catch (_) { return respond('Payment initiation failed. Please try again or visit our office.', true); }
@@ -97,7 +97,7 @@ exports.handle = async (req, res) => {
     if (L1 === '4') {
       if (level === 1) return respond('PlayStation Arena\n1. Book a slot\n2. Check availability\n3. View my bookings');
       if (last === '2') return respond('Current availability:\nVisit /client/playstation or call 0700000002 to see live station map.', true);
-      if (last === '1' || last === '3') return respond('To book a PlayStation slot, please visit:\nhttp://ruaitechsolutions.co.ke/client/playstation\nOr call 0700000002.', true);
+      if (last === '1' || last === '3') return respond('To book a PlayStation slot, please visit:\nhttp://pclsolutions.co.ke/client/playstation\nOr call 0700000002.', true);
     }
 
     // ── 5 Gov Services ──
@@ -105,10 +105,10 @@ exports.handle = async (req, res) => {
       if (level === 1) return respond('Gov Admin Services\n1. Check document status\n2. Book appointment\n3. Fee inquiry');
       if (last === '1') {
         const doc = await require('../models/GovDocument').findOne({ clientPhone: phone }).sort('-createdAt');
-        if (!doc) return respond('No document requests found for your number.\nVisit Ruai Tech Solutions to start your application.', true);
+        if (!doc) return respond('No document requests found for your number.\nVisit Postera Crescam Laude to start your application.', true);
         return respond(`Document: ${doc.documentType}\nStatus: ${doc.status}\nUpdated: ${doc.updatedAt?.toDateString()}`, true);
       }
-      if (last === '2') return respond('To book a Gov Admin appointment:\nCall 0700000006 or visit Ruai Town Centre.\nOpen: Mon-Sat 8AM-6PM', true);
+      if (last === '2') return respond('To book a Gov Admin appointment:\nCall 0700000006 or visit PCL Centre.\nOpen: Mon-Sat 8AM-6PM', true);
       if (last === '3') return respond('Service fees vary by document type.\nVisit our office for a fee schedule.\nNo hidden charges — transparent pricing guaranteed.', true);
     }
 
@@ -122,7 +122,7 @@ exports.handle = async (req, res) => {
       }
       if (last === '1') return respond('To raise a support ticket, please send an SMS to 0700000000\nwith the format: TICKET [your issue description]', true);
       if (last === '3') {
-        try { await sendSMS(phone, 'Our team will call you back within 30 minutes. Thank you for your patience - Ruai Tech Solutions'); } catch (_) {}
+        try { await sendSMS(phone, 'Our team will call you back within 30 minutes. Thank you for your patience - Postera Crescam Laude'); } catch (_) {}
         return respond('Callback request registered. We will call you within 30 minutes.', true);
       }
     }
@@ -134,7 +134,7 @@ exports.handle = async (req, res) => {
       if (!client) return respond('Account not found. Please register at our office or client portal.', true);
       if (last === '1') return respond(`Loyalty Points: ${client.loyaltyPoints} pts\n100 pts = KES 50 discount\n\nEarn more by paying invoices on time!`, true);
       if (last === '2') return respond(`Outstanding Balance: KES ${client.outstandingBalance || 0}\n\nTo pay, select option 3 from the main menu.`, true);
-      if (last === '3') return respond('To update your phone number, please visit Ruai Tech Solutions office with your ID.', true);
+      if (last === '3') return respond('To update your phone number, please visit Postera Crescam Laude office with your ID.', true);
     }
 
     // Default — unknown input

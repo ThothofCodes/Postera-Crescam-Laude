@@ -29,9 +29,9 @@ function receiptHTML(invoice) {
     .ref{background:#e8f5ee;border:1px solid #1a6b3c;padding:8px 16px;border-radius:4px;display:inline-block;margin:8px 0;font-weight:bold;color:#1a6b3c}
   </style></head><body>
   <div class="header">
-    <h1>🏢 RUAI TECH SOLUTIONS</h1>
-    <p>Ruai Town Centre, Nairobi County, Kenya</p>
-    <p>Email: info@ruaitechsolutions.co.ke | Tel: +254 700 000 001</p>
+    <h1>🏢 PCL SOLUTIONS</h1>
+    <p>PCL Centre, Nairobi County, Kenya</p>
+    <p>Email: info@pclsolutions.co.ke | Tel: +254 700 000 001</p>
   </div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div><h2 style="margin:0;color:#0d1f35">PAYMENT RECEIPT</h2></div>
@@ -54,9 +54,9 @@ function receiptHTML(invoice) {
     <div class="ref">M-Pesa Ref: ${invoice.mpesaRef || 'N/A'}</div>
   </div>
   <div class="footer">
-    <p>This is an official receipt from Ruai Tech Solutions.</p>
+    <p>This is an official receipt from Postera Crescam Laude.</p>
     <p>Receipt ID: REC-${invoice.invoiceId || Date.now()} | Generated: ${new Date().toLocaleString('en-KE', { timeZone: 'Africa/Nairobi' })}</p>
-    <p>Thank you for your business! Visit us again at Ruai Town Centre.</p>
+    <p>Thank you for your business! Visit us again at PCL Centre.</p>
   </div>
   </body></html>`;
 }

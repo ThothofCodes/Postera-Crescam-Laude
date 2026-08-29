@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAdminAuth } from '../admin/context/AdminAuthContext';
-import RuaiTechLogo from '../components/Logo';
+import PCLLogo from '../components/Logo';
 import toast from 'react-hot-toast';
 
 export default function Login() {
@@ -78,7 +78,7 @@ export default function Login() {
       }}>
         {/* Logo */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
-          <RuaiTechLogo size={48} showText={true} textSize="16px" />
+          <PCLLogo size={48} showText={true} textSize="16px" />
         </div>
 
         {/* Title — changes based on admin vs regular login */}

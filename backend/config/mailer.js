@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async ({ to, subject, html }) => {
   await transporter.sendMail({
-    from: `"Ruai Tech Solutions" <${process.env.EMAIL_USER}>`,
+    from: `"Postera Crescam Laude" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,

@@ -11,7 +11,7 @@ const adminSockets = new Map(); // adminId -> Set of socketIds (admin may have m
 const pendingCallbacks = new Map(); // socketId -> { clientName, message, requestedAt, departmentSlug }
 const adminAvailability = new Map(); // adminId -> boolean (whether admin wants to be available)
 
-// ── Ruai Pulse — per-department presence metadata ─────────────────────────
+// ── Pulse — per-department presence metadata ─────────────────────────
 // adminId -> { departmentSlug, isSuperAdmin, role, name }
 // SUPER_ADMIN holds the highest clearance level in this system: their presence
 // counts toward EVERY department's beacon, not just one. A Dept Head or Staff
@@ -149,7 +149,7 @@ const presenceManager = {
     }
   },
 
-  // ── Ruai Pulse — department-scoped presence ──────────────────────────────
+  // ── Pulse — department-scoped presence ──────────────────────────────
   /**
    * Is anyone able to answer chat for a given department right now?
    * SUPER_ADMIN holds the highest clearance level in this system, so their
@@ -202,7 +202,7 @@ const presenceManager = {
 
   /**
    * A six(+)-beacon snapshot for dashboards: which departments currently have
-   * live, available coverage. Used by the Ruai Pulse status board.
+   * live, available coverage. Used by the Pulse status board.
    * @param {string[]} allDeptSlugs - every department slug the business runs
    */
   getDepartmentBeacons(allDeptSlugs = []) {

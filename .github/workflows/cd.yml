@@ -215,8 +215,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/ruaitech-backend:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/ruaitech-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/pcl-backend:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/pcl-backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -227,8 +227,8 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/ruaitech-frontend:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/ruaitech-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/pcl-frontend:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/pcl-frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

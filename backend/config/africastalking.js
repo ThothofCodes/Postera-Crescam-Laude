@@ -30,7 +30,7 @@ const sendSMS = async (to, message) => {
     await sms.send({
       to: recipients,
       message,
-      from: process.env.AT_SENDER_ID || 'RuaiTech',
+      from: process.env.AT_SENDER_ID || 'PCL',
     });
   } catch (err) {
     console.error('SMS error:', err.message);

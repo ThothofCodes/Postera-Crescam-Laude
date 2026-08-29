@@ -1,8 +1,8 @@
-# Ruai Tech Solutions — Integrated Platform
+# Postera Crescam Laude — Integrated Platform
 
 **Author:** Thoth of Codes · `codeofthoth@outlook.com`  
 **Stack:** MongoDB · Express · React · Node.js (MERN) · Socket.io  
-**Location:** Ruai Town Centre, Nairobi County, Kenya  
+**Location:** PCL Centre, Nairobi County, Kenya  
 
 ---
 
@@ -43,8 +43,8 @@ Ensure the following are installed before proceeding:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Thothofcodes/ruaitech_solutions.git
-cd ruaitech_solutions
+git clone https://github.com/Thothofcodes/pcl_solutions.git
+cd pcl_solutions
 
 # Install root dev tools (concurrently)
 npm install
@@ -110,7 +110,7 @@ Fill in every variable in `.env`. The critical ones to set before first boot:
 
 ```env
 # 1 — Your MongoDB connection string
-MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/ruaitech
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/pcl
 
 # 2 — A strong random secret (generate with: openssl rand -base64 32)
 JWT_SECRET=<min-32-character-random-string>
@@ -243,8 +243,8 @@ Complete `.env` template for `backend/.env`:
 
 ```env
 # Database
-MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/ruaitech
-MONGO_LOCAL=mongodb://localhost:27017/ruaitech  # fallback for local dev
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/pcl
+MONGO_LOCAL=mongodb://localhost:27017/pcl  # fallback for local dev
 
 # Authentication
 JWT_SECRET=<32-char-random-string>
@@ -269,7 +269,7 @@ AT_PURCHASE_KEY=<purchase_key>
 
 # Email (SendGrid recommended)
 SENDGRID_API_KEY=<your_sendgrid_key>
-EMAIL_FROM=noreply@ruaitech.co.ke
+EMAIL_FROM=noreply@pcl.co.ke
 
 # Cloudinary (file uploads)
 CLOUDINARY_CLOUD_NAME=<cloud_name>
@@ -332,7 +332,7 @@ The project includes a comprehensive CI/CD pipeline using GitHub Actions:
   - End-to-end simulation smoke tests with MongoDB service
   - Code quality checks
 - Uses Node.js v20.x with dependency caching for faster builds
-- Runs tests with a dedicated test database connection (mongodb://localhost:27017/ruaitech_ci_test)
+- Runs tests with a dedicated test database connection (mongodb://localhost:27017/pcl_ci_test)
 
 ### CD (Continuous Deployment)
 - Runs on every push to `main` branch, manual triggers, and published releases
@@ -569,7 +569,7 @@ NODE_ENV=development node backend/server.js
 ## Project Structure
 
 ```
-ruaitech_solutions/
+pcl_solutions/
 ├── backend/
 │   ├── config/          # DB, Cloudinary, AT, mailer
 │   ├── controllers/     # 21 route controllers
@@ -596,5 +596,5 @@ ruaitech_solutions/
 
 ---
 
-© 2026 Ruai Tech Solutions · Ruai Town Centre, Nairobi County, Kenya  
+© 2026 Postera Crescam Laude · PCL Centre, Nairobi County, Kenya  
 Super Administrator: **Thoth of Codes** · `codeofthoth@outlook.com` · [github.com/ThothofCodes](https://github.com/ThothofCodes)

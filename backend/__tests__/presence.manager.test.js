@@ -3,7 +3,7 @@
 // Continuity Audit fix coverage: this is the first real test file the
 // project has had (jest/supertest were installed but zero *.test.js files
 // existed anywhere — see CHANGELOG_PHASE9.md). It targets exactly the logic
-// this fix pass touched: per-department presence (Ruai Pulse) and the rule
+// this fix pass touched: per-department presence (Pulse) and the rule
 // that SUPER_ADMIN holds the highest clearance level and is therefore
 // treated as present on every department's beacon.
 

@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This document explains how to deploy the Ruai Tech Solutions platform using the CI/CD pipeline.
+This document explains how to deploy the Postera Crescam Laude platform using the CI/CD pipeline.
 
 ## Overview
 
@@ -103,7 +103,7 @@ To build and run locally with Docker:
 docker-compose up --build
 
 # Or with specific environment variables
-MONGO_URI="mongodb://localhost:27017/ruaitech" \
+MONGO_URI="mongodb://localhost:27017/pcl" \
 JWT_SECRET="your_jwt_secret" \
 SUPER_ADMIN_EMAIL="admin@example.com" \
 docker-compose up --build

@@ -126,7 +126,7 @@ export default function PublicWebPortal() {
   return (
     <div style={styles.wrap}>
       <div style={styles.header}>
-        <div style={styles.title}>RUAI TECH — WEB PROJECT PORTAL</div>
+        <div style={styles.title}>PCL — WEB PROJECT PORTAL</div>
         <div style={styles.subtitle}>Secure token access (no login required)</div>
       </div>
 

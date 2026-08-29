@@ -139,7 +139,7 @@ A comprehensive Socket.IO chat hook that manages real-time customer ↔ admin co
 - `chat-error` — error from server
 - `new-callback-request` — new callback notification
 - `admin:now-available` — admin came online
-- `admin:status:dept` — per-department status update (for RuaiPulseBoard)
+- `admin:status:dept` — per-department status update (for PulseBoard)
 
 **Connection Options:** WebSocket first, polling fallback; infinite reconnection with 1s–5s backoff; unique `clientId` via UUID; device info attached for admin auth.
 
@@ -313,7 +313,7 @@ Route guard for authenticated admin/staff routes:
 Public-facing sticky navigation bar for the store and public pages.
 
 **Features:**
-- **Logo:** `<RuaiTechLogo>` linking to `/store`
+- **Logo:** `<PCLLogo>` linking to `/store`
 - **Desktop nav:** 6 links — Store, Calculator, Consult, Services, Help, Contact — styled as `NavLink` with ember underline on active
 - **Cart link:** Shows 🛒 with orange badge count from `useCart().count`
 - **Mobile:** Hamburger button toggles a slide-down mobile menu (hidden on >768px, shown on ≤768px)
@@ -331,7 +331,7 @@ Fixed sidebar for the legacy admin panel (used in `AdminLayout`).
 
 **Features:**
 - Width: 235px, full viewport height
-- Logo section with `<RuaiTechLogo>` and "Admin Panel" / "Staff Portal" subtitle
+- Logo section with `<PCLLogo>` and "Admin Panel" / "Staff Portal" subtitle
 - User badge showing name, role pill, and department pill
 - Role-specific navigation:
   - **Admin/DEPT_HEAD_OWNER:** Dashboard, Bookings, Clients, Services, Products, Orders, Consultations, Revenue, Staff, Settings
@@ -527,8 +527,8 @@ M-Pesa STK Push payment form.
 
 ---
 
-### `RuaiPulseBoard.jsx`
-**Path:** `frontend/src/components/RuaiPulseBoard.jsx`  
+### `PulseBoard.jsx`
+**Path:** `frontend/src/components/PulseBoard.jsx`  
 **Props:** `{ authToken }`
 
 Real-time department availability dashboard (Phase 9 market research feature).
@@ -918,7 +918,7 @@ The top-level layout for the Super Admin section.
 **Structure:**
 - 230px fixed sidebar with navigation links
 - Header bar with "Postera — Command Centre" title, `<NotificationBell>`, user info
-- Main content area with `<RuaiPulseBoard>` at top, then `<Outlet />`
+- Main content area with `<PulseBoard>` at top, then `<Outlet />`
 
 **Sidebar links:** Dashboard, All Departments, User Management, Email Allocation, Finance, All Tickets, Inventory Master, Audit Log, Broadcast, Settings
 

@@ -19,7 +19,7 @@ function buildReceiptText(order, items, deliveryFee, grandTotal) {
     '══════════════════════════════════',
     '  POSTERA CRESCAM LAUDE',
     '  Empowering Kenya\'s Digital Future',
-    '  Ruai Town Centre, Nairobi County',
+    '  PCL Centre, Nairobi County',
     '══════════════════════════════════',
     '',
     `Order: ${order?.orderNumber || '—'}`,
@@ -100,7 +100,7 @@ function printReceipt(order, items, deliveryFee, grandTotal) {
   <div class="header">
     <div class="brand">Postera Crescam Laude</div>
     <div class="tagline">Empowering Kenya's Digital Future</div>
-    <div class="meta">Ruai Town Centre, Nairobi County, Kenya</div>
+    <div class="meta">PCL Centre, Nairobi County, Kenya</div>
   </div>
 
   <div class="detail-row"><span>Order Number</span><span style="font-family:'Share Tech Mono',monospace;color:#EE6100;font-weight:700">${order?.orderNumber || '—'}</span></div>
@@ -186,7 +186,7 @@ export default function Checkout() {
           <div style={{ textAlign: 'center', borderBottom: '2px solid #EE6100', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
             <div style={{ fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 16, color: '#244A44', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Postera Crescam Laude</div>
             <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#6A8A82', letterSpacing: '0.08em' }}>Empowering Kenya's Digital Future</div>
-            <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#6A8A82', marginTop: 4 }}>Ruai Town Centre, Nairobi County</div>
+            <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#6A8A82', marginTop: 4 }}>PCL Centre, Nairobi County</div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}><span style={{ color: '#6A8A82' }}>Order Number</span><span style={{ fontFamily: "'Share Tech Mono',monospace", color: '#EE6100', fontWeight: 700 }}>{order?.orderNumber}</span></div>

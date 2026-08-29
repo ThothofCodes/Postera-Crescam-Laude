@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import RuaiTechLogo from './Logo';
+import PCLLogo from './Logo';
 
 // Full admin links — for admin/DEPT_HEAD_OWNER roles
 const ADMIN_LINKS = [
@@ -66,7 +66,7 @@ export default function CollapsibleSidebar() {
         }}
           onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(238,97,0,0.07)'; }}
           onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(238,97,0,0.03)'; }}>
-          <RuaiTechLogo size={isCollapsed ? 30 : 32} showText={!isCollapsed} textSize={isCollapsed ? "0px" : "12px"} />
+          <PCLLogo size={isCollapsed ? 30 : 32} showText={!isCollapsed} textSize={isCollapsed ? "0px" : "12px"} />
         </Link>
         
         {/* Toggle Button */}

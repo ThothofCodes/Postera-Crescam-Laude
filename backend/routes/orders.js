@@ -16,7 +16,7 @@ const { sendEmail } = require('../config/mailer');
 const STORE = {
   name: 'Postera Crescam Laude',
   tagline: "Empowering Kenya's Digital Future",
-  address: 'Ruai Town Centre, Nairobi County, Kenya',
+  address: 'PCL Centre, Nairobi County, Kenya',
   phone: '+254 140 918 502',
   email: 'info@posteracrescamlaude.co.ke',
   taxId: 'PCL/VAT/2026',
@@ -372,7 +372,7 @@ router.post('/retry-payment/:identifier', async (req, res) => {
 
     // Re-trigger STK push
     const { stkPush } = require('../middleware/mpesa');
-    const stkPushResult = await stkPush(order.customer.phone, order.total, order.orderNumber, 'Ruai Tech Order');
+    const stkPushResult = await stkPush(order.customer.phone, order.total, order.orderNumber, 'PCL Order');
     order.checkoutRequestId = stkPushResult.CheckoutRequestID;
     order.retryCount = retryCount;
     order.lastRetryAt = new Date();
@@ -445,7 +445,7 @@ router.post('/switch-to-cash/:identifier', async (req, res) => {
               </div>
               <p><strong>What to do:</strong></p>
               <ul>
-                <li>📍 Visit us at Ruai Town Centre, Nairobi County</li>
+                <li>📍 Visit us at PCL Centre, Nairobi County</li>
                 <li>🔢 Bring your order number for verification</li>
                 <li>💰 Pay when you collect your order</li>
               </ul>

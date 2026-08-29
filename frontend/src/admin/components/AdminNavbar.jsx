@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
-import RuaiTechLogo from '../../components/Logo';
+import PCLLogo from '../../components/Logo';
 
 /* ── Accordion Section ────────────────────────────────────────────── */
 function AccordionSection({ title, icon, items, collapsed, location, onNavigate, color = '#EE6100' }) {
@@ -192,7 +192,7 @@ const AdminNavbar = ({ collapsed = false, onToggle, mobileOpen = false, onMobile
         }}>
           {!collapsed ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
-              <RuaiTechLogo size={26} showText={true} textSize="11px" />
+              <PCLLogo size={26} showText={true} textSize="11px" />
             </div>
           ) : (
             <div style={{ display: 'flex', justifyContent: 'center' }}>

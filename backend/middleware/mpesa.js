@@ -1,7 +1,8 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 const axios = require('axios');
 const crypto = require('crypto');
-const { generateSignedCallbackUrl } = require('./webhookSignature');
+// Webhook signature is only for verifying incoming callbacks — NOT for the STK request URL
+// Safaricom rejects callback URLs with query parameters
 
 // ── FIX (Continuity Audit, Part Four — critical) ───────────────────────────
 // Every Daraja call used to be hardcoded to sandbox.safaricom.co.ke, with no
@@ -107,41 +108,63 @@ const stkPush = async (phone, amount, accountRef, description) => {
   }
 
   // Sanitize accountRef and description — alphanumeric + spaces only
-  const safeRef = String(accountRef || 'RuaiTech').replace(/[^A-Z0-9 ]/gi, '').slice(0, 12);
+  const safeRef = String(accountRef || 'PCL').replace(/[^A-Z0-9 ]/gi, '').slice(0, 12);
   const safeDesc = String(description || 'Payment').replace(/[^A-Z0-9 ]/gi, '').slice(0, 13);
 
   const token = await generateToken();
   const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, '').slice(0, 14);
   const password = Buffer.from(`${MPESA_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
 
-  // Generate signed callback URL with HMAC signature
-  const tempCheckoutId = crypto.randomBytes(16).toString('hex'); // Temporary ID for signing
-  const signedCallbackUrl = await generateSignedCallbackUrl(MPESA_CALLBACK_URL, tempCheckoutId);
+  // Use the plain callback URL — Safaricom rejects URLs with query parameters
+  // Signature verification happens when the callback arrives, not in the request
+  const callbackUrl = MPESA_CALLBACK_URL;
 
-  const { data } = await axios.post(
-    `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
-    {
-      BusinessShortCode: MPESA_SHORTCODE,
-      Password: password,
-      Timestamp: timestamp,
-      TransactionType: 'CustomerPayBillOnline',
-      Amount: parsedAmount,
-      PartyA: validPhone,
-      PartyB: MPESA_SHORTCODE,
-      PhoneNumber: validPhone,
-      CallBackURL: signedCallbackUrl,
-      AccountReference: safeRef,
-      TransactionDesc: safeDesc,
-    },
-    { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 },
-  );
+  const stkPayload = {
+    BusinessShortCode: MPESA_SHORTCODE,
+    Password: password,
+    Timestamp: timestamp,
+    TransactionType: 'CustomerPayBillOnline',
+    Amount: parsedAmount,
+    PartyA: validPhone,
+    PartyB: MPESA_SHORTCODE,
+    PhoneNumber: validPhone,
+    CallBackURL: callbackUrl,
+    AccountReference: safeRef,
+    TransactionDesc: safeDesc,
+  };
 
-  // Store the temporary checkout ID mapping for signature verification
-  // The actual CheckoutRequestID will come from Safaricom's response
+  console.log(`[MPESA] STK Push request: phone=${validPhone}, amount=${parsedAmount}, shortcode=${MPESA_SHORTCODE}`);
+  console.log(`[MPESA] Callback URL: ${callbackUrl}`);
+
+  let data;
+  try {
+    const response = await axios.post(
+      `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
+      stkPayload,
+      { headers: { Authorization: `Bearer ${token}` }, timeout: 15000 },
+    );
+    data = response.data;
+  } catch (apiErr) {
+    // Safaricom returns 400 with error details in the response body
+    const errData = apiErr.response?.data || {};
+    console.error('[MPESA] STK Push API error:', JSON.stringify(errData));
+    throw new Error(
+      errData.errorMessage
+        || errData.error?.errorMessage
+        || `STK Push failed: ${apiErr.response?.status || apiErr.message}`,
+    );
+  }
+
+  // Check for Safaricom-level errors in the response body
+  if (data.ResponseCode && data.ResponseCode !== '0') {
+    console.error('[MPESA] STK Push rejected:', JSON.stringify(data));
+    throw new Error(data.ResponseDescription || `STK Push rejected with code ${data.ResponseCode}`);
+  }
+
   if (data.CheckoutRequestID) {
-    // Update the signature with the real checkout request ID
-    const _realSignedUrl = await generateSignedCallbackUrl(MPESA_CALLBACK_URL, data.CheckoutRequestID);
-    console.log(`[MPESA] STK Push initiated: ${data.CheckoutRequestID}, signed callback URL generated`);
+    console.log(`[MPESA] STK Push initiated: ${data.CheckoutRequestID}`);
+  } else {
+    console.error('[MPESA] STK Push response missing CheckoutRequestID:', JSON.stringify(data));
   }
 
   return data;

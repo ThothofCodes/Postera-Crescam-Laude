@@ -87,7 +87,7 @@ exports.createConsultation = async (req, res, next) => {
 
     if (payNow) {
       try {
-        const mpesaRes = await stkPush(client.phone, fee, `CONSULT-${consultation._id}`, 'Ruai Tech Consultation');
+        const mpesaRes = await stkPush(client.phone, fee, `CONSULT-${consultation._id}`, 'PCL Consultation');
         consultation.checkoutRequestId = mpesaRes.CheckoutRequestID;
         await consultation.save();
       } catch (mpesaErr) {
@@ -139,7 +139,7 @@ exports.completeConsultation = async (req, res, next) => {
       try {
         await sendEmail({
           to: c.client.email,
-          subject: 'Your Ruai Tech Consultation Summary',
+          subject: 'Your PCL Consultation Summary',
           html: `<h2>Consultation Summary</h2><p>${clientSummary}</p>`,
         });
       } catch (emailErr) {

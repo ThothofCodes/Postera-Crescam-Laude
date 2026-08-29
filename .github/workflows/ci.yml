@@ -64,7 +64,7 @@ jobs:
         env:
           JWT_SECRET: ci-test-secret-not-for-production
           NODE_ENV: test
-          MONGO_URI: mongodb://localhost:27017/ruaitech_ci_test
+          MONGO_URI: mongodb://localhost:27017/pcl_ci_test
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -235,7 +235,7 @@ jobs:
         working-directory: backend
         run: node migrations/migrate.js up
         env:
-          MONGO_URI: mongodb://localhost:27017/ruaitech_ci
+          MONGO_URI: mongodb://localhost:27017/pcl_ci
           JWT_SECRET: ci-test-secret-not-for-production
           NODE_ENV: test
 
@@ -243,7 +243,7 @@ jobs:
         working-directory: backend
         run: node seeds/seed-test.js
         env:
-          MONGO_URI: mongodb://localhost:27017/ruaitech_ci
+          MONGO_URI: mongodb://localhost:27017/pcl_ci
           JWT_SECRET: ci-test-secret-not-for-production
           NODE_ENV: test
 
@@ -253,7 +253,7 @@ jobs:
           nohup node server.js > /tmp/backend.log 2>&1 &
           echo "BACKEND_PID=$!" >> $GITHUB_ENV
         env:
-          MONGO_URI: mongodb://localhost:27017/ruaitech_ci
+          MONGO_URI: mongodb://localhost:27017/pcl_ci
           JWT_SECRET: ci-test-secret-not-for-production
           PORT: 5001
           NODE_ENV: test

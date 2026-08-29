@@ -6,6 +6,7 @@ const { runAssessmentReset } = require('./assessmentReset');
 const { runBISnapshot } = require('./biSnapshot');
 const { runInventoryAlerts } = require('./inventoryAlerts');
 const { runPSAutoClose } = require('./psAutoClose');
+const { runScheduledPublish } = require('./scheduledPublish');
 
 module.exports = function startCronJobs() {
   // Internet/cyber/webdev renewal invoices — 03:00 EAT daily
@@ -20,6 +21,8 @@ module.exports = function startCronJobs() {
   cron.schedule('0 6 * * *', runInventoryAlerts, { timezone: 'Africa/Nairobi' });
   // PlayStation Arena — auto-close expired prepaid sessions, every minute
   cron.schedule('* * * * *', runPSAutoClose, { timezone: 'Africa/Nairobi' });
+  // Tech Hub — auto-publish scheduled articles, every minute
+  cron.schedule('* * * * *', runScheduledPublish, { timezone: 'Africa/Nairobi' });
 
   console.log('✅ Cron jobs scheduled (EAT timezone):');
   console.log('   03:00 — Billing renewals');
@@ -28,4 +31,5 @@ module.exports = function startCronJobs() {
   console.log('   02:00 — BI snapshot');
   console.log('   06:00 — Inventory alerts');
   console.log('   */1m  — PS Arena auto-close');
+  console.log('   */1m  — Scheduled article publish');
 };

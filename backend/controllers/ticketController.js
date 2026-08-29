@@ -123,7 +123,7 @@ exports.updateStatus = async (req, res, next) => {
           const messages = {
             OPEN: 'Your support ticket is received. We will update you shortly.',
             IN_PROGRESS: 'Your support ticket is now being handled. We will update you when there is progress.',
-            AWAITING_CLIENT: 'We are waiting for your response to continue handling your ticket. Please check in with Ruai Tech Solutions.',
+            AWAITING_CLIENT: 'We are waiting for your response to continue handling your ticket. Please check in with Postera Crescam Laude.',
             RESOLVED: 'Your support ticket has been resolved. Thank you for your patience.',
             CLOSED: 'Your support ticket is now closed. If you need further help, please contact us again.',
             REOPENED: 'Your support ticket has been reopened. We will continue working on it.',

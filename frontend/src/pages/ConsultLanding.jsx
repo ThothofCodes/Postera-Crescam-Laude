@@ -49,7 +49,7 @@ export default function ConsultLanding() {
         <div className="feature-strip" style={{ marginBottom: '3rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.5rem' }}>
             {[
-              { icon: '📍', color: '#EE6100', title: 'In-Person',        desc: 'Ruai Town Centre',          href: null },
+              { icon: '📍', color: '#EE6100', title: 'In-Person',        desc: 'PCL Centre',          href: null },
               { icon: '💬', color: '#25D366', title: 'WhatsApp',          desc: '+254 140 918 502',          href: `${WA_LINK}?text=${encodeURIComponent('Hi! I\'d like a consultation.')}` },
               { icon: '📞', color: '#2BB6A3', title: 'Phone Call',        desc: 'IP Phone — coming soon',    href: null },
               { icon: '🎥', color: '#FFB020', title: 'Video Call',        desc: 'Google Meet / Zoom',        href: null },

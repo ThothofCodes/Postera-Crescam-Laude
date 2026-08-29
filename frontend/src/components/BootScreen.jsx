@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 const BRAND_NAME    = 'Postera Crescam Laude';
 const BRAND_SHORT   = 'PCL';
 const TAGLINE       = "Empowering Kenya's Digital Future";
-const LOCATION      = 'Ruai Town Centre, Nairobi County, Kenya';
+const LOCATION      = 'PCL Centre, Nairobi County, Kenya';
 const CONTACT_EMAIL = 'info@posteracrescamlaude.co.ke';
 
 const SERVICES = [

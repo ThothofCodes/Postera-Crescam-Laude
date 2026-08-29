@@ -10,7 +10,7 @@ const isValidId = (id) => require('mongoose').Types.ObjectId.isValid(id);
 // Suggest email string from name + dept slug
 function suggestEmail(name, slug) {
   const first = (name || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 20) || 'user';
-  return `${first}.${slug}@ruaitechsolutions.co.ke`;
+  return `${first}.${slug}@pclsolutions.co.ke`;
 }
 
 // Create staff invitation
@@ -92,10 +92,10 @@ exports.inviteStaff = async (req, res, next) => {
     try {
       await sendEmail({
         to: email,
-        subject: 'Welcome to Ruai Tech Solutions — Staff Invitation',
+        subject: 'Welcome to Postera Crescam Laude — Staff Invitation',
         html: `
           <h2>Welcome, ${name}!</h2>
-          <p>You have been invited to join Ruai Tech Solutions as a staff member.</p>
+          <p>You have been invited to join Postera Crescam Laude as a staff member.</p>
           <p>Please set your password using the link below (valid for 24 hours):</p>
           <p><a href="${process.env.CLIENT_URL}/staff/set-password?token=${token}&userId=${user._id}">
             Set Your Password →
@@ -181,10 +181,10 @@ exports.resendInvitation = async (req, res, next) => {
     try {
       await sendEmail({
         to: user.email,
-        subject: 'Ruai Tech Solutions — Staff Invitation (Reminder)',
+        subject: 'Postera Crescam Laude — Staff Invitation (Reminder)',
         html: `
           <h2>Welcome back, ${user.name}!</h2>
-          <p>This is a reminder that you have been invited to join Ruai Tech Solutions as a staff member.</p>
+          <p>This is a reminder that you have been invited to join Postera Crescam Laude as a staff member.</p>
           <p>Please set your password using the link below (valid for 24 hours):</p>
           <p><a href="${process.env.CLIENT_URL}/staff/set-password?token=${token}&userId=${user._id}">
             Set Your Password →

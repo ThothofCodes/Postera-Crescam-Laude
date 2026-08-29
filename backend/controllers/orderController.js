@@ -99,7 +99,7 @@ exports.createOrder = async (req, res, next) => {
     let stkPushResult = null;
     if (paymentMethod === 'mpesa') {
       try {
-        stkPushResult = await stkPush(phone, total, order.orderNumber, 'Ruai Tech Order');
+        stkPushResult = await stkPush(phone, total, order.orderNumber, 'PCL Order');
         order.checkoutRequestId = stkPushResult.CheckoutRequestID;
         await order.save();
       } catch (e) {

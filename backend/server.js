@@ -83,7 +83,7 @@ app.use(cors({
 }));
 
 // ── 3. Body size limits — prevent large payload DoS ────────────────────────
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '5mb' })); // Increased for Tech Hub article body content
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // ── 4. NoSQL injection sanitization — strip $ and . from req.body/params ───
@@ -293,6 +293,8 @@ app.use('/api/deployment', require('./routes/deployment'));
 app.use('/api/db-health', require('./routes/dbHealth'));
 app.use('/api/connection-pool', require('./routes/connectionPool'));
 app.use('/api/webhook-config', require('./routes/webhookConfig'));
+app.use('/api/tech-hub', require('./routes/techHub')); // Tech Hub admin management (auth required)
+app.use('/api/tech-hub/public', require('./routes/techHubPublic')); // Tech Hub public content (no auth)
 
 // ── 10a. Swagger API docs ──────────────────────────────────────────────────
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

@@ -220,7 +220,7 @@ async function testCallbackList(token) {
 
 async function runSimulation() {
   console.log('\n╔═══════════════════════════════════════════════════════╗');
-  console.log('║   🚀 RUAI TECH SOLUTIONS — FULL CHANNEL SIMULATION    ║');
+  console.log('║   🚀 PCL SOLUTIONS — FULL CHANNEL SIMULATION    ║');
   console.log('║   Testing all core features and integrations          ║');
   console.log('╚═══════════════════════════════════════════════════════╝\n');
 

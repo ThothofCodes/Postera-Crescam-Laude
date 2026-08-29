@@ -27,7 +27,7 @@ exports.runBillingRenewals = async function () {
           dueDate: isp.cycleEnd,
           invoiceId: `RTS-INT-${Date.now()}`,
         });
-        try { await sendSMS(isp.phone, `Hi ${isp.name}, your Ruai Tech internet package renews on ${isp.cycleEnd?.toDateString()}. Amount: KES ${isp.monthlyFee}. Pay via M-Pesa Paybill 522522 Acc: ${isp.phone}.`); } catch (_) {}
+        try { await sendSMS(isp.phone, `Hi ${isp.name}, your PCL internet package renews on ${isp.cycleEnd?.toDateString()}. Amount: KES ${isp.monthlyFee}. Pay via M-Pesa Paybill 522522 Acc: ${isp.phone}.`); } catch (_) {}
       }
     }
     console.log(`[CRON] BillingRenewals: ${dueISP.length} ISP renewals processed`);

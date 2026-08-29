@@ -1,7 +1,7 @@
 {
-  "name": "ruaitech-solutions-frontend",
+  "name": "pcl-solutions-frontend",
   "version": "1.0.0",
-  "description": "Ruai Tech Solutions — Integrated Platform UI",
+  "description": "Postera Crescam Laude — Integrated Platform UI",
   "private": true,
   "type": "module",
   "scripts": {
@@ -21,6 +21,7 @@
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^5.2.0",
     "axios": "^1.16.1",
+    "marked": "^15.0.12",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.6.0",

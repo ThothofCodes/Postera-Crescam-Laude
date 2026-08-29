@@ -1,6 +1,6 @@
 # PHASE 10 — IMAGE UPLOAD FIX + TIER 1 ROADMAP FEATURES
 
-This phase covers two requests: (1) why product images weren't accepting input or displaying, and (2) implementing the Tier 1 items from `RUAI_TECH_MARKET_RESEARCH.md`.
+This phase covers two requests: (1) why product images weren't accepting input or displaying, and (2) implementing the Tier 1 items from `PCL_MARKET_RESEARCH.md`.
 
 ---
 
@@ -31,8 +31,8 @@ This phase covers two requests: (1) why product images weren't accepting input o
 **3. WhatsApp as a notification channel alongside SMS**
 - `backend/config/africastalking.js` gained `sendWhatsApp()` and a unified `notifyCustomer(to, message, channel)`. Verified against the `africastalking` npm package metadata, which lists WhatsApp as a supported product on the same SDK — but the WhatsApp product requires separate activation in the AT dashboard, so this falls back to SMS automatically (logged, not silent) whenever `AT_WHATSAPP_SENDER_ID` isn't configured. Documented in `.env.example`.
 
-**4. Ruai Pulse department beacon board — the real frontend**
-- New `frontend/src/components/RuaiPulseBoard.js` — six department beacons wired to the actual backend events built in Phase 9 (`presence:get-beacons` request/response, `admin:status:dept` push), not a mockup. Reuses `useChat()`'s existing socket connection rather than opening a second one (`useChat` now additionally returns `socket` — purely additive, no existing consumer is affected).
+**4. Pulse department beacon board — the real frontend**
+- New `frontend/src/components/PulseBoard.js` — six department beacons wired to the actual backend events built in Phase 9 (`presence:get-beacons` request/response, `admin:status:dept` push), not a mockup. Reuses `useChat()`'s existing socket connection rather than opening a second one (`useChat` now additionally returns `socket` — purely additive, no existing consumer is affected).
 - Mounted in `SuperDashboard.js`, visible across every nested Super Admin page — the first place in the app where six-department coverage is visible at a glance instead of only the old single global "online/offline" flag.
 
 ---
@@ -40,5 +40,5 @@ This phase covers two requests: (1) why product images weren't accepting input o
 ## Known follow-ups from this phase
 
 - The PS Arena countdown auto-close runs on a 1-minute cron resolution, not a live server-side tick — a session can run up to ~60 seconds past its planned end before the cron catches it. Acceptable for a Town Centre arena; tighten the cron interval if it ever matters more precisely.
-- `RuaiPulseBoard` is only mounted in `SuperDashboard.js` for now — the research doc's vision of it on the public-facing site (so customers see which departments have live support before opening the chat widget) is the natural next step, using the same component with `authToken={null}`.
+- `PulseBoard` is only mounted in `SuperDashboard.js` for now — the research doc's vision of it on the public-facing site (so customers see which departments have live support before opening the chat widget) is the natural next step, using the same component with `authToken={null}`.
 - WhatsApp delivery is unverified end-to-end (no live AT WhatsApp-enabled account was available to test against in this environment) — test in the AT sandbox before relying on it for real customer communication.

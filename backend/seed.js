@@ -28,8 +28,8 @@ const SUPER_ADMIN = {
 };
 
 const ADMIN = {
-  name: 'Ruai Tech Admin',
-  email: process.env.SEED_ADMIN_EMAIL || 'admin@ruaitechsolutions.co.ke',
+  name: 'PCL Admin',
+  email: process.env.SEED_ADMIN_EMAIL || 'admin@pclsolutions.co.ke',
   password: ADMIN_PASSWORD,
   role: 'admin',
   isActive: true,
@@ -121,7 +121,7 @@ const PRODUCTS = [
     name: 'Business Web Package', category: 'services', description: 'Up to 10-page business website with blog, gallery, contact form, SEO setup, and 1 year hosting.', shortDesc: '10 pages, blog, SEO, 1yr hosting', price: 25000, isDigital: true, stock: 0, featured: true, tags: ['website', 'business', 'seo'],
   },
   {
-    name: 'Internet 3-Month Bundle', category: 'services', description: 'Prepaid 3-month internet access package. Unlimited browsing at our Ruai Town Centre cybercafe.', shortDesc: '3 months unlimited cybercafe access', price: 2500, isDigital: true, stock: 0, tags: ['internet', 'bundle', 'cybercafe'],
+    name: 'Internet 3-Month Bundle', category: 'services', description: 'Prepaid 3-month internet access package. Unlimited browsing at our PCL Centre cybercafe.', shortDesc: '3 months unlimited cybercafe access', price: 2500, isDigital: true, stock: 0, tags: ['internet', 'bundle', 'cybercafe'],
   },
 ];
 

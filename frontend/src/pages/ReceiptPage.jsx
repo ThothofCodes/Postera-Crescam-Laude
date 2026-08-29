@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 const STORE = {
   name: 'Postera Crescam Laude',
   tagline: "Empowering Kenya's Digital Future",
-  address: 'Ruai Town Centre, Nairobi County, Kenya',
+  address: 'PCL Centre, Nairobi County, Kenya',
   phone: '+254 140 918 502',
   email: 'info@posteracrescamlaude.co.ke',
   taxId: 'PCL/VAT/2026',

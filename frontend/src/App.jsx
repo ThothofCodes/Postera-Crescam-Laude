@@ -34,6 +34,7 @@ const HelpDesk = React.lazy(() => import('./pages/HelpDesk'));
 const TechInsights = React.lazy(() => import('./pages/TechInsights'));
 const TechHubLocal = React.lazy(() => import('./pages/TechHubLocal'));
 const BlogManagement = React.lazy(() => import('./admin/pages/shared/BlogManagement'));
+const TechStudio = React.lazy(() => import('./admin/pages/super/TechStudio'));
 const PublicWebPortal = React.lazy(() => import('./pages/PublicWebPortal'));
 const Callbacks = React.lazy(() => import('./pages/Callbacks'));
 const AccessDenied = React.lazy(() => import('./pages/AccessDenied'));
@@ -234,6 +235,7 @@ export default function App() {
                   <Route path="chat" element={<MessagesPage />} />
                   <Route path="staff-invitation" element={<StaffInvitation color="#a78bfa" />} />                   <Route path="health" element={<React.Suspense fallback={<Spinner />}><HealthDashboard /></React.Suspense>} />
                    <Route path="blog" element={<React.Suspense fallback={<Spinner />}><BlogManagement /></React.Suspense>} />
+                   <Route path="studio" element={<React.Suspense fallback={<Spinner />}><TechStudio /></React.Suspense>} />
                 </Route>
 
                 {/* ── Departments ── */}

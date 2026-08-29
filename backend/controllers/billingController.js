@@ -80,7 +80,7 @@ exports.sendInvoice = async (req, res, next) => {
     if (invoice.status !== 'DRAFT') return res.status(400).json({ message: 'Only DRAFT invoices can be sent' });
     invoice.status = 'SENT';
     await invoice.save();
-    sendSMS(invoice.client.phone, `Invoice ${invoice.invoiceId} from Ruai Tech Solutions: KES ${invoice.totalAmount}. Due: ${invoice.dueDate.toDateString()}. Pay via M-Pesa or visit our portal.`);
+    sendSMS(invoice.client.phone, `Invoice ${invoice.invoiceId} from Postera Crescam Laude: KES ${invoice.totalAmount}. Due: ${invoice.dueDate.toDateString()}. Pay via M-Pesa or visit our portal.`);
     res.json(invoice);
   } catch (err) { next(err); }
 };
@@ -91,7 +91,7 @@ exports.initiatePayment = async (req, res, next) => {
     const invoice = await Invoice.findById(req.params.id).populate('client', 'fullName phone');
     if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
     if (['PAID', 'CANCELLED'].includes(invoice.status)) return res.status(400).json({ message: `Invoice is already ${invoice.status}` });
-    const mpesaRes = await stkPush(invoice.client.phone, invoice.balance, invoice.invoiceId, 'Ruai Tech Invoice');
+    const mpesaRes = await stkPush(invoice.client.phone, invoice.balance, invoice.invoiceId, 'PCL Invoice');
     invoice.checkoutRequestId = mpesaRes.CheckoutRequestID;
     invoice.status = 'PAYMENT_SENT';
     await invoice.save();

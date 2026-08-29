@@ -1,5 +1,5 @@
 # PHASE 9 — CONTINUITY AUDIT FIX PASS
-**Date:** June 2026 · **Scope:** Implementation of every finding in `RUAI_TECH_CONTINUITY_AUDIT.md`
+**Date:** June 2026 · **Scope:** Implementation of every finding in `PCL_CONTINUITY_AUDIT.md`
 **Governing principle for every RBAC change below: SUPER_ADMIN holds the highest clearance level in this system — every fix that touches permissions was implemented to widen or correctly scope access for everyone *else*, never to reduce what SUPER_ADMIN can see or do.**
 
 This phase follows directly from the standalone audit report. Where that document predicted a fix, this one records what was actually changed, file by file, plus three additional bugs that only surfaced once the code was opened up to be fixed.
@@ -14,7 +14,7 @@ This phase follows directly from the standalone audit report. Where that documen
 - `isAdminRole()` no longer does `role.toLowerCase().includes('admin')`. It checks real membership in `['SUPER_ADMIN', 'DEPT_HEAD_OWNER', 'STAFF', 'admin', 'staff']`. `DEPT_HEAD_OWNER` and `STAFF` were previously unrecognized — meaning only the literal Super Admin could ever be "the admin" for chat.
 - Added `isSuperAdminRole()` — the one and only check for the highest clearance level. Used to decide whether a connecting socket should be treated as covering every department's beacon at once.
 - Admin sockets now carry `departmentSlug` (already present in the JWT payload — no token-shape change needed) and join both `admin-room` and `admin-room:{departmentSlug}`.
-- New opt-in events: `admin:status:dept` (department-scoped status push) and `presence:get-beacons` (request/response snapshot for a Ruai Pulse–style dashboard). Both are additive — nothing that existed before was removed, so `ChatToggle.js`/`ChatWidget.js` keep working unmodified.
+- New opt-in events: `admin:status:dept` (department-scoped status push) and `presence:get-beacons` (request/response snapshot for a Pulse–style dashboard). Both are additive — nothing that existed before was removed, so `ChatToggle.js`/`ChatWidget.js` keep working unmodified.
 
 **`backend/socket/presence.manager.js`**
 - `adminConnected(adminId, socketId, meta)` takes an optional third argument — old two-argument call sites still work.

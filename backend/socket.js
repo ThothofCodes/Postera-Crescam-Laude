@@ -116,7 +116,7 @@ function initSocket(httpServer) {
 
     if (isAdminRole(userRole)) {
       // Register presence IMMEDIATELY on connect, tagged with department +
-      // clearance level so dept-scoped presence (Ruai Pulse) works correctly.
+      // clearance level so dept-scoped presence (Pulse) works correctly.
       presenceManager.adminConnected(userId, socket.id, {
         departmentSlug,
         isSuperAdmin,
@@ -431,7 +431,7 @@ function initSocket(httpServer) {
     }
 
     // ── Shared functionality ───────────────────────────────────────
-    // ── Ruai Pulse — on-demand department beacon snapshot ──────────
+    // ── Pulse — on-demand department beacon snapshot ──────────
     // Either an admin dashboard or a visitor page can ask "who's covering
     // which department right now?" by passing the department slugs it cares
     // about. SUPER_ADMIN presence is automatically reflected as covering

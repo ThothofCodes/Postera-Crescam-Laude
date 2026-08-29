@@ -1,4 +1,4 @@
-# Ruai Tech Solutions — Site Route Access Map
+# Postera Crescam Laude — Site Route Access Map
 
 > **Copyright © 2026 Thoth of Codes. Licensed under the MIT License.**  
 > **Platform:** MERN Stack · MongoDB Atlas · M-Pesa Daraja API  
@@ -50,7 +50,7 @@
 ## 3. Legacy Platform Admin (General Admin)
 
 > **Login:** `http://localhost:3000/login`  
-> **Credentials:** `admin@ruaitechsolutions.co.ke` / `RuaiTech@2026`  
+> **Credentials:** `admin@pclsolutions.co.ke` / `PCL@2026`  
 > **Guard:** JWT required — any authenticated user with `admin` or `staff` role
 
 | Route | Access | Page / Component | Description |
@@ -341,7 +341,7 @@
 | Portal | URL | Email | Password | Role |
 |--------|-----|-------|----------|------|
 | Super Admin | `/admin/super` | `codeofthoth@outlook.com` | `ThothSuperAdmin@2026` | `SUPER_ADMIN` |
-| Platform Admin | `/login` | `admin@ruaitechsolutions.co.ke` | `RuaiTech@2026` | `admin` |
+| Platform Admin | `/login` | `admin@pclsolutions.co.ke` | `PCL@2026` | `admin` |
 | Dept Head (example) | `/admin/{slug}` | Assigned via User Management | Set at creation | `DEPT_HEAD_OWNER` |
 | Staff (example) | `/admin/{slug}` | Assigned via User Management | Set at creation | `STAFF` |
 
@@ -372,4 +372,4 @@ cd backend && node seed.js
 
 ---
 
-*© 2026 Thoth of Codes — Ruai Tech Solutions. All rights reserved. MIT License.*
+*© 2026 Thoth of Codes — Postera Crescam Laude. All rights reserved. MIT License.*

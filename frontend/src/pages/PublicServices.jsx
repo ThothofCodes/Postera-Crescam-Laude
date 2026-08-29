@@ -45,7 +45,7 @@ export default function PublicServices() {
         <div className="section-label">Postera Crescam Laude</div>
         <h1 className="hero-title">Our Services</h1>
         <p className="hero-subtitle">
-          Everything you need under one roof — internet, printing, repairs, web development and more at Ruai Town Centre, Nairobi.
+          Everything you need under one roof — internet, printing, repairs, web development and more at PCL Centre, Nairobi.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Link to="/consult/book" className="btn-primary" style={{ display: 'inline-block', padding: '0.75rem 2rem', borderRadius: 8, fontWeight: 700, fontSize: 15 }}>

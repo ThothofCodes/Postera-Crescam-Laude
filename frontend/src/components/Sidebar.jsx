@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import RuaiTechLogo from './Logo';
+import PCLLogo from './Logo';
 
 // Full admin links — for admin/DEPT_HEAD_OWNER roles
 const ADMIN_LINKS = [
@@ -48,7 +48,7 @@ export default function Sidebar() {
       <Link to="/" title="Dashboard" style={{ padding: '1.1rem 1rem', borderBottom: '1px solid rgba(238,97,0,0.1)', background: 'rgba(238,97,0,0.03)', display: 'block', textDecoration: 'none', transition: 'background 0.2s' }}
         onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(238,97,0,0.07)'; }}
         onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(238,97,0,0.03)'; }}>
-        <RuaiTechLogo size={32} showText={true} textSize="12px" />
+        <PCLLogo size={32} showText={true} textSize="12px" />
         <div style={{ fontSize: 9, color: 'var(--text-muted)', letterSpacing: '0.18em', textTransform: 'uppercase', marginTop: 6, fontFamily: "'Inter',sans-serif" }}>
           {isStaff ? 'Staff Portal' : 'Admin Panel'}
         </div>

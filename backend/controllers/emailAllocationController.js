@@ -9,7 +9,7 @@ const genToken = () => require('crypto').randomBytes(32).toString('hex');
 // Suggest email string from name + dept slug
 function suggestEmail(name, slug) {
   const first = (name || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 20) || 'user';
-  return `${first}.${slug}@ruaitechsolutions.co.ke`;
+  return `${first}.${slug}@pclsolutions.co.ke`;
 }
 
 // POST /api/email/request — Dept head requests email for a staff user
@@ -86,7 +86,7 @@ exports.provision = async (req, res, next) => {
     try {
       await sendEmail({
         to: finalEmail,
-        subject: 'Welcome to Ruai Tech Solutions — Your Company Account',
+        subject: 'Welcome to Postera Crescam Laude — Your Company Account',
         html: `<h2>Welcome, ${record.linkedUserId?.name || 'Team Member'}!</h2>
                <p>Your company email has been provisioned: <strong>${finalEmail}</strong></p>
                <p>Set your password here (link expires in 24 hours):</p>
@@ -159,7 +159,7 @@ exports.resetPassword = async (req, res, next) => {
     try {
       await sendEmail({
         to: record.companyEmail,
-        subject: 'Ruai Tech — Password Reset Link',
+        subject: 'PCL — Password Reset Link',
         html: `<p>Hi ${record.linkedUserId?.name},</p>
                <p><a href="${process.env.CLIENT_URL}/staff/set-password?token=${token}">Reset your password →</a></p>
                <p>This link expires in 24 hours.</p>`,

@@ -26,7 +26,7 @@ export default function Contact() {
         <div className="section-label">Get in Touch</div>
         <h1 className="hero-title">Contact Us</h1>
         <p style={{ color: 'var(--white-dim)', maxWidth: 500, margin: '0 auto', fontFamily: "'Inter',sans-serif" }}>
-          We're based in Ruai Town Centre, Nairobi. Walk in or reach us online.
+          We're based in PCL Centre, Nairobi. Walk in or reach us online.
         </p>
       </div>
 
@@ -35,7 +35,7 @@ export default function Contact() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={card}>
               <h3 style={{ margin: '0 0 1rem', color: '#F4F1EA', fontFamily: "'Poppins',sans-serif" }}>📍 Find Us</h3>
-              {[['📍', 'Ruai Town Centre, Nairobi County, Kenya'], ['📞', 'IP Phone — coming soon'], ['✉️', 'info@posteracrescamlaude.co.ke']].map(([icon, text]) => (
+              {[['📍', 'PCL Centre, Nairobi County, Kenya'], ['📞', 'IP Phone — coming soon'], ['✉️', 'info@posteracrescamlaude.co.ke']].map(([icon, text]) => (
                 <p key={text} style={{ margin: '0 0 10px', fontSize: 14, color: '#A9C4BE', display: 'flex', gap: 10, fontFamily: "'Inter',sans-serif" }}>
                   <span>{icon}</span><span>{text}</span>
                 </p>

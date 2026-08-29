@@ -11,7 +11,7 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=5001
-      - MONGO_URI=mongodb://mongo:27017/ruaitech
+      - MONGO_URI=mongodb://mongo:27017/pcl
       - JWT_SECRET=dev-secret-change-in-production
       - CLIENT_URL=http://localhost:3000
     depends_on:

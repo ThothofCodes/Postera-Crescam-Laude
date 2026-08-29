@@ -14,10 +14,10 @@ const { sendSMS, notifyCustomer } = require('../config/africastalking');
 // Keys match JobCard's real status enum exactly: ['received', 'diagnosing',
 // 'awaiting-parts', 'in-repair', 'completed', 'collected', 'cancelled'].
 const JOBCARD_STAGE_MESSAGES = {
-  diagnosing: (job) => `Your device (${job.jobNumber}) is now being diagnosed at Ruai Tech Solutions.`,
+  diagnosing: (job) => `Your device (${job.jobNumber}) is now being diagnosed at Postera Crescam Laude.`,
   'awaiting-parts': (job) => `Update on your device (${job.jobNumber}): we're waiting on a part. We'll notify you once it arrives.`,
-  'in-repair': (job) => `Your device (${job.jobNumber}) is now being repaired at Ruai Tech Solutions.`,
-  completed: (job) => `Your device repair (${job.jobNumber}) is complete. Please collect at Ruai Tech Solutions.`,
+  'in-repair': (job) => `Your device (${job.jobNumber}) is now being repaired at Postera Crescam Laude.`,
+  completed: (job) => `Your device repair (${job.jobNumber}) is complete. Please collect at Postera Crescam Laude.`,
 };
 
 // ── JOB CARDS (Hardware Repair) ────────────────────────────────────────────
@@ -80,7 +80,7 @@ exports.updateJobCard = async (req, res, next) => {
 
 /**
  * Public, unauthenticated repair status lookup (Phase 9 market research,
- * Tier 1 #1) — a Ruai Town Centre customer looks up their device by job
+ * Tier 1 #1) — a PCL Centre customer looks up their device by job
  * number alone, no account or login needed. Deliberately returns only the
  * fields a customer should see — never clientPhone, internal notes, or cost
  * breakdowns, since this route has no auth in front of it.
@@ -197,7 +197,7 @@ exports.updateGovDoc = async (req, res, next) => {
     const doc = await GovDocument.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!doc) return res.status(404).json({ message: 'Document not found' });
     if (req.body.status === 'completed') {
-      sendSMS(doc.clientPhone, `Your document request (${doc.ticketNumber}) is ready for collection at Ruai Tech Solutions.`);
+      sendSMS(doc.clientPhone, `Your document request (${doc.ticketNumber}) is ready for collection at Postera Crescam Laude.`);
     }
     res.json(doc);
   } catch (err) { next(err); }

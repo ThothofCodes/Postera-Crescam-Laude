@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 //
 // Phase 9 market research, Tier 1 #4 — the real implementation of the
-// "Ruai Pulse" concept from RUAI_TECH_CONTINUITY_AUDIT.md Part Six. The
+// "Pulse" concept from PCL_CONTINUITY_AUDIT.md Part Six. The
 // backend half (presence.manager.js department scoping, the
 // 'presence:get-beacons' request/response event, and 'admin:status:dept'
 // push) was built in Phase 9; this is the frontend half that actually
@@ -19,7 +19,7 @@ const DEPARTMENTS = [
   { slug: 'govadmin',      label: 'Government Admin',      icon: '🏛️' },
 ];
 
-export default function RuaiPulseBoard({ authToken = null }) {
+export default function PulseBoard({ authToken = null }) {
   const { socket, connected } = useChat({ authToken });
   const [beacons, setBeacons] = useState(
     DEPARTMENTS.map((d) => ({ department: d.slug, online: false, coveredBySuperAdmin: false }))
@@ -70,7 +70,7 @@ export default function RuaiPulseBoard({ authToken = null }) {
           margin: 0, fontFamily: "'Poppins', sans-serif", fontSize: '0.95rem',
           fontWeight: 600, color: 'var(--text-primary)',
         }}>
-          Ruai Pulse — Department Coverage
+          Pulse — Department Coverage
         </h3>
         <span style={{ fontSize: '0.7rem', color: connected ? 'var(--color-primary)' : 'var(--color-accent)' }}>
           {connected ? '● live' : '○ connecting…'}

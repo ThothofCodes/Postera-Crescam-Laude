@@ -110,7 +110,7 @@ exports.sendPortalInvite = async (req, res, next) => {
     const otp = genOTP();
     const expiry = new Date(Date.now() + 10 * 60000);
     await CRMClient.findByIdAndUpdate(req.params.id, { portalOTP: otp, portalOTPExpiry: expiry, portalAccess: true });
-    sendSMS(client.phone, `Your Ruai Tech Solutions portal access code is: ${otp}. Valid for 10 minutes. Visit: ruaitechsolutions.co.ke/client`);
+    sendSMS(client.phone, `Your Postera Crescam Laude portal access code is: ${otp}. Valid for 10 minutes. Visit: pclsolutions.co.ke/client`);
     res.json({ message: 'Portal invite sent via SMS' });
   } catch (err) { next(err); }
 };
@@ -165,7 +165,7 @@ exports.requestOTP = async (req, res, next) => {
     const otp = genOTP();
     const expiry = new Date(Date.now() + 10 * 60000);
     await CRMClient.findByIdAndUpdate(client._id, { portalOTP: otp, portalOTPExpiry: expiry });
-    sendSMS(client.phone, `Your Ruai Tech Solutions login code: ${otp}. Valid 10 minutes.`);
+    sendSMS(client.phone, `Your Postera Crescam Laude login code: ${otp}. Valid 10 minutes.`);
     res.json({ message: 'OTP sent' });
   } catch (err) { next(err); }
 };

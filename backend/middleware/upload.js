@@ -37,9 +37,9 @@ const upload = multer({
  * Returns a Promise<{ url, public_id }>.
  *
  * @param {Buffer}  buffer   - file.buffer from multer memoryStorage
- * @param {string}  folder   - Cloudinary folder (default: 'ruaitech/products')
+ * @param {string}  folder   - Cloudinary folder (default: 'pcl/products')
  */
-function uploadBufferToCloudinary(buffer, folder = 'ruaitech/products') {
+function uploadBufferToCloudinary(buffer, folder = 'pcl/products') {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {

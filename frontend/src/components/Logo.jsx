@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Thoth of Codes. Licensed under the MIT License.
 // PCL — Logo with breathing-glow animation
 
-export default function RuaiTechLogo({ size = 40, showText = true, textSize = '15px' }) {
+export default function PCLLogo({ size = 40, showText = true, textSize = '15px' }) {
   const useWordmark = showText || size >= 36;
 
   return (

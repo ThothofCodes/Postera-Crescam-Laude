@@ -1,4 +1,4 @@
-# PCL / Ruai Tech Solutions — API Documentation
+# PCL / Postera Crescam Laude — API Documentation
 
 > **Base URL:** `http://localhost:5001` (development)  
 > **Content-Type:** `application/json`  
@@ -1606,7 +1606,7 @@ Creates inactive user, generates company email suggestion, sends invitation emai
 {
   "message": "Staff invitation sent successfully",
   "user": { "id", "name", "email", "role", "departmentSlug", "invitedAt" },
-  "companyEmail": "john.repair@ruaitechsolutions.co.ke"
+  "companyEmail": "john.repair@pclsolutions.co.ke"
 }
 ```
 

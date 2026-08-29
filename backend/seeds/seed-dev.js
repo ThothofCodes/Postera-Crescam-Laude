@@ -26,15 +26,15 @@ const USERS = [
     isActive: true,
   },
   {
-    name: 'Ruai Tech Admin',
-    email: 'admin@ruaitechsolutions.co.ke',
+    name: 'PCL Admin',
+    email: 'admin@pclsolutions.co.ke',
     password: 'Admin@2026',
     role: 'admin',
     isActive: true,
   },
   {
     name: 'John Doe',
-    email: 'john@ruaitechsolutions.co.ke',
+    email: 'john@pclsolutions.co.ke',
     password: 'Staff@2026',
     role: 'DEPT_HEAD_OWNER',
     departmentSlug: 'internet',
@@ -42,7 +42,7 @@ const USERS = [
   },
   {
     name: 'Jane Smith',
-    email: 'jane@ruaitechsolutions.co.ke',
+    email: 'jane@pclsolutions.co.ke',
     password: 'Staff@2026',
     role: 'DEPT_HEAD_OWNER',
     departmentSlug: 'webdev',
@@ -50,7 +50,7 @@ const USERS = [
   },
   {
     name: 'Mike Johnson',
-    email: 'mike@ruaitechsolutions.co.ke',
+    email: 'mike@pclsolutions.co.ke',
     password: 'Staff@2026',
     role: 'DEPT_HEAD_OWNER',
     departmentSlug: 'repair',
@@ -58,7 +58,7 @@ const USERS = [
   },
   {
     name: 'Sarah Wilson',
-    email: 'sarah@ruaitechsolutions.co.ke',
+    email: 'sarah@pclsolutions.co.ke',
     password: 'Staff@2026',
     role: 'DEPT_HEAD_OWNER',
     departmentSlug: 'cybersecurity',
@@ -66,7 +66,7 @@ const USERS = [
   },
   {
     name: 'David Brown',
-    email: 'david@ruaitechsolutions.co.ke',
+    email: 'david@pclsolutions.co.ke',
     password: 'Staff@2026',
     role: 'DEPT_HEAD_OWNER',
     departmentSlug: 'playstation',
@@ -74,7 +74,7 @@ const USERS = [
   },
   {
     name: 'Emily Davis',
-    email: 'emily@ruaitechsolutions.co.ke',
+    email: 'emily@pclsolutions.co.ke',
     password: 'Staff@2026',
     role: 'DEPT_HEAD_OWNER',
     departmentSlug: 'govadmin',
@@ -538,7 +538,7 @@ async function seed() {
   console.log('');
   console.log('  Users Created:');
   console.log('    SUPER_ADMIN: codeofthoth@outlook.com / SuperAdmin@2026');
-  console.log('    Admin:       admin@ruaitechsolutions.co.ke / Admin@2026');
+  console.log('    Admin:       admin@pclsolutions.co.ke / Admin@2026');
   console.log('    Staff:       staff@test.com / Staff@2026');
   console.log('    Customer:    customer1@test.com / Customer@2026');
   console.log('');
