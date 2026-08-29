@@ -289,6 +289,7 @@ jobs:
       - name: Run Cypress E2E tests
         working-directory: frontend
         run: npx cypress run --browser chrome
+        if: hashFiles('frontend/cypress/e2e/**/*.cy.*') != ''
         env:
           CYPRESS_baseUrl: http://localhost:3000
 
