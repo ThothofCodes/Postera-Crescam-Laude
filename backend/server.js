@@ -295,6 +295,7 @@ app.use('/api/connection-pool', require('./routes/connectionPool'));
 app.use('/api/webhook-config', require('./routes/webhookConfig'));
 app.use('/api/tech-hub', require('./routes/techHub')); // Tech Hub admin management (auth required)
 app.use('/api/tech-hub/public', require('./routes/techHubPublic')); // Tech Hub public content (no auth)
+app.use('/api/meetings', require('./routes/meetings')); // LiveKit meeting rooms
 
 // ── 10a. Swagger API docs ──────────────────────────────────────────────────
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

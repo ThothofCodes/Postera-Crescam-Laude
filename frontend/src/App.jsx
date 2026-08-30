@@ -236,6 +236,7 @@ export default function App() {
                   <Route path="staff-invitation" element={<StaffInvitation color="#a78bfa" />} />                   <Route path="health" element={<React.Suspense fallback={<Spinner />}><HealthDashboard /></React.Suspense>} />
                    <Route path="blog" element={<React.Suspense fallback={<Spinner />}><BlogManagement /></React.Suspense>} />
                    <Route path="studio" element={<React.Suspense fallback={<Spinner />}><TechStudio /></React.Suspense>} />
+                   <Route path="meetings" element={<React.Suspense fallback={<Spinner />}><MeetingScheduler /></React.Suspense>} />
                 </Route>
 
                 {/* ── Departments ── */}

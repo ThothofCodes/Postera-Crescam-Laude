@@ -32,6 +32,7 @@ const SUPER_LINKS = [
   ['Inventory Master','◈','/admin/super/inventory'],
   ['Blog Management','📝','/admin/super/blog'],
   ['Tech Studio','🎛','/admin/super/studio'],
+  ['Meeting Room','📹','/admin/super/meetings'],
   ['Audit Log','☰','/admin/super/audit'],
   ['Broadcast','◈','/admin/super/broadcast'],
   ['Settings','◉','/admin/super/settings'],
