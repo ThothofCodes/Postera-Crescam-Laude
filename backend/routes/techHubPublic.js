@@ -7,17 +7,23 @@ const router = express.Router();
 
 const { createClient } = require('@sanity/client');
 
-const sanityClient = createClient({
-  projectId: process.env.SANITY_PROJECT_ID,
-  dataset: process.env.SANITY_DATASET || 'production',
-  apiVersion: '2024-01-01',
-  useCdn: true, // CDN for read-only public queries
-});
-
 const isConfigured = !!(
   process.env.SANITY_PROJECT_ID
   && process.env.SANITY_PROJECT_ID !== 'your-project-id'
 );
+
+let _sanityClient = null;
+function getSanityClient() {
+  if (!_sanityClient && isConfigured) {
+    _sanityClient = createClient({
+      projectId: process.env.SANITY_PROJECT_ID,
+      dataset: process.env.SANITY_DATASET || 'production',
+      apiVersion: '2024-01-01',
+      useCdn: true,
+    });
+  }
+  return _sanityClient;
+}
 
 // ── Fetch published articles ─────────────────────────────────────────────────
 router.get('/articles', async (req, res) => {
@@ -28,7 +34,7 @@ router.get('/articles', async (req, res) => {
     const start = (parseInt(page, 10) - 1) * parseInt(limit, 10);
     const catFilter = category ? `&& category == "${category}"` : '';
 
-    const data = await sanityClient.fetch(`{
+    const data = await getSanityClient()?.fetch(`{
       "articles": *[_type == "article" && !(_id in path("drafts.**")) ${catFilter}]
         | order(publishedAt desc) [${start}...${start + parseInt(limit, 10)}] {
         _id,
@@ -57,7 +63,7 @@ router.get('/articles/:slug', async (req, res) => {
   try {
     if (!isConfigured) return res.status(404).json({ message: 'Not found' });
 
-    const article = await sanityClient.fetch(
+    const article = await getSanityClient()?.fetch(
       `*[_type == "article" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
         _id, title, slug, excerpt, body, category, tags, featured, publishedAt,
         "imageUrl": mainImage.asset->_url,
@@ -83,7 +89,7 @@ router.get('/tips', async (req, res) => {
     if (!isConfigured) return res.json({ tips: [] });
 
     const { limit = 20 } = req.query;
-    const tips = await sanityClient.fetch(
+    const tips = await getSanityClient()?.fetch(
       `*[_type == "techTip" && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...${parseInt(limit, 10)}] {
         _id, title, slug, tip, category, difficulty, publishedAt
       }`,
@@ -102,7 +108,7 @@ router.get('/news', async (req, res) => {
     if (!isConfigured) return res.json({ news: [] });
 
     const { limit = 20 } = req.query;
-    const news = await sanityClient.fetch(
+    const news = await getSanityClient()?.fetch(
       `*[_type == "news" && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...${parseInt(limit, 10)}] {
         _id, title, slug, summary, source, sourceUrl, publishedAt,
         "imageUrl": image.asset->_url
@@ -122,7 +128,7 @@ router.get('/facts', async (req, res) => {
     if (!isConfigured) return res.json({ facts: [] });
 
     const { limit = 10 } = req.query;
-    const facts = await sanityClient.fetch(
+    const facts = await getSanityClient()?.fetch(
       `*[_type == "fact" && !(_id in path("drafts.**"))] | order(publishedAt desc) [0...${parseInt(limit, 10)}] {
         _id, title, fact, source, category, publishedAt
       }`,
@@ -140,7 +146,7 @@ router.get('/categories', async (req, res) => {
   try {
     if (!isConfigured) return res.json({ categories: [] });
 
-    const articles = await sanityClient.fetch(
+    const articles = await getSanityClient()?.fetch(
       'array(*[_type == "article" && !(_id in path("drafts.**"))] { category })',
     );
     const counts = {};

@@ -4,20 +4,34 @@
 const { createClient } = require('@sanity/client');
 const { uploadToImgBB, isConfigured: imgbbConfigured } = require('./imgbb');
 
-// ── Sanity Client ────────────────────────────────────────────────────────────
-const sanityClient = createClient({
-  projectId: process.env.SANITY_PROJECT_ID,
-  dataset: process.env.SANITY_DATASET || 'production',
-  apiVersion: '2024-01-01',
-  useCdn: false,
-  token: process.env.SANITY_AUTH_TOKEN,
-});
-
+// ── Sanity Client (lazy — won't crash if projectId is missing) ──────────────
 const isConfigured = !!(
   process.env.SANITY_PROJECT_ID
   && process.env.SANITY_AUTH_TOKEN
   && process.env.SANITY_PROJECT_ID !== 'your-project-id'
 );
+
+let _sanityClient = null;
+function getSanityClient() {
+  if (!_sanityClient) {
+    if (!isConfigured) {
+      throw new Error('Sanity CMS not configured. Set SANITY_PROJECT_ID and SANITY_AUTH_TOKEN.');
+    }
+    _sanityClient = createClient({
+      projectId: process.env.SANITY_PROJECT_ID,
+      dataset: process.env.SANITY_DATASET || 'production',
+      apiVersion: '2024-01-01',
+      useCdn: false,
+      token: process.env.SANITY_AUTH_TOKEN,
+    });
+  }
+  return _sanityClient;
+}
+const sanityClient = new Proxy({}, {
+  get(_, prop) {
+    return getSanityClient()[prop];
+  },
+});
 
 // ── Image Upload to ImgBB (free hosting) ─────────────────────────────────────
 async function uploadImageBuffer(buffer, filename) {

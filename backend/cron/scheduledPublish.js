@@ -3,19 +3,25 @@
 
 const { createClient } = require('@sanity/client');
 
-const sanityClient = createClient({
-  projectId: process.env.SANITY_PROJECT_ID,
-  dataset: process.env.SANITY_DATASET || 'production',
-  apiVersion: '2024-01-01',
-  useCdn: false,
-  token: process.env.SANITY_AUTH_TOKEN,
-});
-
 const isConfigured = !!(
   process.env.SANITY_PROJECT_ID
   && process.env.SANITY_AUTH_TOKEN
   && process.env.SANITY_PROJECT_ID !== 'your-project-id'
 );
+
+let _sanityClient = null;
+function getSanityClient() {
+  if (!_sanityClient && isConfigured) {
+    _sanityClient = createClient({
+      projectId: process.env.SANITY_PROJECT_ID,
+      dataset: process.env.SANITY_DATASET || 'production',
+      apiVersion: '2024-01-01',
+      useCdn: false,
+      token: process.env.SANITY_AUTH_TOKEN,
+    });
+  }
+  return _sanityClient;
+}
 
 /**
  * Find and publish all articles whose scheduledAt has passed.
@@ -30,7 +36,7 @@ async function runScheduledPublish() {
     // Find articles that are:
     // 1. In draft status (not yet published)
     // 2. Have a scheduledAt date that is in the past
-    const articles = await sanityClient.fetch(
+    const articles = await getSanityClient()?.fetch(
       `*[_type == "article"
         && defined(scheduledAt)
         && scheduledAt <= $now
@@ -44,7 +50,7 @@ async function runScheduledPublish() {
     );
 
     // Also check drafts that have scheduledAt
-    const draftArticles = await sanityClient.fetch(
+    const draftArticles = await getSanityClient()?.fetch(
       `*[_type == "article"
         && defined(scheduledAt)
         && scheduledAt <= $now
@@ -66,7 +72,7 @@ async function runScheduledPublish() {
     for (const article of allToPublish) {
       try {
         // Publish the article
-        await sanityClient.request({
+        await getSanityClient()?.request({
           method: 'PUT',
           uri: `/data/publish/${article._id}`,
         });

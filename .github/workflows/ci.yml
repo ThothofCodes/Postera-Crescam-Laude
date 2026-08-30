@@ -259,6 +259,8 @@ jobs:
           NODE_ENV: test
           MPESA_ENV: sandbox
           CLIENT_URL: http://localhost:3000
+          SANITY_PROJECT_ID: ''
+          SANITY_AUTH_TOKEN: ''
 
       - name: Wait for backend to be healthy
         run: |
